@@ -36,12 +36,12 @@
         ]
     },
     "include": [
+        "jest.config.ts",
         "src/**/*.js",
         "src/**/*.ts",
-        "tests/**/*.js",
-        "tests/**/*.ts"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist"
     ]
 }
