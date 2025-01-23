@@ -1,5 +1,5 @@
 import { AddressInfo, Socket } from 'net';
-import uuidv4 from 'uuid/v4';
+import {v4} from 'uuid';
 import { Subject } from 'rxjs';
 import EventEmitter from 'events';
 
@@ -99,7 +99,7 @@ export class Player extends Actor {
     public readonly npcUpdateTask: NpcSyncTask;
     public readonly numericInputEvent: Subject<number>;
     public readonly dialogueInteractionEvent: Subject<number>;
-    public readonly personalInstance = new WorldInstance(uuidv4());
+    public readonly personalInstance = new WorldInstance(v4());
     public readonly interfaceState = new InterfaceState(this);
     public isLowDetail: boolean;
     public trackedPlayers: Player[];
@@ -1190,7 +1190,7 @@ export class Player extends Actor {
 
             let color: number;
 
-            if (playerQuest?.complete) {
+            if (playerQuest?.complete || playerQuest?.progress === 'complete') {
                 // Quest complete, regardless of progress
                 color = colors.green;
             } else if ((playerQuest?.progress || 0) > 0) {

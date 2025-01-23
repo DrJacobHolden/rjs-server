@@ -1,7 +1,7 @@
 import { defaultPlayerTabWidgets, Player } from '@engine/world/actor/player/player';
 import { questDialogueActionFactory, QuestJournalHandler } from '@engine/config/quest-config';
 import { serverConfig } from '@server/game/game-server';
-import uuidv4 from 'uuid/v4';
+import { v4 } from 'uuid';
 import { logger } from '@runejs/common';
 import { Position } from '@engine/world/position';
 import { WorldInstance } from '@engine/world/instances';
@@ -171,7 +171,7 @@ function spawnQuestNpcs(player: Player): void {
 
 const tutorialInitAction: playerInitActionHandler = async ({ player }) => {
     if(serverConfig.tutorialEnabled && !player.savedMetadata.tutorialComplete) {
-        player.instance = new WorldInstance(uuidv4());
+        player.instance = new WorldInstance(v4());
         player.metadata.blockObjectInteractions = true;
         spawnQuestNpcs(player);
         await tutorialHandler(player);

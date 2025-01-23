@@ -28,7 +28,7 @@ export const handler: buttonActionHandler = async ({ player, buttonId }) => {
         let journalEntry;
         for(const stage of questJournalStages) {
             const stageNum = parseInt(stage, 10);
-            if(isNaN(stageNum)) {
+            if(isNaN(stageNum) || playerStage === 'complete') {
                 continue;
             }
 

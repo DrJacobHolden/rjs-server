@@ -50,7 +50,7 @@ export function translateItemSpawnConfig(config: ItemSpawnConfiguration): ItemSp
 export async function loadItemSpawnConfigurations(path: string): Promise<ItemSpawn[]> {
     const itemSpawns: ItemSpawn[] = [];
 
-    const files = await loadConfigurationFiles(path);
+    const files = await loadConfigurationFiles<ItemSpawnConfiguration[]>(path);
     files.forEach(spawns => spawns.forEach(itemSpawn => itemSpawns.push(translateItemSpawnConfig(itemSpawn))));
 
     return itemSpawns;
