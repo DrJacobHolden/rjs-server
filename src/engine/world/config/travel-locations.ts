@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { JSON_SCHEMA, safeLoad } from 'js-yaml';
+import { JSON_SCHEMA, load } from 'js-yaml';
 import { Position } from '@engine/world/position';
 
 interface RawTravelLocation {
@@ -15,7 +15,7 @@ export interface TravelLocation {
 }
 
 const readLocations = (): TravelLocation[] => {
-    const locationData = safeLoad(
+    const locationData = load(
         readFileSync('data/config/travel-locations-data.yaml', 'utf8'),
         { schema: JSON_SCHEMA }) as RawTravelLocation[];
     return locationData.map((location) => {

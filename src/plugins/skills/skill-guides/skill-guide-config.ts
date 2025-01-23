@@ -1,10 +1,20 @@
 import { loadConfigurationFiles } from '@runejs/common/fs';
 import { itemMap, ItemDetails } from '@engine/config';
 
+interface SkillGuideConfiguration {
+    id: number;
+    name: string;
+    members: boolean;
+    sub_guides: {
+        name: string;
+        lines: {
+            item: string;
+            text: string;
+            level: number;
+        }[];
+    }[];
+}
 
-/**
- * Skill Guide Configuration
- */
 export interface SkillGuide {
     id: number;
     name: string;
@@ -12,9 +22,6 @@ export interface SkillGuide {
     sub_guides: SkillSubGuide[];
 }
 
-/**
- * Skill Sub Guide Configuration
- */
 export interface SkillSubGuide {
     name: string;
     lines: {
@@ -32,7 +39,7 @@ export interface SkillSubGuide {
 export async function loadSkillGuideConfigurations(path: string): Promise<SkillGuide[]> {
     const skillGuides: SkillGuide[] = [];
 
-    const files = await loadConfigurationFiles(path);
+    const files = await loadConfigurationFiles<SkillGuideConfiguration>(path);
     files.forEach((skillGuide) => {
         if(!skillGuide?.sub_guides) {
             return;

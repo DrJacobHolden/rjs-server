@@ -117,7 +117,10 @@ export async function loadNpcConfigurations(path: string): Promise<{
     const npcs: { [key: string]: NpcDetails } = {};
     let npcPresets: NpcPresetConfiguration = {};
 
-    const files = await loadConfigurationFiles(path);
+    const files = await loadConfigurationFiles<
+        { presets: NpcPresetConfiguration | undefined; }
+        & { [key: string]: NpcServerConfig; }
+    >(path);
 
     files.forEach(npcConfigs => {
         const npcKeys = Object.keys(npcConfigs);

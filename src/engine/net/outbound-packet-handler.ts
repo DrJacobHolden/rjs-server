@@ -367,7 +367,7 @@ export class OutboundPacketHandler {
     public sendUpdateSingleWidgetItem(widget: { widgetId: number, containerId: number }, slot: number, item: Item | null): void {
         const packet = new Packet(214, PacketType.DYNAMIC_LARGE);
         packet.put(widget.widgetId << 16 | widget.containerId, 'INT');
-        packet.put(slot, 'SMART');
+        packet.put(slot, 'SMART_SHORT');
 
         if(!item) {
             packet.put(0, 'SHORT');
