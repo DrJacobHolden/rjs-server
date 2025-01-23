@@ -1,7 +1,11 @@
-FROM node:20
+FROM node:23
 WORKDIR /usr/src/app
+
 COPY package.json ./
 COPY package-lock.json ./
+
+RUN apt update
+RUN apt install -y libsdl-pango-dev
 
 RUN npm ci
 
