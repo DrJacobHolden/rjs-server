@@ -87,28 +87,29 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
             this.actor.sendMessage('You swing your axe at the tree.');
             this.actor.face(this.landscapeObjectPosition);
             this.actor.playAnimation(tool.animation);
+            // First tick / iteration should never proceed beyond this point.
             return;
         }
 
         // play a random axe sound at the correct time
-        if(taskIteration % 3 !== 0) {
-            if(taskIteration % 1 === 0) {
-                const randomSoundIdx = Math.floor(Math.random() * soundIds.axeSwing.length);
-                this.actor.playSound(soundIds.axeSwing[randomSoundIdx], 7, 0);
-            }
-            return;
-        }
-
-        // Get tool level, and set it to 2 if the tool is an iron hatchet or iron pickaxe
-        // TODO why is this set to 2? Was ported from the old code
-        let toolLevel = tool.level - 1;
-        if(tool.itemId === 1349 || tool.itemId === 1267) {
-            toolLevel = 2;
+        if (taskIteration % 3 !== 0) {
+            const randomSoundIdx = Math.floor(
+                Math.random() * soundIds.axeSwing.length,
+            );
+            this.actor.playSound(soundIds.axeSwing[randomSoundIdx], 7, 0);
         }
 
         // roll for success
-        const succeeds = canCut(this.treeInfo, toolLevel, this.actor.skills.woodcutting.level);
-        if(!succeeds) {
+        const succeeds = canCut(
+            this.treeInfo,
+            tool.level,
+            this.actor.skills.woodcutting.level,
+        );
+
+        if (!succeeds) {
+            this.actor.playAnimation(tool.animation);
+
+            // Keep chopping.
             return;
         }
 
@@ -160,11 +161,7 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
             }
 
             this.stop();
-            return;
         }
-
-        this.actor.playAnimation(tool.animation);
-
     }
 
     /**
