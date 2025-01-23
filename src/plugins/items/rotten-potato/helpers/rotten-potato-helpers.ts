@@ -12,15 +12,19 @@ import { WidgetInteractionAction } from '@engine/action/pipe/widget-interaction.
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const RottenPotatoItem: ItemDetails = findItem('rs:rotten_potato')!;
 
-
-export const ExecuteIfAdmin = (details: ItemOnItemAction | WidgetInteractionAction, callback) => {
-    if(details.player.rights === Rights.ADMIN) {
+export const ExecuteIfAdmin = (
+    details: ItemOnItemAction | WidgetInteractionAction,
+    callback,
+) => {
+    if (details.player.rights === Rights.ADMIN) {
         callback(details);
         return;
     }
     while (details.player.inventory.has(RottenPotatoItem.gameId)) {
         details.player.inventory.removeFirst(RottenPotatoItem.gameId, false);
     }
-    details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, details.player.inventory);
-
-}
+    details.player.outgoingPackets.sendUpdateAllWidgetItems(
+        widgets.inventory,
+        details.player.inventory,
+    );
+};

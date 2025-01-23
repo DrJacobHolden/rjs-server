@@ -4,7 +4,7 @@
             "tradable": true,
             "consumable": true,
             "metadata": {
-                "consume_effects":{
+                "consume_effects": {
                     "clock": "food"
                 },
                 "special": false
@@ -14,7 +14,7 @@
             "tradable": true,
             "consumable": true,
             "metadata": {
-                "consume_effects":{
+                "consume_effects": {
                     "clock": "food"
                 },
                 "special": false
@@ -127,7 +127,7 @@
         "metadata": {
             "consume_effects": {
                 "skills": {
-                    "hitpoints": [5,7]
+                    "hitpoints": [5, 7]
                 }
             }
         }
@@ -149,7 +149,7 @@
         "metadata": {
             "consume_effects": {
                 "skills": {
-                    "hitpoints": [5,8]
+                    "hitpoints": [5, 8]
                 }
             }
         }
@@ -226,7 +226,7 @@
         "metadata": {
             "consume_effects": {
                 "skills": {
-                    "hitpoints": [8,12]
+                    "hitpoints": [8, 12]
                 }
             }
         }
@@ -504,26 +504,26 @@
             }
         },
         "variations": [
-                {
-                    "metadata": {
-                        "consume_effects": {
-                            "replaced_by": "rs:admiral_pie:1"
-                        }
-                    },
-                    "suffix": "0",
-                    "game_id": 7198
+            {
+                "metadata": {
+                    "consume_effects": {
+                        "replaced_by": "rs:admiral_pie:1"
+                    }
                 },
-                {
-                    "metadata": {
-                        "consume_effects": {
-                            "replaced_by": "rs:pie_dish"
-                        }
-                    },
-                    "suffix": "1",
-                    "tradable": false,
-                    "game_id": 7200
-                }
-            ]
+                "suffix": "0",
+                "game_id": 7198
+            },
+            {
+                "metadata": {
+                    "consume_effects": {
+                        "replaced_by": "rs:pie_dish"
+                    }
+                },
+                "suffix": "1",
+                "tradable": false,
+                "game_id": 7200
+            }
+        ]
     },
     "rs:wild_pie": {
         "extends": "rs:food",
@@ -1119,7 +1119,6 @@
     "rs:butter": {
         "tradable": true,
         "game_id": 6697
-
     },
     "rs:raw_shrimp": {
         "extends": "rs:food",

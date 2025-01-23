@@ -7,7 +7,7 @@ const blinkingTabClickPacket = (player: Player, packet: PacketData) => {
 
     const tabClickEventIndex = player.metadata?.tabClickEvent?.tabIndex || -1;
 
-    if(tabClickEventIndex === tabIndex) {
+    if (tabClickEventIndex === tabIndex) {
         if (player.metadata.tabClickEvent) {
             player.metadata.tabClickEvent.event.next(true);
         }
@@ -17,5 +17,5 @@ const blinkingTabClickPacket = (player: Player, packet: PacketData) => {
 export default {
     opcode: 44,
     size: 1,
-    handler: blinkingTabClickPacket
+    handler: blinkingTabClickPacket,
 };

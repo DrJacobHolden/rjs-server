@@ -11,7 +11,9 @@ import { ActorWalkToTask } from './actor-walk-to-task';
  *
  * @author jameskmonger
  */
-export abstract class ActorLandscapeObjectInteractionTask<TActor extends Actor = Actor> extends ActorWalkToTask<TActor, LandscapeObject> {
+export abstract class ActorLandscapeObjectInteractionTask<
+    TActor extends Actor = Actor,
+> extends ActorWalkToTask<TActor, LandscapeObject> {
     private _landscapeObject: LandscapeObject;
     private _objectPosition: Position;
 
@@ -21,18 +23,18 @@ export abstract class ActorLandscapeObjectInteractionTask<TActor extends Actor =
      * @param sizeX The size of the LandscapeObject in the X direction.
      * @param sizeY The size of the LandscapeObject in the Y direction.
      */
-    constructor (
+    constructor(
         actor: TActor,
         landscapeObject: LandscapeObject,
         // TODO (jkm) get size/orientation automatically from the object's info
         sizeX: number = 1,
-        sizeY: number = 1
+        sizeY: number = 1,
     ) {
         super(
             actor,
             landscapeObject,
             // TODO (jkm) atDestination must take orientation into account
-            Math.max(sizeX, sizeY)
+            Math.max(sizeX, sizeY),
         );
 
         if (!landscapeObject) {
@@ -41,7 +43,11 @@ export abstract class ActorLandscapeObjectInteractionTask<TActor extends Actor =
         }
 
         // create the Position here to prevent instantiating a new Position every tick
-        this._objectPosition = new Position(landscapeObject.x, landscapeObject.y, landscapeObject.level);
+        this._objectPosition = new Position(
+            landscapeObject.x,
+            landscapeObject.y,
+            landscapeObject.level,
+        );
         this._landscapeObject = landscapeObject;
     }
 
@@ -62,7 +68,11 @@ export abstract class ActorLandscapeObjectInteractionTask<TActor extends Actor =
             return;
         }
 
-        const { object: worldObject } = activeWorld.findObjectAtLocation(this.actor, this._landscapeObject.objectId, this._objectPosition);
+        const { object: worldObject } = activeWorld.findObjectAtLocation(
+            this.actor,
+            this._landscapeObject.objectId,
+            this._objectPosition,
+        );
 
         if (!worldObject) {
             this.stop();

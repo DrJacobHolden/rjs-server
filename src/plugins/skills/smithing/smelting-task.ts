@@ -13,9 +13,13 @@ import { animationIds, soundIds } from '@engine/world/config';
  */
 export class SmeltingTask extends ActorTask<Player> {
     private elapsedTicks = 0;
-    private amountSmelted = 0
+    private amountSmelted = 0;
 
-    constructor(player: Player, private readonly smeltable: Smeltable, private readonly amount: number) {
+    constructor(
+        player: Player,
+        private readonly smeltable: Smeltable,
+        private readonly amount: number,
+    ) {
         super(player);
     }
 
@@ -32,19 +36,27 @@ export class SmeltingTask extends ActorTask<Player> {
         const barItem = findItem(bar.barId);
 
         if (!barItem) {
-            this.actor.sendMessage(`Could not find item with id ${bar.barId}. Please tell a dev.`);
+            this.actor.sendMessage(
+                `Could not find item with id ${bar.barId}. Please tell a dev.`,
+            );
             this.stop();
             return;
         }
 
         if (!this.hasMaterials()) {
-            this.actor.sendMessage(`You don't have enough ${barItem.name.toLowerCase()}.`, true);
+            this.actor.sendMessage(
+                `You don't have enough ${barItem.name.toLowerCase()}.`,
+                true,
+            );
             this.stop();
             return;
         }
 
         if (!this.hasLevel()) {
-            this.actor.sendMessage(`You need a smithing level of ${bar.requiredLevel} to smelt ${barItem.name.toLowerCase()}s.`, true);
+            this.actor.sendMessage(
+                `You need a smithing level of ${bar.requiredLevel} to smelt ${barItem.name.toLowerCase()}s.`,
+                true,
+            );
             return;
         }
 
@@ -74,7 +86,10 @@ export class SmeltingTask extends ActorTask<Player> {
     private hasMaterials() {
         return this.smeltable.bar.ingredients.every((item) => {
             const itemIndex = this.actor.inventory.findIndex(item);
-            if (itemIndex === -1 || this.actor.inventory.amountInStack(itemIndex) < item.amount) {
+            if (
+                itemIndex === -1 ||
+                this.actor.inventory.amountInStack(itemIndex) < item.amount
+            ) {
                 return false;
             }
 
@@ -87,6 +102,9 @@ export class SmeltingTask extends ActorTask<Player> {
      * @returns {boolean} True if the player has the required level, false otherwise.
      */
     private hasLevel() {
-        return this.actor.skills.hasLevel(Skill.SMITHING, this.smeltable.bar.requiredLevel);
+        return this.actor.skills.hasLevel(
+            Skill.SMITHING,
+            this.smeltable.bar.requiredLevel,
+        );
     }
 }

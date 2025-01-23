@@ -3,36 +3,42 @@ import { parseServerConfig, SocketServer } from '@runejs/common/net';
 import { Filestore } from '@runejs/filestore';
 
 import { activateGameWorld, World } from '@engine/world';
-import { loadCoreConfigurations, loadGameConfigurations, xteaRegions } from '@engine/config';
+import {
+    loadCoreConfigurations,
+    loadGameConfigurations,
+    xteaRegions,
+} from '@engine/config';
 import { loadPackets } from '@engine/net';
 import { watchForChanges, watchSource } from '@engine/util';
 import { GatewayServer } from '@server/gateway';
 import { GameServerConfig } from '@server/game';
-
 
 /**
  * The singleton instance containing the server's active configuration settings.
  */
 export let serverConfig: GameServerConfig;
 
-
 /**
  * The singleton instance referencing the game's asset file store.
  */
 export let filestore: Filestore;
 
-
 export const openGatewayServer = (host: string, port: number): void => {
     SocketServer.launch<GatewayServer>(
         'Game Gateway Server',
-        host, port, socket => new GatewayServer(socket));
+        host,
+        port,
+        (socket) => new GatewayServer(socket),
+    );
 };
 
 export async function setupConfig(): Promise<boolean> {
     serverConfig = parseServerConfig<GameServerConfig>();
 
-    if(!serverConfig) {
-        logger.error('Unable to start server due to missing or invalid server configuration.');
+    if (!serverConfig) {
+        logger.error(
+            'Unable to start server due to missing or invalid server configuration.',
+        );
         return false;
     }
 
@@ -43,22 +49,19 @@ export async function setupConfig(): Promise<boolean> {
     return true;
 }
 
-
 /**
  * Configures the game server, parses the asset file store, initializes the game world,
  * and finally spins up the game server itself.
  */
 export async function launchGameServer(): Promise<void> {
     const config = await setupConfig();
-    if(!config) {
+    if (!config) {
         return;
     }
     await loadPackets();
-    const world =  await activateGameWorld();
+    const world = await activateGameWorld();
 
-
-
-    if(process.argv.indexOf('-fakePlayers') !== -1) {
+    if (process.argv.indexOf('-fakePlayers') !== -1) {
         world.generateFakePlayers();
     }
 

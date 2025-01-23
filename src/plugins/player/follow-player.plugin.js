@@ -4,7 +4,7 @@ module.exports = {
         {
             type: 'player_interaction',
             options: 'follow',
-            handler: details => details.player.follow(details.otherPlayer)
-        }
-    ]
+            handler: (details) => details.player.follow(details.otherPlayer),
+        },
+    ],
 };

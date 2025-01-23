@@ -2,7 +2,7 @@ import { getItemOption } from '@engine/world';
 import { Player } from '@engine/world/actor';
 import { PacketData } from '@engine/net';
 
-const option1 = buffer => {
+const option1 = (buffer) => {
     const itemId = buffer.get('short', 'u');
     const slot = buffer.get('short', 'u', 'le');
     const widgetId = buffer.get('short', 's', 'le');
@@ -10,7 +10,7 @@ const option1 = buffer => {
     return { widgetId, containerId, itemId, slot };
 };
 
-const option2 = buffer => {
+const option2 = (buffer) => {
     const itemId = buffer.get('short', 'u', 'le');
     const containerId = buffer.get('short', 's', 'le');
     const widgetId = buffer.get('short', 's', 'le');
@@ -18,7 +18,7 @@ const option2 = buffer => {
     return { widgetId, containerId, itemId, slot };
 };
 
-const option3 = buffer => {
+const option3 = (buffer) => {
     const slot = buffer.get('short', 'u');
     const containerId = buffer.get('short', 's', 'le');
     const widgetId = buffer.get('short', 's', 'le');
@@ -26,7 +26,7 @@ const option3 = buffer => {
     return { widgetId, containerId, itemId, slot };
 };
 
-const option4 = buffer => {
+const option4 = (buffer) => {
     const itemId = buffer.get('short', 'u');
     const slot = buffer.get('short', 'u', 'le');
     const containerId = buffer.get('short', 's', 'le');
@@ -34,7 +34,7 @@ const option4 = buffer => {
     return { widgetId, containerId, itemId, slot };
 };
 
-const option5 = buffer => {
+const option5 = (buffer) => {
     const containerId = buffer.get('short', 's', 'le');
     const widgetId = buffer.get('short', 's', 'le');
     const slot = buffer.get('short', 'u', 'le');
@@ -42,7 +42,7 @@ const option5 = buffer => {
     return { widgetId, containerId, itemId, slot };
 };
 
-const inventoryOption1 = buffer => {
+const inventoryOption1 = (buffer) => {
     const slot = buffer.get('short', 'u', 'le');
     const itemId = buffer.get('short', 's', 'le');
     const containerId = buffer.get('short', 's', 'le');
@@ -50,7 +50,7 @@ const inventoryOption1 = buffer => {
     return { widgetId, containerId, itemId, slot };
 };
 
-const inventoryOption4 = buffer => {
+const inventoryOption4 = (buffer) => {
     const slot = buffer.get('short', 'u');
     const widgetId = buffer.get('short', 's', 'le');
     const containerId = buffer.get('short', 's', 'le');
@@ -71,39 +71,60 @@ const itemInteractionPacket = (player: Player, packet: PacketData) => {
     };
 
     const packetDetails = packets[packetId];
-    const { widgetId, containerId, itemId, slot } = packetDetails.packetDef(packet.buffer);
+    const { widgetId, containerId, itemId, slot } = packetDetails.packetDef(
+        packet.buffer,
+    );
 
-    const option = getItemOption(itemId, packetDetails.optionNumber, { widgetId, containerId });
+    const option = getItemOption(itemId, packetDetails.optionNumber, {
+        widgetId,
+        containerId,
+    });
 
-    player.actionPipeline.call('item_interaction', player, itemId, slot, widgetId, containerId, option);
+    player.actionPipeline.call(
+        'item_interaction',
+        player,
+        itemId,
+        slot,
+        widgetId,
+        containerId,
+        option,
+    );
 };
 
-export default [{
-    opcode: 38,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 98,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 228,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 26,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 147,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 240,
-    size: 8,
-    handler: itemInteractionPacket
-}, {
-    opcode: 102,
-    size: 8,
-    handler: itemInteractionPacket
-}];
+export default [
+    {
+        opcode: 38,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 98,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 228,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 26,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 147,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 240,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 102,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+];

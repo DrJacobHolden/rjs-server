@@ -113,5 +113,4 @@ export type PlayerMetadata = {
      * before the teleport animation finishes (it takes a few ticks).
      */
     castingStationarySpell: boolean;
-
 };

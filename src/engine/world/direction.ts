@@ -8,56 +8,64 @@ export interface DirectionData {
 /**
  * A direction within the world.
  */
-export type Direction = 'NORTH' | 'SOUTH' | 'EAST' | 'WEST' | 'NORTHEAST' | 'NORTHWEST' | 'SOUTHEAST' | 'SOUTHWEST';
+export type Direction =
+    | 'NORTH'
+    | 'SOUTH'
+    | 'EAST'
+    | 'WEST'
+    | 'NORTHEAST'
+    | 'NORTHWEST'
+    | 'SOUTHEAST'
+    | 'SOUTHWEST';
 export const directionData: { [key: string]: DirectionData } = {
-    'NORTH': {
+    NORTH: {
         index: 1,
         deltaX: 0,
         deltaY: 1,
-        rotation: 1
+        rotation: 1,
     },
-    'SOUTH': {
+    SOUTH: {
         index: 6,
         deltaX: 0,
         deltaY: -1,
-        rotation: 3
+        rotation: 3,
     },
-    'EAST': {
+    EAST: {
         index: 4,
         deltaX: 1,
         deltaY: 0,
-        rotation: 2
+        rotation: 2,
     },
-    'WEST': {
+    WEST: {
         index: 3,
         deltaX: -1,
         deltaY: 0,
-        rotation: 0
+        rotation: 0,
     },
-    'NORTHEAST': {
+    NORTHEAST: {
         index: 2,
         deltaX: 1,
         deltaY: 1,
-        rotation: 1
+        rotation: 1,
     },
-    'NORTHWEST': {
+    NORTHWEST: {
         index: 0,
         deltaX: -1,
         deltaY: 1,
-        rotation: 0
+        rotation: 0,
     },
-    'SOUTHEAST': {
+    SOUTHEAST: {
         index: 7,
         deltaX: 1,
         deltaY: -1,
-        rotation: 2
+        rotation: 2,
     },
-    'SOUTHWEST': {
+    SOUTHWEST: {
         index: 5,
         deltaX: -1,
         deltaY: -1,
-        rotation: 3
-    }
+        rotation: 3,
+    },
 };
 export const WNES: Direction[] = ['WEST', 'NORTH', 'EAST', 'SOUTH'];
 

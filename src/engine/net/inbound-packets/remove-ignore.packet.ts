@@ -6,5 +6,7 @@ export default {
     opcode: 28,
     size: 8,
     handler: (player: Player, packet: PacketData) =>
-        player.removeIgnoredPlayer(longToString(BigInt(packet.buffer.get('long'))))
+        player.removeIgnoredPlayer(
+            longToString(BigInt(packet.buffer.get('long'))),
+        ),
 };

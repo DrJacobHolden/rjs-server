@@ -12,7 +12,10 @@ export function checkForGemBoost(player: Player): number {
     }
 
     const itemConfig = findItem(neckItem.itemId);
-    if (!itemConfig || !itemConfig.key.startsWith('rs:amulet_of_glory:charged_')) {
+    if (
+        !itemConfig ||
+        !itemConfig.key.startsWith('rs:amulet_of_glory:charged_')
+    ) {
         return 256;
     }
 

@@ -6,43 +6,66 @@ import { Rights } from '@engine/world/actor/player/player';
 import { widgets } from '@engine/config/config-handler';
 import { dialogue, execute } from '@engine/world/actor/dialogue';
 
-
-export const handler: itemInteractionActionHandler = ({ player, itemId, itemSlot }) => {
+export const handler: itemInteractionActionHandler = ({
+    player,
+    itemId,
+    itemSlot,
+}) => {
     const inventory = player.inventory;
     const item = getItemFromContainer(itemId, itemSlot, inventory);
 
-    if(!item) {
+    if (!item) {
         // The specified item was not found in the specified slot.
         return;
     }
 
-    if(!serverConfig.adminDropsEnabled && player.rights === Rights.ADMIN) {
-        dialogue([ player ], [
-            text => ('Administrators are not allowed to drop items.'),
-            options => [
-                'Destroy the item!', [
-                    execute(() => {
-                        inventory.remove(itemSlot);
-                        player.outgoingPackets.sendUpdateSingleWidgetItem(widgets.inventory, itemSlot, null);
-                    }),
+    if (!serverConfig.adminDropsEnabled && player.rights === Rights.ADMIN) {
+        dialogue(
+            [player],
+            [
+                (text) => 'Administrators are not allowed to drop items.',
+                (options) => [
+                    'Destroy the item!',
+                    [
+                        execute(() => {
+                            inventory.remove(itemSlot);
+                            player.outgoingPackets.sendUpdateSingleWidgetItem(
+                                widgets.inventory,
+                                itemSlot,
+                                null,
+                            );
+                        }),
+                    ],
+                    'Bank the item!',
+                    [
+                        execute(() => {
+                            inventory.remove(itemSlot);
+                            player.bank.add(item);
+                            player.outgoingPackets.sendUpdateSingleWidgetItem(
+                                widgets.inventory,
+                                itemSlot,
+                                null,
+                            );
+                        }),
+                    ],
                 ],
-                'Bank the item!', [
-                    execute(() => {
-                        inventory.remove(itemSlot);
-                        player.bank.add(item);
-                        player.outgoingPackets.sendUpdateSingleWidgetItem(widgets.inventory, itemSlot, null);
-                    }),
-                ]
-            ]
-        ]);
+            ],
+        );
 
         return;
     }
 
     inventory.remove(itemSlot);
-    player.outgoingPackets.sendUpdateSingleWidgetItem(widgets.inventory, itemSlot, null);
+    player.outgoingPackets.sendUpdateSingleWidgetItem(
+        widgets.inventory,
+        itemSlot,
+        null,
+    );
     player.playSound(soundIds.dropItem, 5);
-    player.instance.spawnWorldItem(item, player.position, { owner: player, expires: 300 });
+    player.instance.spawnWorldItem(item, player.position, {
+        owner: player,
+        expires: 300,
+    });
     // (Jameskmonger) actionsCancelled is deprecated, casting this to satisfy the typecheck for now
     player.actionsCancelled.next(null as unknown as ActionCancelType);
 };
@@ -55,7 +78,7 @@ export default {
             widgets: widgets.inventory,
             options: 'drop',
             handler,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

@@ -1,7 +1,6 @@
 import { objectInteractionActionHandler } from '@engine/action';
 import { World } from '@engine/world';
 
-
 export const action: objectInteractionActionHandler = (details) => {
     details.player.busy = true;
     details.player.playAnimation(3571);
@@ -25,7 +24,6 @@ export const action: objectInteractionActionHandler = (details) => {
     //     }
     //     details.player.busy = false;
     // }, World.TICK_LENGTH);
-
 };
 
 export default {
@@ -33,10 +31,10 @@ export default {
     hooks: [
         {
             type: 'object_interaction',
-            objectIds: [ 2718, 2721 ],
-            options: [ 'operate' ],
+            objectIds: [2718, 2721],
+            options: ['operate'],
             walkTo: true,
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

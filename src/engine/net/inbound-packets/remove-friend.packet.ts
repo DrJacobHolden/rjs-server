@@ -7,11 +7,11 @@ export default {
     size: 8,
     handler: (player: Player, packet: PacketData) => {
         const friendName = longToString(BigInt(packet.buffer.get('long')));
-        if(!friendName) {
+        if (!friendName) {
             return;
         }
 
         player.removeFriend(friendName);
         PrivateMessaging.friendRemoved(player, friendName);
-    }
+    },
 };

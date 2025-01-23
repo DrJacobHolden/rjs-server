@@ -10,22 +10,17 @@ import { ActorWalkToTask } from './actor-walk-to-task';
  *
  * @author jameskmonger
  */
-export abstract class ActorWorldItemInteractionTask<TActor extends Actor = Actor> extends ActorWalkToTask<TActor> {
+export abstract class ActorWorldItemInteractionTask<
+    TActor extends Actor = Actor,
+> extends ActorWalkToTask<TActor> {
     private _worldItem: WorldItem;
 
     /**
      * @param actor The actor executing this task.
      * @param worldItem The world item to interact with.
      */
-    constructor (
-        actor: TActor,
-        worldItem: WorldItem,
-    ) {
-        super(
-            actor,
-            worldItem.position,
-            1
-        );
+    constructor(actor: TActor, worldItem: WorldItem) {
+        super(actor, worldItem.position, 1);
 
         if (!worldItem) {
             this.stop();
@@ -33,7 +28,6 @@ export abstract class ActorWorldItemInteractionTask<TActor extends Actor = Actor
         }
 
         this._worldItem = worldItem;
-
     }
 
     /**

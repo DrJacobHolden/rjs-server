@@ -2,20 +2,23 @@ import { join } from 'node:path';
 import { writeFileSync } from 'node:fs';
 import { filestore } from '@server/game/game-server';
 import { logger } from '@runejs/common';
-import { ItemConfig, NpcConfig, ObjectConfig, WidgetBase } from '@runejs/filestore';
-
+import {
+    ItemConfig,
+    NpcConfig,
+    ObjectConfig,
+    WidgetBase,
+} from '@runejs/filestore';
 
 export interface DataDumpResult {
     successful: boolean;
     filePath: string;
 }
 
-
 function dump<T>(fileName: string, definitions: T[]): DataDumpResult {
     const filePath = join('data/dump', fileName);
 
     const arr: T[] = [];
-    for(let i = 0; i < definitions.length; i++) {
+    for (let i = 0; i < definitions.length; i++) {
         arr.push(definitions[i]);
     }
 
@@ -23,29 +26,41 @@ function dump<T>(fileName: string, definitions: T[]): DataDumpResult {
         writeFileSync(filePath, JSON.stringify(arr, null, 4));
         return {
             successful: true,
-            filePath
+            filePath,
         };
-    } catch(error) {
+    } catch (error) {
         logger.error(`Error dumping ${fileName}`);
         return {
             successful: false,
-            filePath
+            filePath,
         };
     }
 }
 
 export const dumpNpcs = (): DataDumpResult => {
-    return dump<NpcConfig>('npcs.json', filestore.configStore.npcStore.decodeNpcStore());
+    return dump<NpcConfig>(
+        'npcs.json',
+        filestore.configStore.npcStore.decodeNpcStore(),
+    );
 };
 
 export const dumpItems = (): DataDumpResult => {
-    return dump<ItemConfig>('items.json', filestore.configStore.itemStore.decodeItemStore());
+    return dump<ItemConfig>(
+        'items.json',
+        filestore.configStore.itemStore.decodeItemStore(),
+    );
 };
 
 export const dumpObjects = (): DataDumpResult => {
-    return dump<ObjectConfig>('objects.json', filestore.configStore.objectStore.decodeObjectStore());
+    return dump<ObjectConfig>(
+        'objects.json',
+        filestore.configStore.objectStore.decodeObjectStore(),
+    );
 };
 
 export const dumpWidgets = (): DataDumpResult => {
-    return dump<WidgetBase>('widgets.json', filestore.widgetStore.decodeWidgetStore());
+    return dump<WidgetBase>(
+        'widgets.json',
+        filestore.widgetStore.decodeWidgetStore(),
+    );
 };

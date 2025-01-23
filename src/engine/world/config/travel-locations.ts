@@ -17,7 +17,8 @@ export interface TravelLocation {
 const readLocations = (): TravelLocation[] => {
     const locationData = load(
         readFileSync('data/config/travel-locations-data.yaml', 'utf8'),
-        { schema: JSON_SCHEMA }) as RawTravelLocation[];
+        { schema: JSON_SCHEMA },
+    ) as RawTravelLocation[];
     return locationData.map((location) => {
         return {
             name: location.name,
@@ -30,11 +31,11 @@ const readLocations = (): TravelLocation[] => {
 export class TravelLocations {
     public readonly locations: TravelLocation[];
 
-    public constructor () {
+    public constructor() {
         this.locations = readLocations();
     }
 
-    public find (search: string): TravelLocation | null {
+    public find(search: string): TravelLocation | null {
         search = search.toLowerCase().trim();
         for (const location of this.locations) {
             if (location.key.indexOf(search) >= 0) {

@@ -8,7 +8,9 @@ const action: commandActionHandler = (details) => {
     const y: number = args.y as number;
     const pathingDiameter: number = args.diameter as number;
 
-    player.pathfinding.walkTo(new Position(x, y, player.position.level), { pathingSearchRadius: pathingDiameter });
+    player.pathfinding.walkTo(new Position(x, y, player.position.level), {
+        pathingSearchRadius: pathingDiameter,
+    });
 };
 
 export default {
@@ -16,23 +18,23 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'path' ],
+            commands: ['path'],
             args: [
                 {
                     name: 'x',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'y',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'diameter',
                     type: 'number',
-                    defaultValue: 64
-                }
+                    defaultValue: 64,
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

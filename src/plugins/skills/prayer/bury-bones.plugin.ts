@@ -12,7 +12,10 @@ const action: itemInteractionActionHandler = (details) => {
 
     // bones can be buried only if prayerBuryXp is defined, but they can also
     // grant zero xp - this checks for that edge case
-    if (!details.itemDetails.metadata.prayerBuryXp && details.itemDetails.metadata.prayerBuryXp !== 0) {
+    if (
+        !details.itemDetails.metadata.prayerBuryXp &&
+        details.itemDetails.metadata.prayerBuryXp !== 0
+    ) {
         return;
     }
 
@@ -21,7 +24,10 @@ const action: itemInteractionActionHandler = (details) => {
     player.playAnimation(animationIds.buryBones);
     player.removeItem(details.itemSlot);
     player.playSound(soundIds.buryBones);
-    player.skills.addExp(Skill.PRAYER, details.itemDetails.metadata.prayerBuryXp);
+    player.skills.addExp(
+        Skill.PRAYER,
+        details.itemDetails.metadata.prayerBuryXp,
+    );
 
     giveAchievement(Achievements.BURY_BONES, player);
 };
@@ -49,7 +55,7 @@ const allBones: number[] = [
     findItem('rs:bones_fayrg')?.gameId,
     findItem('rs:bones_raurg')?.gameId,
     findItem('rs:bones_ourg')?.gameId,
-].filter(id => typeof id === 'number') as number[];
+].filter((id) => typeof id === 'number') as number[];
 
 export default {
     pluginId: 'rs:prayer_bury_bones',
@@ -60,7 +66,7 @@ export default {
             options: 'bury',
             itemIds: allBones,
             handler: action,
-            cancelOtherActions: true
-        }
-    ]
+            cancelOtherActions: true,
+        },
+    ],
 };

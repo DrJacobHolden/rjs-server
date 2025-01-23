@@ -46,13 +46,20 @@ const npcInteractionPacket = (player: Player, packet: PacketData) => {
 
     const actionIdx = actions[packetId];
     let optionName = `action-${actionIdx + 1}`;
-    if(options && options.length >= actionIdx) {
-        if(!options[actionIdx] || options[actionIdx].toLowerCase() === 'hidden') {
+    if (options && options.length >= actionIdx) {
+        if (
+            !options[actionIdx] ||
+            options[actionIdx].toLowerCase() === 'hidden'
+        ) {
             // Invalid action
             logger.info(npc);
-            logger.error(`1: Invalid npc ${morphedNpc?.gameId || npc.id} option ${actionIdx + 1}, options: ${JSON.stringify(options)}`);
+            logger.error(
+                `1: Invalid npc ${morphedNpc?.gameId || npc.id} option ${actionIdx + 1}, options: ${JSON.stringify(options)}`,
+            );
             if (morphedNpc) {
-                logger.warn(`Note: (id-${morphedNpc.gameId}) is a morphed NPC. The parent NPC is (id-${npc.id}).`);
+                logger.warn(
+                    `Note: (id-${morphedNpc.gameId}) is a morphed NPC. The parent NPC is (id-${npc.id}).`,
+                );
             }
             return;
         }
@@ -60,26 +67,40 @@ const npcInteractionPacket = (player: Player, packet: PacketData) => {
         optionName = options[actionIdx];
     } else {
         // Invalid action
-        logger.error(`2: Invalid npc ${morphedNpc?.gameId || npc.id} option ${actionIdx + 1}, options: ${JSON.stringify(options)}`);
+        logger.error(
+            `2: Invalid npc ${morphedNpc?.gameId || npc.id} option ${actionIdx + 1}, options: ${JSON.stringify(options)}`,
+        );
         if (morphedNpc) {
-            logger.warn(`Note: (id-${morphedNpc.gameId}) is a morphed NPC. The parent NPC is (id-${npc.id}).`);
+            logger.warn(
+                `Note: (id-${morphedNpc.gameId}) is a morphed NPC. The parent NPC is (id-${npc.id}).`,
+            );
         }
         return;
     }
 
-    player.actionPipeline.call('npc_interaction', player, npc, position, optionName.toLowerCase());
+    player.actionPipeline.call(
+        'npc_interaction',
+        player,
+        npc,
+        position,
+        optionName.toLowerCase(),
+    );
 };
 
-export default [{
-    opcode: 63,
-    size: 2,
-    handler: npcInteractionPacket
-}, {
-    opcode: 116,
-    size: 2,
-    handler: npcInteractionPacket
-}, {
-    opcode: 57,
-    size: 2,
-    handler: npcInteractionPacket
-}];
+export default [
+    {
+        opcode: 63,
+        size: 2,
+        handler: npcInteractionPacket,
+    },
+    {
+        opcode: 116,
+        size: 2,
+        handler: npcInteractionPacket,
+    },
+    {
+        opcode: 57,
+        size: 2,
+        handler: npcInteractionPacket,
+    },
+];

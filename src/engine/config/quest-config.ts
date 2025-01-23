@@ -2,7 +2,6 @@ import { logger } from '@runejs/common';
 import { Npc, Player } from '@engine/world/actor';
 import { npcInteractionActionHandler } from '@engine/action';
 
-
 export type QuestKey = number | 'complete';
 
 export type QuestStageHandler = {
@@ -14,7 +13,10 @@ export type QuestDialogueHandler = {
 };
 
 export type QuestJournalHandler = {
-    [key in QuestKey]?: ((player: Player) => Promise<string>) | ((player: Player) => string) | string;
+    [key in QuestKey]?:
+        | ((player: Player) => Promise<string>)
+        | ((player: Player) => string)
+        | string;
 };
 
 export interface QuestCompletion {
@@ -26,7 +28,9 @@ export interface QuestCompletion {
         modelRotationY?: number;
         modelZoom?: number;
     };
-    giveRewards?: ((player?: Player) => void) | ((player?: Player) => Promise<void>);
+    giveRewards?:
+        | ((player?: Player) => void)
+        | ((player?: Player) => Promise<void>);
 }
 
 export class PlayerQuest {
@@ -40,21 +44,23 @@ export class PlayerQuest {
     }
 }
 
-export function questDialogueActionFactory(questId: string,
-                                           npcDialogueHandler: QuestDialogueHandler,
-                                           stageHandler: (player: Player) => Promise<void>): npcInteractionActionHandler {
-    return async({ player, npc }) => {
+export function questDialogueActionFactory(
+    questId: string,
+    npcDialogueHandler: QuestDialogueHandler,
+    stageHandler: (player: Player) => Promise<void>,
+): npcInteractionActionHandler {
+    return async ({ player, npc }) => {
         const quest = player.getQuest(questId);
-        if(!quest) {
+        if (!quest) {
             return;
         }
 
         const progress = quest.progress;
         const dialogueHandler = npcDialogueHandler[progress];
-        if(dialogueHandler) {
+        if (dialogueHandler) {
             try {
                 await dialogueHandler(player, npc);
-            } catch(e) {
+            } catch (e) {
                 logger.error(e);
             }
 

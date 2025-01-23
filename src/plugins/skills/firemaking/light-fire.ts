@@ -21,15 +21,18 @@ const fireDurationTicks = (): number => {
  * @author jameskmonger
  */
 export const canLightFireAtCurrentPosition = (player: Player): boolean => {
-    const existingFire = player.instance.getTileModifications(player.position).mods.spawnedObjects.find(o => (
-        o.x === player.position.x
-        && o.y === player.position.y
-        && o.level === player.position.level
-        && o.type === 10
-    ))
+    const existingFire = player.instance
+        .getTileModifications(player.position)
+        .mods.spawnedObjects.find(
+            (o) =>
+                o.x === player.position.x &&
+                o.y === player.position.y &&
+                o.level === player.position.level &&
+                o.type === 10,
+        );
 
     return existingFire === undefined;
-}
+};
 
 /**
  * Light a fire at the specified position.
@@ -39,7 +42,12 @@ export const canLightFireAtCurrentPosition = (player: Player): boolean => {
  * @param worldItemLog The world item representing the log.
  * @param burnExp The experience gained for lighting the fire.
  */
-export const lightFire = (player: Player, position: Position, worldItemLog: WorldItem, burnExp: number): void => {
+export const lightFire = (
+    player: Player,
+    position: Position,
+    worldItemLog: WorldItem,
+    burnExp: number,
+): void => {
     if (!canLightFireAtCurrentPosition(player)) {
         player.sendMessage('You cannot light a fire here.');
         return;
@@ -52,24 +60,30 @@ export const lightFire = (player: Player, position: Position, worldItemLog: Worl
         y: position.y,
         level: position.level,
         type: 10,
-        orientation: 0
+        orientation: 0,
     };
 
     player.playAnimation(null);
     player.sendMessage('The fire catches and the logs begin to burn.');
     player.skills.firemaking.addExp(burnExp);
 
-    if(!player.walkingQueue.moveIfAble(-1, 0)) {
-        if(!player.walkingQueue.moveIfAble(1, 0)) {
-            if(!player.walkingQueue.moveIfAble(0, -1)) {
+    if (!player.walkingQueue.moveIfAble(-1, 0)) {
+        if (!player.walkingQueue.moveIfAble(1, 0)) {
+            if (!player.walkingQueue.moveIfAble(0, -1)) {
                 player.walkingQueue.moveIfAble(0, 1);
             }
         }
     }
 
-    player.instance.spawnTemporaryGameObject(fireObject, position, fireDurationTicks()).then(() => {
-        player.instance.spawnWorldItem({ itemId: itemIds.ashes, amount: 1 }, position, { expires: 300 });
-    });
+    player.instance
+        .spawnTemporaryGameObject(fireObject, position, fireDurationTicks())
+        .then(() => {
+            player.instance.spawnWorldItem(
+                { itemId: itemIds.ashes, amount: 1 },
+                position,
+                { expires: 300 },
+            );
+        });
 
     player.face(position, false);
     player.metadata.lastFire = Date.now();

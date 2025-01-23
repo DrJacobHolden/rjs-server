@@ -5,7 +5,10 @@ import { itemIds } from '@engine/world/config/item-ids';
 import { animationIds } from '@engine/world/config/animation-ids';
 import { buttonActionHandler, ButtonAction } from '@engine/action';
 import { Skill } from '@engine/world/actor/skills';
-import { widgetButtonIds, widgetItems } from '@plugins/skills/smithing/smelting-constants';
+import {
+    widgetButtonIds,
+    widgetItems,
+} from '@plugins/skills/smithing/smelting-constants';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { colors } from '@engine/util/colors';
 import { findItem, widgets } from '@engine/config/config-handler';
@@ -16,5 +19,4 @@ import { itemInteractionActionHandler } from '@engine/action';
 
 export default {
     pluginId: 'rs:fletching',
-
 };

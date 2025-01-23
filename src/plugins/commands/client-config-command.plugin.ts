@@ -14,18 +14,18 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'config', 'conf' ],
+            commands: ['config', 'conf'],
             args: [
                 {
                     name: 'configId',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'configValue',
-                    type: 'number'
-                }
+                    type: 'number',
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

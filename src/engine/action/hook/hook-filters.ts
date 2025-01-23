@@ -1,14 +1,16 @@
 import { ActionHook } from '@engine/action';
 import { Player } from '@engine/world/actor';
 
-
-export const stringHookFilter = (expected: string | string[], input: string): boolean => {
-    if(Array.isArray(expected)) {
-        if(expected.indexOf(input) === -1) {
+export const stringHookFilter = (
+    expected: string | string[],
+    input: string,
+): boolean => {
+    if (Array.isArray(expected)) {
+        if (expected.indexOf(input) === -1) {
             return false;
         }
     } else {
-        if(expected !== input) {
+        if (expected !== input) {
             return false;
         }
     }
@@ -16,14 +18,16 @@ export const stringHookFilter = (expected: string | string[], input: string): bo
     return true;
 };
 
-
-export const numberHookFilter = (expected: number | number[], input: number): boolean => {
-    if(Array.isArray(expected)) {
-        if(expected.indexOf(input) === -1) {
+export const numberHookFilter = (
+    expected: number | number[],
+    input: number,
+): boolean => {
+    if (Array.isArray(expected)) {
+        if (expected.indexOf(input) === -1) {
             return false;
         }
     } else {
-        if(expected !== input) {
+        if (expected !== input) {
             return false;
         }
     }
@@ -31,59 +35,76 @@ export const numberHookFilter = (expected: number | number[], input: number): bo
     return true;
 };
 
-
-export const advancedNumberHookFilter = (expected: number | number[], input: number, options?: string | string[],
-    searchOption?: string): boolean => {
-    if(expected !== undefined) {
-        if(Array.isArray(expected)) {
-            if(expected.indexOf(input) === -1) {
+export const advancedNumberHookFilter = (
+    expected: number | number[],
+    input: number,
+    options?: string | string[],
+    searchOption?: string,
+): boolean => {
+    if (expected !== undefined) {
+        if (Array.isArray(expected)) {
+            if (expected.indexOf(input) === -1) {
                 return false;
             }
         } else {
-            if(expected !== input) {
+            if (expected !== input) {
                 return false;
             }
         }
     }
 
-    if(options !== undefined && searchOption !== undefined) {
-        if(Array.isArray(options)) {
+    if (options !== undefined && searchOption !== undefined) {
+        if (Array.isArray(options)) {
             return options.indexOf(searchOption) !== -1;
         }
-            return options === searchOption;
+        return options === searchOption;
     }
-        return true;
+    return true;
 };
-
 
 /**
  * A quest requirement filter for hooks that uses the hook's `questRequirements` object.
  * @param player The player involved with the hook.
  * @param actionHook The action hook definition to filter.
  */
-export function questHookFilter(player: Player, actionHook: ActionHook): boolean {
-    if(!actionHook.questRequirement) {
+export function questHookFilter(
+    player: Player,
+    actionHook: ActionHook,
+): boolean {
+    if (!actionHook.questRequirement) {
         return true;
     }
 
     const questId = actionHook.questRequirement.questId;
-    const playerQuest = player.quests.find(quest => quest.questId === questId);
-    if(!playerQuest) {
+    const playerQuest = player.quests.find(
+        (quest) => quest.questId === questId,
+    );
+    if (!playerQuest) {
         // @TODO quest requirements
         return actionHook.questRequirement.stage === 0;
     }
 
-    if(actionHook.questRequirement.stage === 'complete') {
+    if (actionHook.questRequirement.stage === 'complete') {
         return playerQuest.progress === 'complete';
     }
 
-    if(typeof playerQuest.progress === 'number') {
-        if(actionHook.questRequirement.stage !== undefined) {
-            if(!numberHookFilter(actionHook.questRequirement.stage, playerQuest.progress)) {
+    if (typeof playerQuest.progress === 'number') {
+        if (actionHook.questRequirement.stage !== undefined) {
+            if (
+                !numberHookFilter(
+                    actionHook.questRequirement.stage,
+                    playerQuest.progress,
+                )
+            ) {
                 return false;
             }
-        } else if(actionHook.questRequirement.stages !== undefined) {
-            if(!numberHookFilter(actionHook.questRequirement.stages, playerQuest.progress)) {
+        } else if (actionHook.questRequirement.stages !== undefined) {
+            if (
+                !numberHookFilter(
+                    actionHook.questRequirement.stages,
+                    playerQuest.progress,
+                )
+            ) {
                 return false;
             }
         }

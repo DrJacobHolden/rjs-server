@@ -13,11 +13,10 @@ import { IHarvestable } from '@engine/world/config';
 export const canMine = (
     ore: IHarvestable,
     toolLevel: number,
-    miningLevel: number
+    miningLevel: number,
 ): boolean => {
     const successChance = randomBetween(0, 255);
 
-    const percentNeeded =
-        ore.baseChance + toolLevel + miningLevel;
+    const percentNeeded = ore.baseChance + toolLevel + miningLevel;
     return successChance <= percentNeeded;
 };

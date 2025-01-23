@@ -4,17 +4,24 @@ import { UpdateFlags } from '@engine/world/actor/update-flags';
 import { Packet, PacketType } from '@engine/net/packet';
 import { stringToLong } from '@engine/util/strings';
 import { findItem, findNpc } from '@engine/config/config-handler';
-import { EquipmentSlot, EquipmentType, ItemDetails } from '@engine/config/item-config';
-import { appendMovement, registerNewActors, SyncTask, syncTrackedActors } from './actor-sync';
+import {
+    EquipmentSlot,
+    EquipmentType,
+    ItemDetails,
+} from '@engine/config/item-config';
+import {
+    appendMovement,
+    registerNewActors,
+    SyncTask,
+    syncTrackedActors,
+} from './actor-sync';
 import { Player } from '../player';
 import { activeWorld } from '@engine/world';
-
 
 /**
  * Handles the chonky player synchronization packet.
  */
 export class PlayerSyncTask extends SyncTask<void> {
-
     private readonly player: Player;
 
     public constructor(player: Player) {
@@ -23,19 +30,31 @@ export class PlayerSyncTask extends SyncTask<void> {
     }
 
     public async execute(): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve) => {
             const updateFlags: UpdateFlags = this.player.updateFlags;
-            const playerUpdatePacket: Packet = new Packet(92, PacketType.DYNAMIC_LARGE);
+            const playerUpdatePacket: Packet = new Packet(
+                92,
+                PacketType.DYNAMIC_LARGE,
+            );
             playerUpdatePacket.openBitBuffer();
 
             const updateMaskData = new ByteBuffer(5000);
 
-            if(updateFlags.mapRegionUpdateRequired || this.player.metadata.teleporting) {
+            if (
+                updateFlags.mapRegionUpdateRequired ||
+                this.player.metadata.teleporting
+            ) {
                 playerUpdatePacket.putBits(1, 1); // Update Required
                 playerUpdatePacket.putBits(2, 3); // Map Region changed (movement type - 0=nomove, 1=walk, 2=run, 3=mapchange
-                playerUpdatePacket.putBits(1, this.player.metadata.teleporting ? 1 : 0); // Whether or not the client should discard the current walking queue (1 if teleporting, 0 if not)
+                playerUpdatePacket.putBits(
+                    1,
+                    this.player.metadata.teleporting ? 1 : 0,
+                ); // Whether or not the client should discard the current walking queue (1 if teleporting, 0 if not)
                 playerUpdatePacket.putBits(2, this.player.position.level); // Player Height
-                playerUpdatePacket.putBits(1, updateFlags.updateBlockRequired ? 1 : 0); // Whether or not an update flag block follows
+                playerUpdatePacket.putBits(
+                    1,
+                    updateFlags.updateBlockRequired ? 1 : 0,
+                ); // Whether or not an update flag block follows
                 playerUpdatePacket.putBits(7, this.player.position.chunkLocalX); // Player Local Chunk X
                 playerUpdatePacket.putBits(7, this.player.position.chunkLocalY); // Player Local Chunk Y
             } else {
@@ -44,46 +63,66 @@ export class PlayerSyncTask extends SyncTask<void> {
 
             this.appendUpdateMaskData(this.player, updateMaskData, false);
 
-            let nearbyPlayers = activeWorld.playerTree.colliding({
-                x: this.player.position.x - 15,
-                y: this.player.position.y - 15,
-                width: 32,
-                height: 32
-            }).filter(collision => collision?.actor && collision.actor.instance === this.player.instance);
+            let nearbyPlayers = activeWorld.playerTree
+                .colliding({
+                    x: this.player.position.x - 15,
+                    y: this.player.position.y - 15,
+                    width: 32,
+                    height: 32,
+                })
+                .filter(
+                    (collision) =>
+                        collision?.actor &&
+                        collision.actor.instance === this.player.instance,
+                );
 
-            if(nearbyPlayers.length > 200) {
+            if (nearbyPlayers.length > 200) {
                 nearbyPlayers = activeWorld.playerTree.colliding({
                     x: this.player.position.x - 7,
                     y: this.player.position.y - 7,
                     width: 16,
-                    height: 16
+                    height: 16,
                 });
             }
 
-            this.player.trackedPlayers = syncTrackedActors(playerUpdatePacket, this.player.position,
-                actor => this.appendUpdateMaskData(actor as Player, updateMaskData), this.player.trackedPlayers, nearbyPlayers) as Player[];
+            this.player.trackedPlayers = syncTrackedActors(
+                playerUpdatePacket,
+                this.player.position,
+                (actor) =>
+                    this.appendUpdateMaskData(actor as Player, updateMaskData),
+                this.player.trackedPlayers,
+                nearbyPlayers,
+            ) as Player[];
 
-            registerNewActors(playerUpdatePacket, this.player, this.player.trackedPlayers, nearbyPlayers, actor => {
-                const newPlayer = actor as Player;
-                const positionOffsetX = newPlayer.position.x - this.player.position.x;
-                const positionOffsetY = newPlayer.position.y - this.player.position.y;
+            registerNewActors(
+                playerUpdatePacket,
+                this.player,
+                this.player.trackedPlayers,
+                nearbyPlayers,
+                (actor) => {
+                    const newPlayer = actor as Player;
+                    const positionOffsetX =
+                        newPlayer.position.x - this.player.position.x;
+                    const positionOffsetY =
+                        newPlayer.position.y - this.player.position.y;
 
-                // Add other player to this player's list of tracked players
-                this.player.trackedPlayers.push(newPlayer);
+                    // Add other player to this player's list of tracked players
+                    this.player.trackedPlayers.push(newPlayer);
 
-                // Notify the client of the new player and their worldIndex
-                playerUpdatePacket.putBits(11, newPlayer.worldIndex + 1);
+                    // Notify the client of the new player and their worldIndex
+                    playerUpdatePacket.putBits(11, newPlayer.worldIndex + 1);
 
-                playerUpdatePacket.putBits(5, positionOffsetX); // World Position X axis offset relative to the main player
-                playerUpdatePacket.putBits(5, positionOffsetY); // World Position Y axis offset relative to the main player
-                playerUpdatePacket.putBits(3, newPlayer.faceDirection);
-                playerUpdatePacket.putBits(1, 1); // Update is required
-                playerUpdatePacket.putBits(1, 1); // Discard client walking queues
+                    playerUpdatePacket.putBits(5, positionOffsetX); // World Position X axis offset relative to the main player
+                    playerUpdatePacket.putBits(5, positionOffsetY); // World Position Y axis offset relative to the main player
+                    playerUpdatePacket.putBits(3, newPlayer.faceDirection);
+                    playerUpdatePacket.putBits(1, 1); // Update is required
+                    playerUpdatePacket.putBits(1, 1); // Discard client walking queues
 
-                this.appendUpdateMaskData(newPlayer, updateMaskData, true);
-            });
+                    this.appendUpdateMaskData(newPlayer, updateMaskData, true);
+                },
+            );
 
-            if(updateMaskData.writerIndex !== 0) {
+            if (updateMaskData.writerIndex !== 0) {
                 playerUpdatePacket.putBits(11, 2047);
                 playerUpdatePacket.closeBitBuffer();
 
@@ -98,38 +137,45 @@ export class PlayerSyncTask extends SyncTask<void> {
         });
     }
 
-    private appendUpdateMaskData(player: Player, updateMaskData: ByteBuffer, forceUpdate?: boolean): void {
+    private appendUpdateMaskData(
+        player: Player,
+        updateMaskData: ByteBuffer,
+        forceUpdate?: boolean,
+    ): void {
         const updateFlags = player.updateFlags;
 
-        if(!updateFlags.updateBlockRequired && !forceUpdate) {
+        if (!updateFlags.updateBlockRequired && !forceUpdate) {
             return;
         }
 
         let mask: number = 0;
 
-        if(updateFlags.damage !== null) {
+        if (updateFlags.damage !== null) {
             mask |= 0x100;
         }
-        if(updateFlags.appearanceUpdateRequired || forceUpdate) {
+        if (updateFlags.appearanceUpdateRequired || forceUpdate) {
             mask |= 0x20;
         }
-        if(updateFlags.chatMessages.length !== 0) {
+        if (updateFlags.chatMessages.length !== 0) {
             mask |= 0x8;
         }
-        if(updateFlags.faceActor !== undefined) {
+        if (updateFlags.faceActor !== undefined) {
             mask |= 0x4;
         }
-        if(updateFlags.facePosition) {
+        if (updateFlags.facePosition) {
             mask |= 0x10;
         }
-        if(updateFlags.graphics) {
+        if (updateFlags.graphics) {
             mask |= 0x200;
         }
-        if(updateFlags.animation !== undefined && updateFlags.animation !== null) {
+        if (
+            updateFlags.animation !== undefined &&
+            updateFlags.animation !== null
+        ) {
             mask |= 0x1;
         }
 
-        if(mask >= 0x100) {
+        if (mask >= 0x100) {
             mask |= 0x2;
             updateMaskData.put(mask & 0xff);
             updateMaskData.put(mask >> 8);
@@ -137,7 +183,7 @@ export class PlayerSyncTask extends SyncTask<void> {
             updateMaskData.put(mask);
         }
 
-        if(updateFlags.damage !== null) {
+        if (updateFlags.damage !== null) {
             const damage = updateFlags.damage;
             updateMaskData.put(damage.damageDealt);
             updateMaskData.put(damage.damageType.valueOf());
@@ -145,16 +191,19 @@ export class PlayerSyncTask extends SyncTask<void> {
             updateMaskData.put(damage.maxHitpoints);
         }
 
-        if(updateFlags.facePosition) {
+        if (updateFlags.facePosition) {
             const position = updateFlags.facePosition;
             updateMaskData.put(position.x * 2 + 1, 'SHORT');
             updateMaskData.put(position.y * 2 + 1, 'SHORT', 'LITTLE_ENDIAN');
         }
 
-        if(updateFlags.animation !== undefined && updateFlags.animation !== null) {
+        if (
+            updateFlags.animation !== undefined &&
+            updateFlags.animation !== null
+        ) {
             const animation = updateFlags.animation;
 
-            if(animation === null || animation.id === -1) {
+            if (animation === null || animation.id === -1) {
                 // Reset animation
                 updateMaskData.put(-1, 'SHORT', 'LITTLE_ENDIAN');
                 updateMaskData.put(0, 'BYTE');
@@ -165,16 +214,16 @@ export class PlayerSyncTask extends SyncTask<void> {
             }
         }
 
-        if(updateFlags.faceActor !== undefined) {
+        if (updateFlags.faceActor !== undefined) {
             const actor = updateFlags.faceActor;
 
-            if(actor === null) {
+            if (actor === null) {
                 // Reset faced actor
                 updateMaskData.put(65535, 'SHORT');
             } else {
                 let worldIndex = actor.worldIndex;
 
-                if(actor instanceof Player) {
+                if (actor instanceof Player) {
                     // Client checks if index is less than 32768.
                     // If it is, it looks for an NPC.
                     // If it isn't, it looks for a player (subtracting 32768 to find the index).
@@ -185,36 +234,43 @@ export class PlayerSyncTask extends SyncTask<void> {
             }
         }
 
-        if(updateFlags.chatMessages.length !== 0) {
+        if (updateFlags.chatMessages.length !== 0) {
             const message = updateFlags.chatMessages[0];
 
             if (!message.data) {
                 throw new Error('Chat message data is undefined');
             }
 
-            updateMaskData.put(((message.color || 0 & 0xFF) << 8) + (message.effects || 0 & 0xFF), 'SHORT');
+            updateMaskData.put(
+                ((message.color || 0 & 0xff) << 8) +
+                    (message.effects || 0 & 0xff),
+                'SHORT',
+            );
             updateMaskData.put(player.rights.valueOf(), 'BYTE');
             updateMaskData.put(message.data.length, 'BYTE');
-            for(let i = 0; i < message.data.length; i++) {
+            for (let i = 0; i < message.data.length; i++) {
                 updateMaskData.put(message.data.readInt8(i), 'BYTE');
             }
         }
 
-        if(updateFlags.appearanceUpdateRequired || forceUpdate) {
+        if (updateFlags.appearanceUpdateRequired || forceUpdate) {
             const equipment = player.equipment;
             const appearanceData = new ByteBuffer(500);
             appearanceData.put(player.appearance.gender); // Gender
             appearanceData.put(-1); // Skull Icon
             appearanceData.put(-1); // Prayer Icon
 
-            if(player.savedMetadata.npcTransformation) {
+            if (player.savedMetadata.npcTransformation) {
                 appearanceData.put(65535, 'SHORT');
-                appearanceData.put(player.savedMetadata.npcTransformation, 'SHORT');
+                appearanceData.put(
+                    player.savedMetadata.npcTransformation,
+                    'SHORT',
+                );
             } else {
-                for(let i = 0; i < 4; i++) {
+                for (let i = 0; i < 4; i++) {
                     const item = equipment.items[i];
 
-                    if(item) {
+                    if (item) {
                         appearanceData.put(0x200 + item.itemId, 'SHORT');
                     } else {
                         appearanceData.put(0);
@@ -223,58 +279,81 @@ export class PlayerSyncTask extends SyncTask<void> {
 
                 const torsoItem = player.getEquippedItem('torso');
                 let torsoItemData: ItemDetails | null = null;
-                if(torsoItem) {
+                if (torsoItem) {
                     torsoItemData = findItem(torsoItem.itemId);
                     appearanceData.put(0x200 + torsoItem.itemId, 'SHORT');
                 } else {
-                    appearanceData.put(0x100 + player.appearance.torso, 'SHORT');
+                    appearanceData.put(
+                        0x100 + player.appearance.torso,
+                        'SHORT',
+                    );
                 }
 
                 const offHandItem = player.getEquippedItem('off_hand');
-                if(offHandItem) {
+                if (offHandItem) {
                     appearanceData.put(0x200 + offHandItem.itemId, 'SHORT');
                 } else {
                     appearanceData.put(0);
                 }
 
-                if(torsoItemData?.equipmentData?.equipmentType &&
-                    torsoItemData.equipmentData.equipmentType === 'full_top') {
+                if (
+                    torsoItemData?.equipmentData?.equipmentType &&
+                    torsoItemData.equipmentData.equipmentType === 'full_top'
+                ) {
                     appearanceData.put(0);
                 } else {
                     appearanceData.put(0x100 + player.appearance.arms, 'SHORT');
                 }
 
-                this.appendBasicAppearanceItem(appearanceData, player, player.appearance.legs, 'legs');
+                this.appendBasicAppearanceItem(
+                    appearanceData,
+                    player,
+                    player.appearance.legs,
+                    'legs',
+                );
 
                 const headItem = player.getEquippedItem('head');
                 let helmetType: EquipmentType | null = null;
                 let fullHelmet = false;
 
-                if(headItem) {
+                if (headItem) {
                     const headItemData = findItem(headItem.itemId);
 
-                    if(headItemData?.equipmentData?.equipmentType) {
+                    if (headItemData?.equipmentData?.equipmentType) {
                         helmetType = headItemData.equipmentData.equipmentType;
 
-                        if(helmetType === 'helmet') {
+                        if (helmetType === 'helmet') {
                             fullHelmet = true;
                         }
                     }
                 }
 
-                if(!headItem || helmetType === 'hat') {
+                if (!headItem || helmetType === 'hat') {
                     appearanceData.put(0x100 + player.appearance.head, 'SHORT');
                 } else {
                     appearanceData.put(0);
                 }
 
-                this.appendBasicAppearanceItem(appearanceData, player, player.appearance.hands, 'hands');
-                this.appendBasicAppearanceItem(appearanceData, player, player.appearance.feet, 'feet');
+                this.appendBasicAppearanceItem(
+                    appearanceData,
+                    player,
+                    player.appearance.hands,
+                    'hands',
+                );
+                this.appendBasicAppearanceItem(
+                    appearanceData,
+                    player,
+                    player.appearance.feet,
+                    'feet',
+                );
 
-                if(player.appearance.gender === 1 || fullHelmet) {
+                if (player.appearance.gender === 1 || fullHelmet) {
                     appearanceData.put(0);
                 } else {
-                    appearanceData.put(0x100 + player.appearance.facialHair, 'SHORT');
+                    appearanceData.put(
+                        0x100 + player.appearance.facialHair,
+                        'SHORT',
+                    );
                 }
             }
 
@@ -284,7 +363,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                 player.appearance.legColor,
                 player.appearance.feetColor,
                 player.appearance.skinColor,
-            ].forEach(color => appearanceData.put(color));
+            ].forEach((color) => appearanceData.put(color));
 
             let animations = [
                 0x328, // stand
@@ -296,7 +375,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                 0x338, // run
             ];
 
-            if(player.savedMetadata.npcTransformation) {
+            if (player.savedMetadata.npcTransformation) {
                 const npc = findNpc(player.savedMetadata.npcTransformation);
                 animations = [
                     npc?.animations?.stand || 0x328, // stand
@@ -309,7 +388,9 @@ export class PlayerSyncTask extends SyncTask<void> {
                 ];
             }
 
-            animations.forEach(animationId => appearanceData.put(animationId, 'SHORT'));
+            animations.forEach((animationId) =>
+                appearanceData.put(animationId, 'SHORT'),
+            );
 
             appearanceData.put(stringToLong(player.username), 'LONG'); // Username
             appearanceData.put(player.skills.getCombatLevel()); // Combat Level
@@ -321,20 +402,31 @@ export class PlayerSyncTask extends SyncTask<void> {
             updateMaskData.putBytes(appearanceData.flipWriter());
         }
 
-        if(updateFlags.graphics) {
+        if (updateFlags.graphics) {
             const delay = updateFlags.graphics.delay || 0;
-            updateMaskData.put(updateFlags.graphics.id, 'SHORT', 'LITTLE_ENDIAN');
-            updateMaskData.put(updateFlags.graphics.height << 16 | delay & 0xffff, 'INT');
+            updateMaskData.put(
+                updateFlags.graphics.id,
+                'SHORT',
+                'LITTLE_ENDIAN',
+            );
+            updateMaskData.put(
+                (updateFlags.graphics.height << 16) | (delay & 0xffff),
+                'INT',
+            );
         }
     }
 
-    private appendBasicAppearanceItem(buffer: ByteBuffer, player: Player, appearanceInfo: number, equipmentSlot: EquipmentSlot): void {
+    private appendBasicAppearanceItem(
+        buffer: ByteBuffer,
+        player: Player,
+        appearanceInfo: number,
+        equipmentSlot: EquipmentSlot,
+    ): void {
         const item = player.getEquippedItem(equipmentSlot);
-        if(item) {
+        if (item) {
             buffer.put(0x200 + item.itemId, 'SHORT');
         } else {
             buffer.put(0x100 + appearanceInfo, 'SHORT');
         }
     }
-
 }

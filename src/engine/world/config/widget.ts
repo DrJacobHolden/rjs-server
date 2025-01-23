@@ -17,7 +17,7 @@ export const widgetScripts = {
     bankWithdrawNoteMode: 115,
     acceptAid: 427,
     areaEffectVolume: 872,
-    questPoints: 101
+    questPoints: 101,
 };
 
 export interface PlayerWidget {

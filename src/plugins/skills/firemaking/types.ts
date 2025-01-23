@@ -18,4 +18,4 @@ export type Burnable = {
      * The experience gained for lighting the log.
      */
     experienceGained: number;
-}
+};

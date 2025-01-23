@@ -1,9 +1,12 @@
 import { commandActionHandler } from '@engine/action';
-import { findItemTagsInGroups, findItemTagsInGroupFilter } from '@engine/config/config-handler';
+import {
+    findItemTagsInGroups,
+    findItemTagsInGroupFilter,
+} from '@engine/config/config-handler';
 
 const selectGroups: commandActionHandler = ({ player, args, isConsole }) => {
     const groups: string | number = args.groupkeys;
-    if(!groups || typeof groups !== 'string') {
+    if (!groups || typeof groups !== 'string') {
         player.sendLogMessage('invalid input', isConsole);
         return;
     }
@@ -16,7 +19,7 @@ const selectGroups: commandActionHandler = ({ player, args, isConsole }) => {
 
 const filterGroups: commandActionHandler = ({ player, args, isConsole }) => {
     const groups: string | number = args.groupkeys;
-    if(!groups || typeof groups !== 'string') {
+    if (!groups || typeof groups !== 'string') {
         player.sendLogMessage('invalid input', isConsole);
         return;
     }
@@ -33,25 +36,25 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'selectgroups' ],
+            commands: ['selectgroups'],
             args: [
                 {
                     name: 'groupkeys',
-                    type: 'string'
-                }
+                    type: 'string',
+                },
             ],
-            handler: selectGroups
+            handler: selectGroups,
         },
         {
             type: 'player_command',
-            commands: [ 'filtergroups' ],
+            commands: ['filtergroups'],
             args: [
                 {
                     name: 'groupkeys',
-                    type: 'string'
-                }
+                    type: 'string',
+                },
             ],
-            handler: filterGroups
-        }
-    ]
+            handler: filterGroups,
+        },
+    ],
 };

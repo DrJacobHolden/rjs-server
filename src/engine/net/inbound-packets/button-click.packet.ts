@@ -12,5 +12,5 @@ const buttonClickPacket = (player: Player, packet: PacketData) => {
 export default {
     opcode: 64,
     size: 4,
-    handler: buttonClickPacket
+    handler: buttonClickPacket,
 };

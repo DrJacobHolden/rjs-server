@@ -1,10 +1,8 @@
 import { widgetInteractionActionHandler } from '@engine/action';
 
 const dialogueIds = [
-    64, 65, 66, 67, 241,
-    242, 243, 244, 228, 230,
-    232, 234,
-    210, 211, 212, 213, 214,
+    64, 65, 66, 67, 241, 242, 243, 244, 228, 230, 232, 234, 210, 211, 212, 213,
+    214,
 ];
 
 /**
@@ -22,7 +20,7 @@ export default {
             type: 'widget_interaction',
             widgetIds: dialogueIds,
             handler: action,
-            cancelActions: true
-        }
-    ]
+            cancelActions: true,
+        },
+    ],
 };

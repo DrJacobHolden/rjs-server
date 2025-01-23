@@ -22,7 +22,10 @@ type WalkToTarget = WalkToTargetType | (() => WalkToTargetType);
  *
  * @author jameskmonger
  */
-export interface ActorWalkToTask<TActor extends Actor = Actor, TTarget extends WalkToTarget = Position> extends ActorTask<TActor> {
+export interface ActorWalkToTask<
+    TActor extends Actor = Actor,
+    TTarget extends WalkToTarget = Position,
+> extends ActorTask<TActor> {
     /**
      * An optional function that is called when the actor arrives at the destination.
      */
@@ -37,7 +40,10 @@ export interface ActorWalkToTask<TActor extends Actor = Actor, TTarget extends W
  *
  * @author jameskmonger
  */
-export abstract class ActorWalkToTask<TActor extends Actor = Actor, TTarget extends WalkToTarget = Position> extends ActorTask<TActor> {
+export abstract class ActorWalkToTask<
+    TActor extends Actor = Actor,
+    TTarget extends WalkToTarget = Position,
+> extends ActorTask<TActor> {
     private _atDestination: boolean = false;
 
     /**
@@ -46,27 +52,24 @@ export abstract class ActorWalkToTask<TActor extends Actor = Actor, TTarget exte
      * @param distance The distance from the destination position that the actor must be within to arrive.
      * @param walkOnStart Whether to walk to the destination on task start.
      */
-    constructor (
+    constructor(
         actor: TActor,
         protected readonly destination: TTarget,
         protected readonly distance = 1,
-        walkOnStart = true
+        walkOnStart = true,
     ) {
-        super(
-            actor,
-            {
-                interval: 1,
-                stackType: TaskStackType.NEVER,
-                stackGroup: TaskStackGroup.ACTION,
-                breakTypes: [ TaskBreakType.ON_MOVE ],
-                immediate: false,
-                repeat: true,
-            }
-        );
+        super(actor, {
+            interval: 1,
+            stackType: TaskStackType.NEVER,
+            stackGroup: TaskStackGroup.ACTION,
+            breakTypes: [TaskBreakType.ON_MOVE],
+            immediate: false,
+            repeat: true,
+        });
 
         // TODO (jkm) should this be in constructor? or on first execute?
         if (walkOnStart) {
-            this.actor.pathfinding.walkTo(this.getTargetPosition(), { });
+            this.actor.pathfinding.walkTo(this.getTargetPosition(), {});
         }
     }
 
@@ -91,7 +94,10 @@ export abstract class ActorWalkToTask<TActor extends Actor = Actor, TTarget exte
 
         // TODO this uses actual distances rather than tile distances
         //      is this correct?
-        const withinDistance = this.actor.position.withinInteractionDistance(destination, this.distance)
+        const withinDistance = this.actor.position.withinInteractionDistance(
+            destination,
+            this.distance,
+        );
 
         // the WalkToTask itself is complete when the actor has arrived at the destination
         // execution will now continue in the extended class
@@ -115,9 +121,12 @@ export abstract class ActorWalkToTask<TActor extends Actor = Actor, TTarget exte
     }
 
     private getTargetPosition(): Position {
-        const destination: WalkToTargetType = typeof this.destination === 'function' ? this.destination() : this.destination;
+        const destination: WalkToTargetType =
+            typeof this.destination === 'function'
+                ? this.destination()
+                : this.destination;
 
-        if(destination instanceof Position) {
+        if (destination instanceof Position) {
             return destination;
         }
 

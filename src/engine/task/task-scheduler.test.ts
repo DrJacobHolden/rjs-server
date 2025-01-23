@@ -11,7 +11,7 @@ describe('TaskScheduler', () => {
 
     describe('when enqueueing a task', () => {
         let executeMock: jest.Mock;
-        let task: Task
+        let task: Task;
         beforeEach(() => {
             ({ task, executeMock } = createMockTask());
         });
@@ -59,13 +59,15 @@ describe('TaskScheduler', () => {
         const stackGroup = 'foo';
 
         let firstExecuteMock: jest.Mock;
-        let firstTask: Task
+        let firstTask: Task;
         beforeEach(() => {
-            ({ task: firstTask, executeMock: firstExecuteMock } = createMockTask(interval, stackType, stackGroup));
+            ({ task: firstTask, executeMock: firstExecuteMock } =
+                createMockTask(interval, stackType, stackGroup));
         });
 
         it('should stop any other tasks with the same stack group', () => {
-            const { task: secondTask, executeMock: secondExecuteMock } = createMockTask(interval, stackType, stackGroup);
+            const { task: secondTask, executeMock: secondExecuteMock } =
+                createMockTask(interval, stackType, stackGroup);
 
             taskScheduler.enqueue(firstTask);
             taskScheduler.enqueue(secondTask);
@@ -77,7 +79,8 @@ describe('TaskScheduler', () => {
 
         it('should not stop any other tasks with a different stack group', () => {
             const otherStackGroup = 'bar';
-            const { task: secondTask, executeMock: secondExecuteMock } = createMockTask(interval, stackType, otherStackGroup);
+            const { task: secondTask, executeMock: secondExecuteMock } =
+                createMockTask(interval, stackType, otherStackGroup);
 
             taskScheduler.enqueue(firstTask);
             taskScheduler.enqueue(secondTask);
@@ -90,7 +93,7 @@ describe('TaskScheduler', () => {
 
     describe('when clearing the scheduler', () => {
         let executeMock: jest.Mock;
-        let task: Task
+        let task: Task;
         beforeEach(() => {
             ({ task, executeMock } = createMockTask());
         });

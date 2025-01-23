@@ -2,15 +2,20 @@ import { LandscapeObject, ObjectConfig } from '@runejs/filestore';
 import { Position, Item } from '@engine/world';
 import { Player } from '@engine/world/actor';
 import {
-    ActionHook, getActionHooks, advancedNumberHookFilter, questHookFilter, ActionPipe, RunnableHooks
+    ActionHook,
+    getActionHooks,
+    advancedNumberHookFilter,
+    questHookFilter,
+    ActionPipe,
+    RunnableHooks,
 } from '@engine/action';
 import { WalkToObjectPluginTask } from './task/walk-to-object-plugin-task';
-
 
 /**
  * Defines an item-on-object action hook.
  */
-export interface ItemOnObjectActionHook extends ActionHook<ItemOnObjectAction, itemOnObjectActionHandler> {
+export interface ItemOnObjectActionHook
+    extends ActionHook<ItemOnObjectAction, itemOnObjectActionHandler> {
     // A single game object ID or a list of object IDs that this action applies to.
     objectIds: number | number[];
     // A single game item ID or a list of item IDs that this action applies to.
@@ -19,12 +24,12 @@ export interface ItemOnObjectActionHook extends ActionHook<ItemOnObjectAction, i
     walkTo: boolean;
 }
 
-
 /**
  * The item-on-object action hook handler function to be called when the hook's conditions are met.
  */
-export type itemOnObjectActionHandler = (itemOnObjectAction: ItemOnObjectAction) => void;
-
+export type itemOnObjectActionHandler = (
+    itemOnObjectAction: ItemOnObjectAction,
+) => void;
 
 /**
  * Details about an item-on-object action being performed.
@@ -48,7 +53,6 @@ export interface ItemOnObjectAction {
     cacheOriginal: boolean;
 }
 
-
 /**
  * The pipe that the game engine hands item-on-object actions off to.
  * @param player
@@ -60,41 +64,67 @@ export interface ItemOnObjectAction {
  * @param itemContainerId
  * @param cacheOriginal
  */
-const itemOnObjectActionPipe = (player: Player, landscapeObject: LandscapeObject,
-    objectConfig: ObjectConfig, position: Position,
-    item: Item, itemWidgetId: number, itemContainerId: number,
-    cacheOriginal: boolean): RunnableHooks<ItemOnObjectAction> | null => {
+const itemOnObjectActionPipe = (
+    player: Player,
+    landscapeObject: LandscapeObject,
+    objectConfig: ObjectConfig,
+    position: Position,
+    item: Item,
+    itemWidgetId: number,
+    itemContainerId: number,
+    cacheOriginal: boolean,
+): RunnableHooks<ItemOnObjectAction> | null => {
     // Find all item on object action plugins that reference this location object
-    let matchingHooks = getActionHooks<ItemOnObjectActionHook>('item_on_object')
-        .filter(plugin => questHookFilter(player, plugin) &&
-            advancedNumberHookFilter(plugin.objectIds, landscapeObject.objectId));
-    const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
+    let matchingHooks = getActionHooks<ItemOnObjectActionHook>(
+        'item_on_object',
+    ).filter(
+        (plugin) =>
+            questHookFilter(player, plugin) &&
+            advancedNumberHookFilter(
+                plugin.objectIds,
+                landscapeObject.objectId,
+            ),
+    );
+    const questActions = matchingHooks.filter(
+        (plugin) => plugin.questRequirement !== undefined,
+    );
 
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
     // Find all item on object action plugins that reference this item
-    if(matchingHooks.length !== 0) {
-        matchingHooks = matchingHooks.filter(plugin => advancedNumberHookFilter(plugin.itemIds, item.itemId));
+    if (matchingHooks.length !== 0) {
+        matchingHooks = matchingHooks.filter((plugin) =>
+            advancedNumberHookFilter(plugin.itemIds, item.itemId),
+        );
     }
 
-    if(matchingHooks.length === 0) {
-        player.outgoingPackets.chatboxMessage(`Unhandled item on object interaction: ${ item.itemId } on ${ objectConfig.name } ` +
-            `(id-${ landscapeObject.objectId }) @ ${ position.x },${ position.y },${ position.level }`);
+    if (matchingHooks.length === 0) {
+        player.outgoingPackets.chatboxMessage(
+            `Unhandled item on object interaction: ${item.itemId} on ${objectConfig.name} ` +
+                `(id-${landscapeObject.objectId}) @ ${position.x},${position.y},${position.level}`,
+        );
         return null;
     }
 
-    const walkToPlugins = matchingHooks.filter(plugin => plugin.walkTo);
+    const walkToPlugins = matchingHooks.filter((plugin) => plugin.walkTo);
 
     if (walkToPlugins.length > 0) {
-        player.enqueueBaseTask(new WalkToObjectPluginTask<ItemOnObjectAction>(walkToPlugins, player, landscapeObject, {
-            objectConfig,
-            item,
-            itemWidgetId,
-            itemContainerId,
-            cacheOriginal
-        }));
+        player.enqueueBaseTask(
+            new WalkToObjectPluginTask<ItemOnObjectAction>(
+                walkToPlugins,
+                player,
+                landscapeObject,
+                {
+                    objectConfig,
+                    item,
+                    itemWidgetId,
+                    itemContainerId,
+                    cacheOriginal,
+                },
+            ),
+        );
 
         return null;
     }
@@ -109,13 +139,12 @@ const itemOnObjectActionPipe = (player: Player, landscapeObject: LandscapeObject
             item,
             itemWidgetId,
             itemContainerId,
-            cacheOriginal
-        }
-    }
+            cacheOriginal,
+        },
+    };
 };
-
 
 /**
  * Item-on-object action pipe definition.
  */
-export default [ 'item_on_object', itemOnObjectActionPipe ] as ActionPipe;
+export default ['item_on_object', itemOnObjectActionPipe] as ActionPipe;

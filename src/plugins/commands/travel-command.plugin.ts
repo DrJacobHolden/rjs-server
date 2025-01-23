@@ -21,14 +21,14 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'travel' ],
+            commands: ['travel'],
             args: [
                 {
                     name: 'search',
-                    type: 'string'
-                }
+                    type: 'string',
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

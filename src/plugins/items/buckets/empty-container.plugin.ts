@@ -10,7 +10,7 @@ export const handler: itemInteractionActionHandler = (details) => {
     const inventory = player.inventory;
     const item = getItemFromContainer(itemId, itemSlot, inventory);
 
-    if(!item) {
+    if (!item) {
         // The specified item was not found in the specified slot.
         return;
     }
@@ -27,7 +27,10 @@ export const handler: itemInteractionActionHandler = (details) => {
     }
 
     // @TODO only update necessary slots
-    player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, inventory);
+    player.outgoingPackets.sendUpdateAllWidgetItems(
+        widgets.inventory,
+        inventory,
+    );
 };
 
 export default {
@@ -37,9 +40,13 @@ export default {
             type: 'item_interaction',
             widgets: widgets.inventory,
             options: 'empty',
-            itemIds: [ itemIds.bucketOfMilk, itemIds.bucketOfWater, itemIds.jugOfWater ],
+            itemIds: [
+                itemIds.bucketOfMilk,
+                itemIds.bucketOfWater,
+                itemIds.jugOfWater,
+            ],
             handler,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

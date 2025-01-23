@@ -4,7 +4,6 @@ import { itemIds } from '@engine/world/config/item-ids';
 import { findItem } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
 
-
 export const action: objectInteractionActionHandler = (details) => {
     details.player.busy = true;
     details.player.playAnimation(827);
@@ -56,10 +55,10 @@ export default {
     hooks: [
         {
             type: 'object_interaction',
-            objectIds: [ 313, 5583, 5584, 5585, 1161, 3366, 312, 2646 ],
-            options: [ 'pick' ],
+            objectIds: [313, 5583, 5584, 5585, 1161, 3366, 312, 2646],
+            options: ['pick'],
             walkTo: true,
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

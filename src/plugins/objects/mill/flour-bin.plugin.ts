@@ -6,12 +6,16 @@ import { Player } from '@engine/world/actor/player/player';
 import { ObjectConfig } from '@runejs/filestore';
 import { playerInitActionHandler } from '@engine/action';
 
-
-function flourBin(details: { objectConfig: ObjectConfig, player: Player }): void {
+function flourBin(details: {
+    objectConfig: ObjectConfig;
+    player: Player;
+}): void {
     const { player, objectConfig } = details;
 
     if (!details.player.savedMetadata['mill-flour']) {
-        player.sendMessage(`The ${(objectConfig.name || '').toLowerCase()} is already empty. You need to place wheat in the hopper upstairs `);
+        player.sendMessage(
+            `The ${(objectConfig.name || '').toLowerCase()} is already empty. You need to place wheat in the hopper upstairs `,
+        );
         player.sendMessage('first.');
     } else {
         if (player.hasItemInInventory(itemIds.pot)) {
@@ -27,13 +31,11 @@ function flourBin(details: { objectConfig: ObjectConfig, player: Player }): void
     updateBin(details);
 }
 
-
 export const updateBin: playerInitActionHandler = (details) => {
-    const count = (details.player.savedMetadata['mill-flour'] || 0) === 0 ? 0 : 1;
+    const count =
+        (details.player.savedMetadata['mill-flour'] || 0) === 0 ? 0 : 1;
     details.player.outgoingPackets.updateClientConfig(695, count);
 };
-
-
 
 const actionInteract: objectInteractionActionHandler = (details) => {
     flourBin(details);
@@ -48,21 +50,21 @@ export default {
     hooks: [
         {
             type: 'item_on_object',
-            objectIds: [ 1781, 5792, 1782 ],
-            itemIds: [ itemIds.pot ],
+            objectIds: [1781, 5792, 1782],
+            itemIds: [itemIds.pot],
             walkTo: true,
-            handler: actionItem
+            handler: actionItem,
         },
         {
             type: 'player_init',
-            handler: updateBin
+            handler: updateBin,
         },
         {
             type: 'object_interaction',
-            objectIds: [ 1781, 1782],
-            options: [ 'empty' ],
+            objectIds: [1781, 1782],
+            options: ['empty'],
             walkTo: true,
-            handler: actionInteract
-        }
-    ]
+            handler: actionInteract,
+        },
+    ],
 };

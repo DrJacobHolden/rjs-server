@@ -1,9 +1,16 @@
 import {
-    itemOnObjectActionHandler, ItemOnObjectActionHook, ItemInteractionActionHook
+    itemOnObjectActionHandler,
+    ItemOnObjectActionHook,
+    ItemInteractionActionHook,
 } from '@engine/action';
 import { widgets } from '@engine/config/config-handler';
 import { Skill } from '@engine/world/actor/skills';
-import { anvilIds, bars, smithables, widgetItems } from '@plugins/skills/smithing/forging-constants';
+import {
+    anvilIds,
+    bars,
+    smithables,
+    widgetItems,
+} from '@plugins/skills/smithing/forging-constants';
 import { itemIds } from '@engine/world/config/item-ids';
 import { Smithable } from '@plugins/skills/smithing/forging-types';
 import { Player } from '@engine/world/actor/player/player';
@@ -20,7 +27,9 @@ import { logger } from '@runejs/common';
  * @returns A flat array of item ids, e.g. [ bronze_dagger_id, iron_dagger_id, ...]
  * @remarks This is used to check if the player has the correct item in their inventory.
  */
-const mapSmithableItemIdsToFlatArray = (input: Map<string, Map<string, Smithable>>) => {
+const mapSmithableItemIdsToFlatArray = (
+    input: Map<string, Map<string, Smithable>>,
+) => {
     const result: number[] = [];
     input.forEach((type) => {
         type.forEach((smithable) => {
@@ -41,7 +50,9 @@ const mapSmithableItemIdsToFlatArray = (input: Map<string, Map<string, Smithable
  * @returns A flat array of item ids, e.g. [ bronze_dagger_id, iron_dagger_id, ...]
  * @remarks This is used to check if the player has the correct item in their inventory.
  */
-const mapSmithablesToFlatArray = (input: Map<string, Map<string, Smithable>>) => {
+const mapSmithablesToFlatArray = (
+    input: Map<string, Map<string, Smithable>>,
+) => {
     const results: Smithable[] = [];
     input.forEach((values) => {
         values.forEach((value) => {
@@ -55,10 +66,12 @@ const mapSmithablesToFlatArray = (input: Map<string, Map<string, Smithable>>) =>
  * Lookup a smithable from just an item id.
  * @param itemId
  */
-const findSmithableByItemId = (itemId: number) : Smithable | null => {
-    return mapSmithablesToFlatArray(smithables).find((smithable) => {
-        return smithable.item.itemId === itemId;
-    }) || null;
+const findSmithableByItemId = (itemId: number): Smithable | null => {
+    return (
+        mapSmithablesToFlatArray(smithables).find((smithable) => {
+            return smithable.item.itemId === itemId;
+        }) || null
+    );
 };
 
 /**
@@ -75,11 +88,16 @@ const canForge = (player: Player, smithable: Smithable): boolean => {
         const item = findItem(smithable.item.itemId);
 
         if (!item) {
-            logger.error(`Could not find smithable item with id ${smithable.item.itemId}`);
+            logger.error(
+                `Could not find smithable item with id ${smithable.item.itemId}`,
+            );
             return false;
         }
 
-        player.sendMessage(`You have to be at least level ${smithable.level} to smith ${item.name}s.`, true);
+        player.sendMessage(
+            `You have to be at least level ${smithable.level} to smith ${item.name}s.`,
+            true,
+        );
         return false;
     }
 
@@ -88,7 +106,9 @@ const canForge = (player: Player, smithable: Smithable): boolean => {
         const ingredient = findItem(smithable.ingredient.itemId);
 
         if (!ingredient) {
-            logger.error(`Could not find smithable ingredient with id ${smithable.ingredient.itemId}`);
+            logger.error(
+                `Could not find smithable ingredient with id ${smithable.ingredient.itemId}`,
+            );
             return false;
         }
 
@@ -107,7 +127,10 @@ const canForge = (player: Player, smithable: Smithable): boolean => {
  * @param smithable
  */
 const hasMaterials = (player: Player, smithable: Smithable) => {
-    return smithable.ingredient.amount <= player.inventory.findAll(smithable.ingredient.itemId).length;
+    return (
+        smithable.ingredient.amount <=
+        player.inventory.findAll(smithable.ingredient.itemId).length
+    );
 };
 
 /**
@@ -141,29 +164,42 @@ const openForgingInterface: itemOnObjectActionHandler = (details) => {
     }
 
     if (barLevel > player.skills.getLevel(Skill.SMITHING)) {
-        player.sendMessage(`You have to be at least level ${barLevel} to smith ${bar.name}s.`, true);
+        player.sendMessage(
+            `You have to be at least level ${barLevel} to smith ${bar.name}s.`,
+            true,
+        );
         return;
     }
 
     player.outgoingPackets.updateClientConfig(210, amountInInventory);
-    player.outgoingPackets.updateClientConfig(211, player.skills.getLevel(Skill.SMITHING));
+    player.outgoingPackets.updateClientConfig(
+        211,
+        player.skills.getLevel(Skill.SMITHING),
+    );
 
     details.player.interfaceState.openWidget(widgets.anvil.widgetId, {
-        slot: 'screen'
+        slot: 'screen',
     });
 
     const barWidgetItems = widgetItems.get(item.itemId);
 
     if (barWidgetItems === undefined) {
-        logger.warn(`Could not find bar widget items for item id ${item.itemId}`);
+        logger.warn(
+            `Could not find bar widget items for item id ${item.itemId}`,
+        );
         return;
     }
 
     barWidgetItems.forEach((items, containerId) => {
         items.forEach((smithable, index) => {
-            player.outgoingPackets.sendUpdateSingleWidgetItem({
-                widgetId: widgets.anvil.widgetId, containerId: containerId
-            }, index, smithable.item);
+            player.outgoingPackets.sendUpdateSingleWidgetItem(
+                {
+                    widgetId: widgets.anvil.widgetId,
+                    containerId: containerId,
+                },
+                index,
+                smithable.item,
+            );
         });
     });
 };
@@ -178,7 +214,7 @@ export default {
             walkTo: true,
 
             cancelOtherActions: true,
-            handler: openForgingInterface
+            handler: openForgingInterface,
         } as ItemOnObjectActionHook,
         {
             type: 'item_interaction',
@@ -189,17 +225,27 @@ export default {
                 const smithable = findSmithableByItemId(itemId);
 
                 if (!smithable) {
-                    logger.error(`Could not find smithable with item id ${itemId}`);
-                    player.sendMessage('Could not find smithable, please tell a dev.');
+                    logger.error(
+                        `Could not find smithable with item id ${itemId}`,
+                    );
+                    player.sendMessage(
+                        'Could not find smithable, please tell a dev.',
+                    );
                     return;
                 }
 
                 let wantedAmount = 0;
 
                 switch (option) {
-                    case 'make': wantedAmount = 1; break;
-                    case 'make-5': wantedAmount = 5; break;
-                    case 'make-10': wantedAmount = 10; break;
+                    case 'make':
+                        wantedAmount = 1;
+                        break;
+                    case 'make-5':
+                        wantedAmount = 5;
+                        break;
+                    case 'make-10':
+                        wantedAmount = 10;
+                        break;
                 }
 
                 if (!canForge(player, smithable)) {
@@ -207,7 +253,7 @@ export default {
                 }
 
                 player.enqueueTask(ForgingTask, [smithable, wantedAmount]);
-            }
-        } as ItemInteractionActionHook
-    ]
+            },
+        } as ItemInteractionActionHook,
+    ],
 };

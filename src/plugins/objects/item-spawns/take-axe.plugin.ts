@@ -5,7 +5,7 @@ import { logger } from '@runejs/common';
 
 const itemMappings: Record<number, number> = {
     [objectIds.lumbridgeAxeInLogs]: itemIds.axes.bronze,
-}
+};
 
 export const action: objectInteractionActionHandler = (details) => {
     const { player, option } = details;
@@ -24,7 +24,7 @@ export const action: objectInteractionActionHandler = (details) => {
             return;
         default:
             player.sendMessage('This has not been implemented.');
-            return
+            return;
     }
 };
 
@@ -34,9 +34,9 @@ export default {
         {
             type: 'object_interaction',
             objectIds: [objectIds.lumbridgeAxeInLogs],
-            options: [ 'take-axe' ],
+            options: ['take-axe'],
             walkTo: true,
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

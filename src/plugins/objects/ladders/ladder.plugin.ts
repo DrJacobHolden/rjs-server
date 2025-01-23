@@ -7,7 +7,6 @@ import { Task } from '@engine/task';
 import { ActorTask } from '@engine/task/impl';
 import { Actor, Player } from '@engine/world/actor';
 
-
 const planes = { min: 0, max: 3 };
 const validate: (level: number) => boolean = (level) => {
     return planes.min <= level && level <= planes.max;
@@ -23,26 +22,37 @@ export const action: objectInteractionActionHandler = (details) => {
 
     if (option === 'climb') {
         dialogueAction(player)
-            .then(async d => d.options(
-                `Climb up or down the ${ladderObjectName.toLowerCase()}?`,
-                [
-                    `Climb up the ${ladderObjectName.toLowerCase()}.`,
-                    `Climb down the ${ladderObjectName.toLowerCase()}.`
-                ]))
-            .then(d => {
+            .then(async (d) =>
+                d.options(
+                    `Climb up or down the ${ladderObjectName.toLowerCase()}?`,
+                    [
+                        `Climb up the ${ladderObjectName.toLowerCase()}.`,
+                        `Climb down the ${ladderObjectName.toLowerCase()}.`,
+                    ],
+                ),
+            )
+            .then((d) => {
                 d.close();
                 switch (d.action) {
                     case 1:
                     case 2:
-                        player.enqueueTask(class LadderTask extends ActorTask {
-                            constructor(actor: Actor) {
-                                super(actor, { repeat: false, immediate: false });
-                            }
+                        player.enqueueTask(
+                            class LadderTask extends ActorTask {
+                                constructor(actor: Actor) {
+                                    super(actor, {
+                                        repeat: false,
+                                        immediate: false,
+                                    });
+                                }
 
-                            execute() {
-                                action({ ...details, option: `climb-${(d.action === 1 ? 'up' : 'down')}` });
-                            }
-                        });
+                                execute() {
+                                    action({
+                                        ...details,
+                                        option: `climb-${d.action === 1 ? 'up' : 'down'}`,
+                                    });
+                                }
+                            },
+                        );
                         return;
                 }
             });
@@ -52,12 +62,12 @@ export const action: objectInteractionActionHandler = (details) => {
     const { position } = player;
     const newPosition = new Position(position.x, position.y, position.level);
     newPosition.level = position.level + (up ? 1 : -1);
-    if(position.level === 0) {
-        if(newPosition.level === 1 && position.y >= 6400) {
+    if (position.level === 0) {
+        if (newPosition.level === 1 && position.y >= 6400) {
             newPosition.level = 0;
             newPosition.y -= 6414;
             newPosition.x++;
-        } else if(newPosition.level === -1) {
+        } else if (newPosition.level === -1) {
             newPosition.level = 0;
             newPosition.y += 6414;
             newPosition.x--;
@@ -67,7 +77,9 @@ export const action: objectInteractionActionHandler = (details) => {
     if (!ladderObjectName.startsWith('Stair')) {
         player.playAnimation(up ? 828 : 827);
     }
-    player.sendMessage(`You climb ${option.slice(6)} the ${ladderObjectName.toLowerCase()}.`);
+    player.sendMessage(
+        `You climb ${option.slice(6)} the ${ladderObjectName.toLowerCase()}.`,
+    );
     player.enqueueTask(ActorTeleportTask, [newPosition]);
 };
 
@@ -76,10 +88,13 @@ export default {
     hooks: [
         {
             type: 'object_interaction',
-            objectIds: [ 1738, 1739, 1740, 1746, 1747, 1748, 2147, 2148, 12964, 12965, 12966 ],
-            options: [ 'climb', 'climb-up', 'climb-down' ],
+            objectIds: [
+                1738, 1739, 1740, 1746, 1747, 1748, 2147, 2148, 12964, 12965,
+                12966,
+            ],
+            options: ['climb', 'climb-up', 'climb-down'],
             walkTo: true,
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

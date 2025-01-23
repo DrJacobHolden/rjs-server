@@ -34,26 +34,29 @@ export async function loadPlugins(): Promise<void> {
     questMap = {};
     const plugins = await loadPluginFiles();
 
-    const pluginActionHookList = plugins?.filter(plugin => !!plugin?.hooks)?.map(plugin => plugin.hooks);
+    const pluginActionHookList = plugins
+        ?.filter((plugin) => !!plugin?.hooks)
+        ?.map((plugin) => plugin.hooks);
 
-    if(pluginActionHookList && pluginActionHookList.length !== 0) {
-        pluginActionHookList.reduce(
-            (a, b) => (a || []).concat(b || []))?.forEach(action => {
-            if(!(action instanceof Quest)) {
-                if(!actionHookMap[action.type]) {
-                    actionHookMap[action.type] = [];
+    if (pluginActionHookList && pluginActionHookList.length !== 0) {
+        pluginActionHookList
+            .reduce((a, b) => (a || []).concat(b || []))
+            ?.forEach((action) => {
+                if (!(action instanceof Quest)) {
+                    if (!actionHookMap[action.type]) {
+                        actionHookMap[action.type] = [];
+                    }
+
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    actionHookMap[action.type]?.push(action);
+                } else {
+                    if (!actionHookMap.quest) {
+                        actionHookMap.quest = [];
+                    }
+
+                    actionHookMap.quest.push(action);
                 }
-
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                actionHookMap[action.type]?.push(action);
-            } else {
-                if(!actionHookMap.quest) {
-                    actionHookMap.quest = [];
-                }
-
-                actionHookMap.quest.push(action);
-            }
-        });
+            });
     } else {
         logger.warn('No action hooks detected - update plugins.');
     }
@@ -69,7 +72,7 @@ export async function loadPlugins(): Promise<void> {
     }
 
     // @TODO implement proper sorting rules
-    Object.keys(actionHookMap)
-        .forEach(key => actionHookMap[key] =
-            sortActionHooks(actionHookMap[key]));
+    Object.keys(actionHookMap).forEach(
+        (key) => (actionHookMap[key] = sortActionHooks(actionHookMap[key])),
+    );
 }

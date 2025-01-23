@@ -1,4 +1,4 @@
-import { Task } from './task'
+import { Task } from './task';
 import { TaskStackType } from './types';
 import { createMockTask } from './utils/_testing';
 
@@ -15,12 +15,19 @@ describe('Task', () => {
         const immediate = false;
 
         let executeMock: jest.Mock;
-        let task: Task
+        let task: Task;
 
         describe('and repeat is true', () => {
             const repeat = false;
             beforeEach(() => {
-                ({ task, executeMock } = createMockTask(interval, stackType, stackGroup, immediate, breakType, repeat, ));
+                ({ task, executeMock } = createMockTask(
+                    interval,
+                    stackType,
+                    stackGroup,
+                    immediate,
+                    breakType,
+                    repeat,
+                ));
             });
 
             describe('when ticked once', () => {
@@ -48,7 +55,14 @@ describe('Task', () => {
         describe('and repeat is false', () => {
             const repeat = false;
             beforeEach(() => {
-                ({ task, executeMock } = createMockTask(interval, stackType, stackGroup, immediate, breakType, repeat));
+                ({ task, executeMock } = createMockTask(
+                    interval,
+                    stackType,
+                    stackGroup,
+                    immediate,
+                    breakType,
+                    repeat,
+                ));
             });
 
             describe('when ticked once', () => {
@@ -74,7 +88,6 @@ describe('Task', () => {
         });
     });
 
-
     describe('when interval is 2', () => {
         const interval = 2;
 
@@ -82,13 +95,20 @@ describe('Task', () => {
         const repeat = false;
 
         let executeMock: jest.Mock;
-        let task: Task
+        let task: Task;
 
         describe('and immediate is true', () => {
             const immediate = true;
 
             beforeEach(() => {
-                ({ task, executeMock } = createMockTask(interval, stackType, stackGroup, immediate, breakType, repeat));
+                ({ task, executeMock } = createMockTask(
+                    interval,
+                    stackType,
+                    stackGroup,
+                    immediate,
+                    breakType,
+                    repeat,
+                ));
             });
 
             describe('when ticked once', () => {
@@ -118,7 +138,14 @@ describe('Task', () => {
             const immediate = false;
 
             beforeEach(() => {
-                ({ task, executeMock } = createMockTask(interval, stackType, stackGroup, immediate, breakType, repeat));
+                ({ task, executeMock } = createMockTask(
+                    interval,
+                    stackType,
+                    stackGroup,
+                    immediate,
+                    breakType,
+                    repeat,
+                ));
             });
 
             describe('when ticked once', () => {
@@ -153,8 +180,7 @@ describe('Task', () => {
         beforeEach(() => {
             onStopMock = jest.fn();
             executeMock = jest.fn();
-            task = new class extends Task {
-
+            task = new (class extends Task {
                 public execute(): void {
                     executeMock();
                 }
@@ -162,7 +188,7 @@ describe('Task', () => {
                 public onStop(): void {
                     onStopMock();
                 }
-            }
+            })();
         });
 
         describe('when the task is stopped', () => {

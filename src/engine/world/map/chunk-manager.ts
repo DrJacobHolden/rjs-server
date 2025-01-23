@@ -4,15 +4,18 @@ import { logger } from '@runejs/common';
 import { filestore } from '@server/game/game-server';
 import { LandscapeFile, LandscapeObject, MapFile } from '@runejs/filestore';
 
-
 export class Tile {
-
     public settings: number = 0;
     public blocked: boolean = false;
     public bridge: boolean = false;
 
-    public constructor(public x: number, public y: number, public level: number, settings?: number) {
-        if(settings) {
+    public constructor(
+        public x: number,
+        public y: number,
+        public level: number,
+        settings?: number,
+    ) {
+        if (settings) {
             this.setSettings(settings);
         }
     }
@@ -22,7 +25,6 @@ export class Tile {
         this.blocked = (this.settings & 0x1) === 1;
         this.bridge = (this.settings & 0x2) === 2;
     }
-
 }
 
 export interface MapRegion {
@@ -30,13 +32,14 @@ export interface MapRegion {
     mapFile: MapFile;
 }
 
-
 /**
  * Controls all of the game world's map chunks.
  */
 export class ChunkManager {
-
-    public readonly regionMap: Map<string, MapRegion> = new Map<string, MapRegion>();
+    public readonly regionMap: Map<string, MapRegion> = new Map<
+        string,
+        MapRegion
+    >();
     private readonly chunkMap: Map<string, Chunk>;
 
     public constructor() {
@@ -50,11 +53,12 @@ export class ChunkManager {
         const mapRegionY = Math.floor(chunkY / 8);
         const mapWorldPositionX = (mapRegionX & 0xff) * 64;
         const mapWorldPositionY = mapRegionY * 64;
-        const regionSettings = this.regionMap.get(`${mapRegionX},${mapRegionY}`)?.mapFile?.tileSettings;
+        const regionSettings = this.regionMap.get(`${mapRegionX},${mapRegionY}`)
+            ?.mapFile?.tileSettings;
 
         this.registerMapRegion(mapRegionX, mapRegionY);
 
-        if(!regionSettings) {
+        if (!regionSettings) {
             return new Tile(position.x, position.y, position.level);
         }
 
@@ -63,10 +67,11 @@ export class ChunkManager {
         const tileLevel = position.level;
         let tileSettings = regionSettings[tileLevel][tileX][tileY];
 
-        if(tileLevel < 3) {
+        if (tileLevel < 3) {
             // Check for a bridge tile above the active tile
-            const tileAboveSettings = regionSettings[tileLevel + 1][tileX][tileY];
-            if((tileAboveSettings & 0x2) === 2) {
+            const tileAboveSettings =
+                regionSettings[tileLevel + 1][tileX][tileY];
+            if ((tileAboveSettings & 0x2) === 2) {
                 // Set this tile as walkable if the tile above is a bridge -
                 // This is because the maps are stored with bridges being one level
                 // above where their collision maps need to be
@@ -80,7 +85,7 @@ export class ChunkManager {
     public registerMapRegion(mapRegionX: number, mapRegionY: number): void {
         const key = `${mapRegionX},${mapRegionY}`;
 
-        if(this.regionMap.has(key)) {
+        if (this.regionMap.has(key)) {
             // Map region already registered
             return;
         }
@@ -91,52 +96,64 @@ export class ChunkManager {
 
         try {
             mapFile = filestore.regionStore.getMapFile(mapRegionX, mapRegionY);
-        } catch(error) {
+        } catch (error) {
             logger.error(`Error decoding map file ${mapRegionX},${mapRegionY}`);
         }
         try {
-            landscapeFile = filestore.regionStore.getLandscapeFile(mapRegionX, mapRegionY);
-        } catch(error) {
-            logger.error(`Error decoding landscape file ${mapRegionX},${mapRegionY}`);
+            landscapeFile = filestore.regionStore.getLandscapeFile(
+                mapRegionX,
+                mapRegionY,
+            );
+        } catch (error) {
+            logger.error(
+                `Error decoding landscape file ${mapRegionX},${mapRegionY}`,
+            );
         }
 
-        if(!mapFile) {
+        if (!mapFile) {
             logger.error(`No decoded map file ${mapRegionX},${mapRegionY}`);
             return;
         }
 
-        if(!landscapeFile) {
-            logger.error(`No decoded landscape file ${mapRegionX},${mapRegionY}`);
+        if (!landscapeFile) {
+            logger.error(
+                `No decoded landscape file ${mapRegionX},${mapRegionY}`,
+            );
             return;
         }
 
-        const region: MapRegion = { mapFile, objects: landscapeFile?.landscapeObjects || [] };
+        const region: MapRegion = {
+            mapFile,
+            objects: landscapeFile?.landscapeObjects || [],
+        };
 
         this.regionMap.set(key, region);
         this.registerObjects(region.objects, mapFile);
     }
 
     public registerObjects(objects: LandscapeObject[], mapFile: MapFile): void {
-        if(!objects || objects.length === 0) {
+        if (!objects || objects.length === 0) {
             return;
         }
 
         const mapWorldPositionX = (mapFile.regionX & 0xff) * 64;
         const mapWorldPositionY = mapFile.regionY * 64;
 
-        for(const object of objects) {
+        for (const object of objects) {
             const position = new Position(object.x, object.y, object.level);
             const localX = object.x - mapWorldPositionX;
             const localY = object.y - mapWorldPositionY;
 
-            for(let level = 3; level >= 0; level--) {
-                if((mapFile.tileSettings[level][localX][localY] & 0x2) === 2) {
+            for (let level = 3; level >= 0; level--) {
+                if ((mapFile.tileSettings[level][localX][localY] & 0x2) === 2) {
                     // Object is on or underneath a bridge tile and needs to move down one level
                     position.move(object.x, object.y, object.level - 1);
                 }
             }
 
-            this.getChunkForWorldPosition(position).setFilestoreLandscapeObject(object);
+            this.getChunkForWorldPosition(position).setFilestoreLandscapeObject(
+                object,
+            );
         }
     }
 
@@ -147,8 +164,8 @@ export class ChunkManager {
         const mainY = chunk.position.y;
         const level = chunk.position.level;
 
-        for(let x = mainX - 2; x <= mainX + 2; x++) {
-            for(let y = mainY - 2; y <= mainY + 2; y++) {
+        for (let x = mainX - 2; x <= mainX + 2; x++) {
+            for (let y = mainY - 2; y <= mainY + 2; y++) {
                 chunks.push(this.getChunk({ x, y, level }));
             }
         }
@@ -165,24 +182,29 @@ export class ChunkManager {
     }
 
     public getChunkForWorldPosition(position: Position): Chunk {
-        return this.getChunk({ x: position.chunkX, y: position.chunkY, level: position.level });
+        return this.getChunk({
+            x: position.chunkX,
+            y: position.chunkY,
+            level: position.level,
+        });
     }
 
-    public getChunk(position: Position | { x: number, y: number, level: number }): Chunk {
-        if(!(position instanceof Position)) {
+    public getChunk(
+        position: Position | { x: number; y: number; level: number },
+    ): Chunk {
+        if (!(position instanceof Position)) {
             position = new Position(position.x, position.y, position.level);
         }
 
-        const pos = (position as Position);
-        if(this.chunkMap.has(pos.key)) {
+        const pos = position as Position;
+        if (this.chunkMap.has(pos.key)) {
             // using ! here because we know it exists
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this.chunkMap.get(pos.key)!;
         }
-            const chunk = new Chunk(pos);
-            this.chunkMap.set(pos.key, chunk);
-            chunk.registerMapRegion();
-            return chunk;
+        const chunk = new Chunk(pos);
+        this.chunkMap.set(pos.key, chunk);
+        chunk.registerMapRegion();
+        return chunk;
     }
-
 }

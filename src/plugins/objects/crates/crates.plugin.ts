@@ -12,7 +12,10 @@ export const action: objectInteractionActionHandler = (details) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const pickedItem = findItem(veggies[random])!;
 
-    details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, details.player.inventory);
+    details.player.outgoingPackets.sendUpdateAllWidgetItems(
+        widgets.inventory,
+        details.player.inventory,
+    );
 
     // this used to use `setInterval` but will need rewriting to be synced with ticks
     // see https://github.com/runejs/server/issues/417
@@ -31,10 +34,10 @@ export default {
     hooks: [
         {
             type: 'object_interaction',
-            objectIds: [ 366, 357, 355 ],
-            options: ['loot', 'search', 'examine' ],
+            objectIds: [366, 357, 355],
+            options: ['loot', 'search', 'examine'],
             walkTo: true,
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

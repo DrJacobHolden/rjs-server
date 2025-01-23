@@ -6,14 +6,12 @@ import { logger } from '@runejs/common';
 import { join } from 'node:path';
 import { House, Room } from '@plugins/skills/construction/house';
 
-
 /**
  * Gets the PoH save file name for the given player.
  * @param player
  */
 const getSaveFileName = (player: Player): string =>
     `${player.username.toLowerCase().replace(/ /g, '_')}.json5`;
-
 
 /**
  * Loads and returns the given player's PoH as a ConstructedRegion object.
@@ -23,7 +21,7 @@ const getSaveFileName = (player: Player): string =>
 export const loadHouse = (player: Player): House | null => {
     const houseSaveDir = join('data', 'houses');
 
-    if(!existsSync(houseSaveDir)) {
+    if (!existsSync(houseSaveDir)) {
         mkdirSync(houseSaveDir);
         return null;
     }
@@ -32,12 +30,12 @@ export const loadHouse = (player: Player): House | null => {
 
     try {
         const customMapFile = readFileSync(filePath, 'utf-8');
-        if(!customMapFile) {
+        if (!customMapFile) {
             return null;
         }
 
         const customMap = JSON5.parse(customMapFile);
-        if(!customMap) {
+        if (!customMap) {
             return null;
         }
 
@@ -45,13 +43,12 @@ export const loadHouse = (player: Player): House | null => {
         const house = new House();
         house.copyRooms(loadedHouse.rooms);
         return house;
-    } catch(error) {
+    } catch (error) {
         logger.error(`Error loading player house for ${player.username}.`);
         logger.error(error);
         return null;
     }
 };
-
 
 /**
  * Saves the given player's house as a JSON5 file.
@@ -59,13 +56,13 @@ export const loadHouse = (player: Player): House | null => {
  */
 export const saveHouse = (player: Player): void => {
     const customMap = player.metadata.customMap as ConstructedRegion;
-    if(!customMap) {
+    if (!customMap) {
         return;
     }
 
     const houseSaveDir = join('data', 'houses');
 
-    if(!existsSync(houseSaveDir)) {
+    if (!existsSync(houseSaveDir)) {
         mkdirSync(houseSaveDir);
     }
 
@@ -76,7 +73,7 @@ export const saveHouse = (player: Player): void => {
 
     try {
         writeFileSync(filePath, JSON5.stringify(house, null, 4));
-    } catch(error) {
+    } catch (error) {
         logger.error(`Error saving player house for ${player.username}.`);
         logger.error(error);
     }

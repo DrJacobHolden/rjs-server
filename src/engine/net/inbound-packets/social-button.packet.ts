@@ -13,8 +13,8 @@ export default {
         player.settings.privateChatMode = buffer.get('byte');
         player.settings.tradeMode = buffer.get('byte');
 
-        if(currentPrivateChatMode !== player.settings.privateChatMode) {
+        if (currentPrivateChatMode !== player.settings.privateChatMode) {
             PrivateMessaging.playerPrivateChatModeChanged(player);
         }
-    }
+    },
 };

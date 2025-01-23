@@ -4,13 +4,19 @@ import { widgets } from '@engine/config/config-handler';
 export const handler: itemInteractionActionHandler = (details) => {
     const { player, itemId, itemSlot, itemDetails } = details;
 
-    if(!itemDetails) {
+    if (!itemDetails) {
         // The item is not yet configured on the server.
-        player.sendMessage(`Item ${itemId} is not yet configured on the server.`);
+        player.sendMessage(
+            `Item ${itemId} is not yet configured on the server.`,
+        );
         return;
     }
 
-    player.equipItem(itemId, itemSlot, itemDetails.equipmentData?.equipmentSlot);
+    player.equipItem(
+        itemId,
+        itemSlot,
+        itemDetails.equipmentData?.equipmentSlot,
+    );
 };
 
 export default {
@@ -21,7 +27,7 @@ export default {
             widgets: widgets.inventory,
             options: 'equip',
             handler,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

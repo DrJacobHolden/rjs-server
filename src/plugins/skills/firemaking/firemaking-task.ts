@@ -41,16 +41,17 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
      * @param player The player that is attempting to light the fire.
      * @param logWorldItem The world item that represents the log.
      */
-    constructor(
-        player: Player,
-        logWorldItem: WorldItem
-    ) {
+    constructor(player: Player, logWorldItem: WorldItem) {
         super(player, logWorldItem);
 
-        const logInfo = FIREMAKING_LOGS.find(l => l.logItem.gameId === logWorldItem.itemId);
+        const logInfo = FIREMAKING_LOGS.find(
+            (l) => l.logItem.gameId === logWorldItem.itemId,
+        );
 
         if (!logInfo) {
-            throw new Error(`Invalid firemaking log item id: ${logWorldItem.itemId}`);
+            throw new Error(
+                `Invalid firemaking log item id: ${logWorldItem.itemId}`,
+            );
         }
 
         this.logInfo = logInfo;
@@ -82,7 +83,12 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
 
         if (this.canLightFire) {
             if (tickCount === 2) {
-                lightFire(this.actor, this.actor.position, this.worldItem, this.logInfo.experienceGained);
+                lightFire(
+                    this.actor,
+                    this.actor.position,
+                    this.worldItem,
+                    this.logInfo.experienceGained,
+                );
                 this.stop();
             }
 
@@ -100,7 +106,12 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
         //              OSRS wiki implies that there isn't
         //              https://oldschool.runescape.wiki/w/Firemaking#Success_chance
         const passedMinimumThreshold = tickCount > 10;
-        this.canLightFire = passedMinimumThreshold && canLight(this.logInfo.requiredLevel, this.actor.skills.firemaking.level);
+        this.canLightFire =
+            passedMinimumThreshold &&
+            canLight(
+                this.logInfo.requiredLevel,
+                this.actor.skills.firemaking.level,
+            );
 
         // if we can now light the fire, reset the timer so that on the next tick we can begin lighting the fire
         if (this.canLightFire) {
@@ -125,5 +136,5 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
  * @param worldItemLog The WorldItem that represents the log.
  */
 export function runFiremakingTask(player: Player, worldItemLog: WorldItem) {
-    player.enqueueTask(FiremakingTask, [ worldItemLog ]);
+    player.enqueueTask(FiremakingTask, [worldItemLog]);
 }

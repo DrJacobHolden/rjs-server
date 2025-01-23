@@ -7,12 +7,10 @@ import { Subject } from 'rxjs';
 import { activeWorld } from '@engine/world';
 import { logger } from '@runejs/common';
 
-
 /**
  * Controls an actor's movement.
  */
 export class WalkingQueue {
-
     public readonly movementQueued = new Subject<Position>();
     public readonly movementEvent = new Subject<Position>();
     public readonly movementQueued$ = this.movementQueued.asObservable();
@@ -35,13 +33,17 @@ export class WalkingQueue {
     }
 
     public getLastPosition(): Position {
-        if(this.queue.length === 0) {
+        if (this.queue.length === 0) {
             return this.actor.position;
         }
-            return this.queue[this.queue.length - 1];
+        return this.queue[this.queue.length - 1];
     }
 
-    public add(x: number, y: number, positionMetadata?: { [key: string]: any }): void {
+    public add(
+        x: number,
+        y: number,
+        positionMetadata?: { [key: string]: any },
+    ): void {
         let lastPosition = this.getLastPosition();
 
         let lastX = lastPosition.x;
@@ -51,25 +53,29 @@ export class WalkingQueue {
 
         const stepsBetween = Math.max(Math.abs(diffX), Math.abs(diffY));
 
-        for(let i = 0; i < stepsBetween; i++) {
-            if(diffX !== 0) {
+        for (let i = 0; i < stepsBetween; i++) {
+            if (diffX !== 0) {
                 diffX += diffX < 0 ? 1 : -1;
             }
 
-            if(diffY !== 0) {
+            if (diffY !== 0) {
                 diffY += diffY < 0 ? 1 : -1;
             }
 
             lastX = x - diffX;
             lastY = y - diffY;
 
-            const newPosition = new Position(lastX, lastY, this.actor.position.level);
+            const newPosition = new Position(
+                lastX,
+                lastY,
+                this.actor.position.level,
+            );
 
-            if(this.actor.pathfinding.canMoveTo(lastPosition, newPosition)) {
+            if (this.actor.pathfinding.canMoveTo(lastPosition, newPosition)) {
                 lastPosition = newPosition;
                 newPosition.metadata = {
                     ...newPosition.metadata,
-                    ...positionMetadata
+                    ...positionMetadata,
                 };
                 this.queue.push(newPosition);
                 this.movementQueued.next(newPosition);
@@ -79,13 +85,13 @@ export class WalkingQueue {
             }
         }
 
-        if(lastX !== x || lastY !== y && this.valid) {
+        if (lastX !== x || (lastY !== y && this.valid)) {
             const newPosition = new Position(x, y, this.actor.position.level);
 
-            if(this.actor.pathfinding.canMoveTo(lastPosition, newPosition)) {
+            if (this.actor.pathfinding.canMoveTo(lastPosition, newPosition)) {
                 newPosition.metadata = {
                     ...newPosition.metadata,
-                    ...positionMetadata
+                    ...positionMetadata,
                 };
                 this.queue.push(newPosition);
                 this.movementQueued.next(newPosition);
@@ -97,9 +103,13 @@ export class WalkingQueue {
 
     public moveIfAble(xDiff: number, yDiff: number): boolean {
         const position = this.actor.position;
-        const newPosition = new Position(position.x + xDiff, position.y + yDiff, position.level);
+        const newPosition = new Position(
+            position.x + xDiff,
+            position.y + yDiff,
+            position.level,
+        );
 
-        if(this.actor.pathfinding.canMoveTo(position, newPosition)) {
+        if (this.actor.pathfinding.canMoveTo(position, newPosition)) {
             this.clear();
             this.valid = true;
             this.add(newPosition.x, newPosition.y, { ignoreWidgets: true });
@@ -115,31 +125,35 @@ export class WalkingQueue {
     }
 
     public calculateDirection(diffX: number, diffY: number): number {
-        if(diffX < 0) {
-            if(diffY < 0) {
+        if (diffX < 0) {
+            if (diffY < 0) {
                 return 5;
-            }if(diffY > 0) {
+            }
+            if (diffY > 0) {
                 return 0;
             }
-                return 3;
-        }if(diffX > 0) {
-            if(diffY < 0) {
+            return 3;
+        }
+        if (diffX > 0) {
+            if (diffY < 0) {
                 return 7;
-            }if(diffY > 0) {
+            }
+            if (diffY > 0) {
                 return 2;
             }
-                return 4;
+            return 4;
         }
-            if(diffY < 0) {
-                return 6;
-            }if(diffY > 0) {
-                return 1;
-            }
-                return -1;
+        if (diffY < 0) {
+            return 6;
+        }
+        if (diffY > 0) {
+            return 1;
+        }
+        return -1;
     }
 
     public process(): void {
-        if(this.actor.busy || this.queue.length === 0 || !this.valid) {
+        if (this.actor.busy || this.queue.length === 0 || !this.valid) {
             this.resetDirections();
             return;
         }
@@ -150,21 +164,28 @@ export class WalkingQueue {
             return;
         }
 
-        if(this.actor.metadata.faceActorClearedByWalking === undefined || this.actor.metadata.faceActorClearedByWalking) {
+        if (
+            this.actor.metadata.faceActorClearedByWalking === undefined ||
+            this.actor.metadata.faceActorClearedByWalking
+        ) {
             this.actor.clearFaceActor();
         }
 
         const originalPosition = this.actor.position;
 
-        if(this.actor.pathfinding.canMoveTo(originalPosition, walkPosition)) {
-            const oldChunk = activeWorld.chunkManager.getChunkForWorldPosition(originalPosition);
-            const lastMapRegionUpdatePosition = this.actor.lastMapRegionUpdatePosition;
+        if (this.actor.pathfinding.canMoveTo(originalPosition, walkPosition)) {
+            const oldChunk =
+                activeWorld.chunkManager.getChunkForWorldPosition(
+                    originalPosition,
+                );
+            const lastMapRegionUpdatePosition =
+                this.actor.lastMapRegionUpdatePosition;
 
             const walkDiffX = walkPosition.x - originalPosition.x;
             const walkDiffY = walkPosition.y - originalPosition.y;
             const walkDir = this.calculateDirection(walkDiffX, walkDiffY);
 
-            if(walkDir === -1) {
+            if (walkDir === -1) {
                 this.resetDirections();
                 return;
             }
@@ -175,21 +196,27 @@ export class WalkingQueue {
             let runDir = -1;
 
             // @TODO npc running
-            if(this.actor instanceof Player) {
-                if(this.actor.settings.runEnabled && this.queue.length !== 0) {
+            if (this.actor instanceof Player) {
+                if (this.actor.settings.runEnabled && this.queue.length !== 0) {
                     const runPosition = this.queue.shift();
 
                     if (!runPosition) {
                         return;
                     }
 
-                    if(this.actor.pathfinding.canMoveTo(walkPosition, runPosition)) {
+                    if (
+                        this.actor.pathfinding.canMoveTo(
+                            walkPosition,
+                            runPosition,
+                        )
+                    ) {
                         const runDiffX = runPosition.x - walkPosition.x;
                         const runDiffY = runPosition.y - walkPosition.y;
                         runDir = this.calculateDirection(runDiffX, runDiffY);
 
-                        if(runDir !== -1) {
-                            this.actor.lastMovementPosition = this.actor.position;
+                        if (runDir !== -1) {
+                            this.actor.lastMovementPosition =
+                                this.actor.position;
                             this.actor.position = runPosition;
                         }
                     } else {
@@ -202,32 +229,50 @@ export class WalkingQueue {
             this.actor.walkDirection = walkDir;
             this.actor.runDirection = runDir;
 
-            if(runDir !== -1) {
+            if (runDir !== -1) {
                 this.actor.faceDirection = runDir;
             } else {
                 this.actor.faceDirection = walkDir;
             }
 
-            const newChunk = activeWorld.chunkManager.getChunkForWorldPosition(this.actor.position);
+            const newChunk = activeWorld.chunkManager.getChunkForWorldPosition(
+                this.actor.position,
+            );
 
             this.movementEvent.next(this.actor.position);
 
-            if(this.actor instanceof Player) {
-                const mapDiffX = this.actor.position.x - (lastMapRegionUpdatePosition.chunkX * 8);
-                const mapDiffY = this.actor.position.y - (lastMapRegionUpdatePosition.chunkY * 8);
-                if(mapDiffX < 16 || mapDiffX > 87 || mapDiffY < 16 || mapDiffY > 87) {
+            if (this.actor instanceof Player) {
+                const mapDiffX =
+                    this.actor.position.x -
+                    lastMapRegionUpdatePosition.chunkX * 8;
+                const mapDiffY =
+                    this.actor.position.y -
+                    lastMapRegionUpdatePosition.chunkY * 8;
+                if (
+                    mapDiffX < 16 ||
+                    mapDiffX > 87 ||
+                    mapDiffY < 16 ||
+                    mapDiffY > 87
+                ) {
                     this.actor.updateFlags.mapRegionUpdateRequired = true;
-                    this.actor.lastMapRegionUpdatePosition = this.actor.position;
+                    this.actor.lastMapRegionUpdatePosition =
+                        this.actor.position;
                 }
             }
 
-            if(!oldChunk.equals(newChunk)) {
-                if(this.actor instanceof Player) {
+            if (!oldChunk.equals(newChunk)) {
+                if (this.actor instanceof Player) {
                     this.actor.metadata.updateChunk = { newChunk, oldChunk };
 
-                    this.actor.actionPipeline.call('region_change', regionChangeActionFactory(
-                        this.actor, originalPosition, this.actor.position));
-                } else if(this.actor instanceof Npc) {
+                    this.actor.actionPipeline.call(
+                        'region_change',
+                        regionChangeActionFactory(
+                            this.actor,
+                            originalPosition,
+                            this.actor.position,
+                        ),
+                    );
+                } else if (this.actor instanceof Npc) {
                     oldChunk.removeNpc(this.actor);
                     newChunk.addNpc(this.actor);
                 }

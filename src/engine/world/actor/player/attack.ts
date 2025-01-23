@@ -2,10 +2,10 @@
 
 export class Attack {
     damageType: AttackDamageType;
-    attackRoll: number =0;
+    attackRoll: number = 0;
     defenseRoll: number = 0;
-    hitChance: number =0;
-    damage: number =0;
+    hitChance: number = 0;
+    damage: number = 0;
     maximumHit: number;
 }
 
@@ -14,5 +14,5 @@ export enum AttackDamageType {
     Slash = 1,
     Crush = 2,
     Magic = 3,
-    Range = 4
+    Range = 4,
 }

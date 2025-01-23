@@ -23,32 +23,45 @@ interface SpinnableButton {
     spinnable: Spinnable;
 }
 
-const ballOfWool: Spinnable = { input: itemIds.wool, output: itemIds.ballOfWool, experience: 2.5, requiredLevel: 1 };
-const bowString: Spinnable = { input: itemIds.flax, output: itemIds.bowstring, experience: 15, requiredLevel: 10 };
+const ballOfWool: Spinnable = {
+    input: itemIds.wool,
+    output: itemIds.ballOfWool,
+    experience: 2.5,
+    requiredLevel: 1,
+};
+const bowString: Spinnable = {
+    input: itemIds.flax,
+    output: itemIds.bowstring,
+    experience: 15,
+    requiredLevel: 10,
+};
 const rootsCbowString: Spinnable = {
     input: [
         itemIds.roots.oak,
         itemIds.roots.willow,
         itemIds.roots.maple,
-        itemIds.roots.yew
+        itemIds.roots.yew,
     ],
     output: itemIds.crossbowString,
     experience: 15,
-    requiredLevel: 10
+    requiredLevel: 10,
 };
 const sinewCbowString: Spinnable = {
     input: itemIds.sinew,
     output: itemIds.crossbowString,
     experience: 15,
-    requiredLevel: 10
+    requiredLevel: 10,
 };
 const magicAmuletString: Spinnable = {
     input: itemIds.roots.magic,
     output: itemIds.magicString,
     experience: 30,
-    requiredLevel: 19
+    requiredLevel: 19,
 };
-const widgetButtonIds: Map<number, SpinnableButton> = new Map<number, SpinnableButton>([
+const widgetButtonIds: Map<number, SpinnableButton> = new Map<
+    number,
+    SpinnableButton
+>([
     [100, { shouldTakeInput: false, count: 1, spinnable: ballOfWool }],
     [99, { shouldTakeInput: false, count: 5, spinnable: ballOfWool }],
     [98, { shouldTakeInput: false, count: 10, spinnable: ballOfWool }],
@@ -71,9 +84,11 @@ const widgetButtonIds: Map<number, SpinnableButton> = new Map<number, SpinnableB
     [111, { shouldTakeInput: true, count: 0, spinnable: sinewCbowString }],
 ]);
 
-export const openSpinningInterface: objectInteractionActionHandler = (details) => {
+export const openSpinningInterface: objectInteractionActionHandler = (
+    details,
+) => {
     details.player.interfaceState.openWidget(widgets.whatWouldYouLikeToSpin, {
-        slot: 'screen'
+        slot: 'screen',
     });
 };
 
@@ -111,11 +126,7 @@ class SpinProductTask extends ActorTask<Player> {
      */
     private currentItemIndex = 0;
 
-    constructor(
-        player: Player,
-        spinnable: Spinnable,
-        count: number,
-    ) {
+    constructor(player: Player, spinnable: Spinnable, count: number) {
         super(player);
         this.spinnable = spinnable;
         this.count = count;
@@ -140,9 +151,14 @@ class SpinProductTask extends ActorTask<Player> {
         if (!this.actor.hasItemInInventory(this.currentItem)) {
             let cancel = false;
             if (isArray) {
-                if (this.currentItemIndex < (<number[]> this.spinnable.input).length) {
+                if (
+                    this.currentItemIndex <
+                    (<number[]>this.spinnable.input).length
+                ) {
                     this.currentItemIndex++;
-                    this.currentItem = (<number[]> this.spinnable.input)[this.currentItemIndex];
+                    this.currentItem = (<number[]>this.spinnable.input)[
+                        this.currentItemIndex
+                    ];
                 } else {
                     cancel = true;
                 }
@@ -151,7 +167,9 @@ class SpinProductTask extends ActorTask<Player> {
             }
             if (cancel) {
                 const itemName = findItem(this.currentItem)?.name || '';
-                this.actor.sendMessage(`You don't have any ${itemName.toLowerCase()}.`);
+                this.actor.sendMessage(
+                    `You don't have any ${itemName.toLowerCase()}.`,
+                );
                 this.stop();
                 return;
             }
@@ -175,7 +193,11 @@ class SpinProductTask extends ActorTask<Player> {
     }
 }
 
-const spinProduct: any = (details: ButtonAction, spinnable: Spinnable, count: number) => {
+const spinProduct: any = (
+    details: ButtonAction,
+    spinnable: Spinnable,
+    count: number,
+) => {
     details.player.enqueueTask(SpinProductTask, [spinnable, count]);
 };
 
@@ -187,17 +209,27 @@ export const buttonClicked: buttonActionHandler = (details) => {
     const product = widgetButtonIds.get(details.buttonId);
 
     if (!product) {
-        logger.error(`Unhandled button id ${details.buttonId} for buttonClicked in spinning wheel.`);
+        logger.error(
+            `Unhandled button id ${details.buttonId} for buttonClicked in spinning wheel.`,
+        );
         return;
     }
 
     // Close the widget as it is no longer needed
     details.player.interfaceState.closeAllSlots();
 
-    if (!details.player.skills.hasLevel(Skill.CRAFTING, product.spinnable.requiredLevel)) {
+    if (
+        !details.player.skills.hasLevel(
+            Skill.CRAFTING,
+            product.spinnable.requiredLevel,
+        )
+    ) {
         const outputName = findItem(product.spinnable.output)?.name || '';
 
-        details.player.sendMessage(`You need a crafting level of ${product.spinnable.requiredLevel} to craft ${outputName.toLowerCase()}.`, true);
+        details.player.sendMessage(
+            `You need a crafting level of ${product.spinnable.requiredLevel} to craft ${outputName.toLowerCase()}.`,
+            true,
+        );
         return;
     }
 
@@ -206,23 +238,24 @@ export const buttonClicked: buttonActionHandler = (details) => {
         spinProduct(details, product.spinnable, product.count);
     } else {
         // We should prepare for a number to be sent from the client
-        const numericInputSpinSub = details.player.numericInputEvent.subscribe((number) => {
-            actionCancelledSpinSub?.unsubscribe();
-            numericInputSpinSub?.unsubscribe();
-            // When a number is recieved we can start crafting the product
-            spinProduct(details, product.spinnable, number);
-        });
+        const numericInputSpinSub = details.player.numericInputEvent.subscribe(
+            (number) => {
+                actionCancelledSpinSub?.unsubscribe();
+                numericInputSpinSub?.unsubscribe();
+                // When a number is recieved we can start crafting the product
+                spinProduct(details, product.spinnable, number);
+            },
+        );
         // If the player moves or cancels the number input, we do not want to wait for input, as they could be depositing
         // items into their bank.
-        const actionCancelledSpinSub = details.player.actionsCancelled.subscribe(() => {
-            actionCancelledSpinSub?.unsubscribe();
-            numericInputSpinSub?.unsubscribe();
-        });
+        const actionCancelledSpinSub =
+            details.player.actionsCancelled.subscribe(() => {
+                actionCancelledSpinSub?.unsubscribe();
+                numericInputSpinSub?.unsubscribe();
+            });
         // Ask the player to enter how many they want to create
         details.player.outgoingPackets.showNumberInputDialogue();
     }
-
-
 };
 
 export default {
@@ -231,15 +264,15 @@ export default {
         {
             type: 'object_interaction',
             objectIds: objectIds.spinningWheel,
-            options: [ 'spin' ],
+            options: ['spin'],
             walkTo: true,
-            handler: openSpinningInterface
+            handler: openSpinningInterface,
         },
         {
             type: 'button',
             widgetId: widgets.whatWouldYouLikeToSpin,
             buttonIds: Array.from(widgetButtonIds.keys()),
-            handler: buttonClicked
-        }
-    ]
+            handler: buttonClicked,
+        },
+    ],
 };

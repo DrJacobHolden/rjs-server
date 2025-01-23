@@ -7,10 +7,10 @@ export function createMockTask(
     stackGroup: string = TaskStackGroup.ACTION,
     immediate: boolean = false,
     breakTypes: TaskBreakType[] = [],
-    repeat: boolean = true
-){
+    repeat: boolean = true,
+) {
     const executeMock = jest.fn();
-    const task = new class extends Task {
+    const task = new (class extends Task {
         constructor() {
             super({
                 interval,
@@ -18,14 +18,14 @@ export function createMockTask(
                 stackGroup,
                 immediate,
                 breakTypes,
-                repeat
+                repeat,
             });
         }
 
         public execute(): void {
             executeMock();
         }
-    }
+    })();
 
-    return { task, executeMock }
+    return { task, executeMock };
 }

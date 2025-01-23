@@ -3,7 +3,12 @@ import { equipmentIndices, findItem } from '@engine/config';
 import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl';
 import { colors, colorText, randomBetween } from '@engine/util';
 import { Player, Skill } from '@engine/world/actor';
-import { HarvestTool, IHarvestable, selectWeightedItem, soundIds } from '@engine/world/config';
+import {
+    HarvestTool,
+    IHarvestable,
+    selectWeightedItem,
+    soundIds,
+} from '@engine/world/config';
 import { checkForGemBoost } from '@engine/world/skill-util/glory-boost';
 import { rollGemType } from '@engine/world/skill-util/harvest-roll';
 import { canMine } from './chance';
@@ -30,18 +35,25 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
      */
     private targetItemName: string;
 
-
-    constructor(player: Player, landscapeObject: LandscapeObject, private readonly ore: IHarvestable, private readonly tool: HarvestTool) {
+    constructor(
+        player: Player,
+        landscapeObject: LandscapeObject,
+        private readonly ore: IHarvestable,
+        private readonly tool: HarvestTool,
+    ) {
         super(player, landscapeObject);
 
-        const itemConfigId = typeof ore.items === 'string' ? ore.items : selectWeightedItem(ore.items);
+        const itemConfigId =
+            typeof ore.items === 'string'
+                ? ore.items
+                : selectWeightedItem(ore.items);
         const item = findItem(itemConfigId);
 
         if (!item) {
             throw new Error(`Could not find item with ID ${itemConfigId}`);
         }
 
-        this.targetItemName = item.name.toLowerCase().replace(' ore', '')
+        this.targetItemName = item.name.toLowerCase().replace(' ore', '');
     }
 
     private isGemRock(): boolean {
@@ -70,18 +82,26 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         }
 
         if (!this.hasLevel()) {
-            this.actor.sendMessage(`You need a Mining level of ${this.ore.level} to mine this rock.`, true);
+            this.actor.sendMessage(
+                `You need a Mining level of ${this.ore.level} to mine this rock.`,
+                true,
+            );
             return;
         }
 
         if (!this.hasMaterials()) {
-            this.actor.sendMessage('You do not have a pickaxe for which you have the level to use.');
+            this.actor.sendMessage(
+                'You do not have a pickaxe for which you have the level to use.',
+            );
             return;
         }
 
         // Check if the players inventory is full, and notify them if its full.
         if (!this.actor.inventory.hasSpace()) {
-            this.actor.sendMessage(`Your inventory is too full to hold any more ${this.targetItemName}.`, true);
+            this.actor.sendMessage(
+                `Your inventory is too full to hold any more ${this.targetItemName}.`,
+                true,
+            );
             this.actor.playSound(soundIds.inventoryFull);
             return;
         }
@@ -97,7 +117,7 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         // Get tool level, and set it to 2 if the tool is an iron hatchet or iron pickaxe
         // TODO why is this set to 2? Was ported from the old code
         let toolLevel = this.tool.level - 1;
-        if(this.tool.itemId === 1349 || this.tool.itemId === 1267) {
+        if (this.tool.itemId === 1349 || this.tool.itemId === 1267) {
             toolLevel = 2;
         }
 
@@ -105,21 +125,27 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         const succeeds = canMine(
             { ...this.ore, baseChance: this.getGemMiningChance() },
             toolLevel,
-            this.actor.skills.mining.level
+            this.actor.skills.mining.level,
         );
-        if(!succeeds) {
+        if (!succeeds) {
             return;
         }
 
-        const findsRareGem = randomBetween(1, checkForGemBoost(this.actor)) === 1;
+        const findsRareGem =
+            randomBetween(1, checkForGemBoost(this.actor)) === 1;
         if (findsRareGem) {
-            this.actor.sendMessage(colorText('You found a rare gem.', colors.red));
+            this.actor.sendMessage(
+                colorText('You found a rare gem.', colors.red),
+            );
             this.actor.giveItem(rollGemType());
         } else {
-            this.actor.sendMessage(`You manage to mine some ${this.targetItemName}.`);
-            const itemToGive = typeof this.ore.items === 'string' ?
-                this.ore.items :
-                selectWeightedItem(this.ore.items);
+            this.actor.sendMessage(
+                `You manage to mine some ${this.targetItemName}.`,
+            );
+            const itemToGive =
+                typeof this.ore.items === 'string'
+                    ? this.ore.items
+                    : selectWeightedItem(this.ore.items);
             this.actor.giveItem(itemToGive);
             // TODO (Jameskmonger) handle Gem rocks and Pure essence rocks
             // if (itemToAdd === 1436 && details.player.skills.hasLevel(Skill.MINING, 30)) {
@@ -137,11 +163,20 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
             this.actor.playSound(soundIds.oreDepeleted);
             this.actor.playAnimation(null);
 
-            const replacementObject = this.ore.objects.get(this.landscapeObject.objectId);
+            const replacementObject = this.ore.objects.get(
+                this.landscapeObject.objectId,
+            );
 
             if (replacementObject) {
-                const respawnTime = randomBetween(this.ore.respawnLow, this.ore.respawnHigh);
-                this.actor.instance.replaceGameObject(replacementObject, this.landscapeObject, respawnTime);
+                const respawnTime = randomBetween(
+                    this.ore.respawnLow,
+                    this.ore.respawnHigh,
+                );
+                this.actor.instance.replaceGameObject(
+                    replacementObject,
+                    this.landscapeObject,
+                    respawnTime,
+                );
             }
 
             this.stop();
@@ -164,8 +199,10 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         }
 
         // Base chance scaling from 28 to 70 based on level
-        let chance = this.ore.baseChance +
-            (this.actor.skills.mining.level - this.ore.level) * (70 - 28) / (99 - 40);
+        let chance =
+            this.ore.baseChance +
+            ((this.actor.skills.mining.level - this.ore.level) * (70 - 28)) /
+                (99 - 40);
 
         // Glory multiplies chance by 3 (from 28-70 to 84-210)
         if (this.hasChargedGlory()) {

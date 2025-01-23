@@ -24,24 +24,9 @@
             "@server/*": ["src/server/*"],
             "@plugins/*": ["src/plugins/*"]
         },
-        "types": [
-            "jest",
-            "node"
-        ],
-        "lib": [
-            "esnext",
-            "dom",
-            "dom.iterable",
-            "scripthost"
-        ]
+        "types": ["jest", "node"],
+        "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
     },
-    "include": [
-        "jest.config.ts",
-        "src/**/*.js",
-        "src/**/*.ts",
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+    "include": ["jest.config.ts", "src/**/*.js", "src/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
 }

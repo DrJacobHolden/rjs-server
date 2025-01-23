@@ -8,14 +8,16 @@ export const handler: itemInteractionActionHandler = (details) => {
     const equipment = player.equipment;
     const item = getItemFromContainer(itemId, itemSlot, equipment);
 
-    if(!item) {
+    if (!item) {
         // The specified item was not found in the specified slot.
         return;
     }
 
-    if(!itemDetails) {
+    if (!itemDetails) {
         // The item is not yet configured on the server.
-        player.sendMessage(`Item ${itemId} is not yet configured on the server.`);
+        player.sendMessage(
+            `Item ${itemId} is not yet configured on the server.`,
+        );
         return;
     }
 
@@ -27,13 +29,10 @@ export default {
     hooks: [
         {
             type: 'item_interaction',
-            widgets: [
-                widgets.equipment,
-                widgets.equipmentStats
-            ],
+            widgets: [widgets.equipment, widgets.equipmentStats],
             options: 'remove',
             handler,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

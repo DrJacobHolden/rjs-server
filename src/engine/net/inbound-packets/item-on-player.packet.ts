@@ -12,52 +12,59 @@ const itemOnPlayerPacket = (player: Player, packet: PacketData) => {
     const itemId = buffer.get('short', 'u');
     const itemSlot = buffer.get('short', 'u');
 
-
     let usedItem;
-    if(itemWidgetId === widgets.inventory.widgetId && itemContainerId === widgets.inventory.containerId) {
-        if(itemSlot < 0 || itemSlot > 27) {
+    if (
+        itemWidgetId === widgets.inventory.widgetId &&
+        itemContainerId === widgets.inventory.containerId
+    ) {
+        if (itemSlot < 0 || itemSlot > 27) {
             return;
         }
 
         usedItem = player.inventory.items[itemSlot];
-        if(!usedItem) {
+        if (!usedItem) {
             return;
         }
 
-        if(usedItem.itemId !== itemId) {
+        if (usedItem.itemId !== itemId) {
             return;
         }
     } else {
-        logger.warn(`Unhandled item on object case using widget ${ itemWidgetId }:${ itemContainerId }`);
+        logger.warn(
+            `Unhandled item on object case using widget ${itemWidgetId}:${itemContainerId}`,
+        );
     }
 
-
-    if(playerIndex < 0 || playerIndex > World.MAX_PLAYERS - 1) {
+    if (playerIndex < 0 || playerIndex > World.MAX_PLAYERS - 1) {
         return;
     }
 
     const otherPlayer = activeWorld.playerList[playerIndex];
-    if(!otherPlayer) {
+    if (!otherPlayer) {
         return;
     }
-
 
     const position = otherPlayer.position;
     const distance = Math.floor(position.distanceBetween(player.position));
 
-
-
     // Too far away
-    if(distance > 16) {
+    if (distance > 16) {
         return;
     }
 
-
-    player.actionPipeline.call('item_on_player', player, otherPlayer, position, usedItem, itemWidgetId, itemContainerId)
+    player.actionPipeline.call(
+        'item_on_player',
+        player,
+        otherPlayer,
+        position,
+        usedItem,
+        itemWidgetId,
+        itemContainerId,
+    );
 };
 
 export default {
     opcode: 110,
     size: 10,
-    handler: itemOnPlayerPacket
+    handler: itemOnPlayerPacket,
 };

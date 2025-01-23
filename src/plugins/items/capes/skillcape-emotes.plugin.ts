@@ -3,8 +3,11 @@ import { equipmentChangeActionHandler } from '@engine/action';
 import { itemIds } from '@engine/world/config/item-ids';
 
 export const skillcapeIds: Array<number> = Object.keys(
-    itemIds.skillCapes).flatMap(skill => [itemIds.skillCapes[skill].untrimmed, itemIds.skillCapes[skill].trimmed]
-);
+    itemIds.skillCapes,
+).flatMap((skill) => [
+    itemIds.skillCapes[skill].untrimmed,
+    itemIds.skillCapes[skill].trimmed,
+]);
 
 export const equip: equipmentChangeActionHandler = (details) => {
     const { player } = details;
@@ -25,12 +28,13 @@ export default {
             type: 'equipment_change',
             eventType: 'equip',
             handler: equip,
-            itemIds: skillcapeIds
-        }, {
+            itemIds: skillcapeIds,
+        },
+        {
             type: 'equipment_change',
             eventType: 'unequip',
             handler: unequip,
-            itemIds: skillcapeIds
-        }
-    ]
+            itemIds: skillcapeIds,
+        },
+    ],
 };

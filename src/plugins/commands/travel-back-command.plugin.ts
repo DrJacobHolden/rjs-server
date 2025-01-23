@@ -14,8 +14,8 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'back' ],
-            handler: action
-        }
-    ]
+            commands: ['back'],
+            handler: action,
+        },
+    ],
 };

@@ -3,17 +3,29 @@ import { ItemContainer } from '@engine/world/items/item-container';
 import { Player } from '@engine/world/actor/player/player';
 import { widgets } from '@engine/config/config-handler';
 
-type WidgetDetail = [ number, number, (player: Player) => ItemContainer ];
+type WidgetDetail = [number, number, (player: Player) => ItemContainer];
 
 const swappableWidgets: WidgetDetail[] = [
     // Player Inventory
-    [ widgets.inventory.widgetId, widgets.inventory.containerId, player => player.inventory ],
+    [
+        widgets.inventory.widgetId,
+        widgets.inventory.containerId,
+        (player) => player.inventory,
+    ],
     // Player Bank Screen
-    [ widgets.bank.screenWidget.widgetId, widgets.bank.screenWidget.containerId, player => player.bank ]
+    [
+        widgets.bank.screenWidget.widgetId,
+        widgets.bank.screenWidget.containerId,
+        (player) => player.bank,
+    ],
 ];
 
-function swapItems(container: ItemContainer, fromSlot: number, toSlot: number): void {
-    if(toSlot > container.size - 1 || fromSlot > container.size - 1) {
+function swapItems(
+    container: ItemContainer,
+    fromSlot: number,
+    toSlot: number,
+): void {
+    if (toSlot > container.size - 1 || fromSlot > container.size - 1) {
         return;
     }
 
@@ -23,8 +35,11 @@ function swapItems(container: ItemContainer, fromSlot: number, toSlot: number): 
 export const action: itemSwapActionHandler = (details) => {
     const { player, widgetId, containerId, fromSlot, toSlot } = details;
 
-    const widgetDetails = swappableWidgets.filter(widgetDetail => widgetDetail[0] === widgetId && widgetDetail[1] === containerId);
-    if(widgetDetails?.[0]) {
+    const widgetDetails = swappableWidgets.filter(
+        (widgetDetail) =>
+            widgetDetail[0] === widgetId && widgetDetail[1] === containerId,
+    );
+    if (widgetDetails?.[0]) {
         const itemContainer: ItemContainer = widgetDetails[0][2](player);
         swapItems(itemContainer, fromSlot, toSlot);
     }
@@ -35,8 +50,10 @@ export default {
     hooks: [
         {
             type: 'item_swap',
-            widgetIds: swappableWidgets.map(widgetDetails => widgetDetails[0]),
-            handler: action
-        }
-    ]
+            widgetIds: swappableWidgets.map(
+                (widgetDetails) => widgetDetails[0],
+            ),
+            handler: action,
+        },
+    ],
 };

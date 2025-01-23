@@ -14,13 +14,13 @@ export default {
         const username = longToString(nameLong).toLowerCase();
         const messageLength = buffer.length - 9;
         const messageBytes = new Array(messageLength);
-        for(let i = 0; i < messageLength; i++) {
+        for (let i = 0; i < messageLength; i++) {
             messageBytes[i] = buffer[buffer.readerIndex + i];
         }
 
         const otherPlayer = activeWorld.findActivePlayerByUsername(username);
-        if(otherPlayer) {
+        if (otherPlayer) {
             otherPlayer.privateMessageReceived(player, messageBytes);
         }
-    }
+    },
 };

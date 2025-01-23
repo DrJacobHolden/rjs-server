@@ -1,11 +1,9 @@
 import { Position } from '@engine/world/position';
 
-
 export const MAP_SIZE = 13;
 
-
 export type RoomType =
-    'empty'
+    | 'empty'
     | 'empty_grass'
     | 'garden'
     | 'formal_garden'
@@ -26,43 +24,40 @@ export type RoomType =
     | 'oubliette'
     | 'costume_room';
 
-
 export const RoomStyle = {
     basic_wood: 0,
     basic_stone: 1,
     whitewashed_stone: 2,
     fremennik_wood: 3,
     tropical_wood: 4,
-    fancy_stone: 5
+    fancy_stone: 5,
 };
-
 
 /**
  * A map of room types to their respective world map template positions within the game.
  */
 export const roomTemplates: { [key in RoomType]: Position } = {
-    empty:          new Position(1856, 5056),
-    empty_grass:    new Position(1864, 5056),
-    garden:         new Position(1856, 5064),
-    formal_garden:  new Position(1872, 5064),
-    parlor:         new Position(1856, 5112),
-    kitchen:        new Position(1872, 5112),
-    dining_room:    new Position(1888, 5112),
-    bedroom:        new Position(1904, 5112),
-    skill_hall:     new Position(1864, 5104),
-    quest_hall:     new Position(1912, 5104),
+    empty: new Position(1856, 5056),
+    empty_grass: new Position(1864, 5056),
+    garden: new Position(1856, 5064),
+    formal_garden: new Position(1872, 5064),
+    parlor: new Position(1856, 5112),
+    kitchen: new Position(1872, 5112),
+    dining_room: new Position(1888, 5112),
+    bedroom: new Position(1904, 5112),
+    skill_hall: new Position(1864, 5104),
+    quest_hall: new Position(1912, 5104),
     portal_chamber: new Position(1864, 5088),
-    combat_room:    new Position(1880, 5088),
-    games_room:     new Position(1896, 5088),
-    treasure_room:  new Position(1912, 5088),
-    chapel:         new Position(1872, 5096),
-    study:          new Position(1888, 5096),
-    throne_room:    new Position(1904, 5096),
-    workshop:       new Position(1856, 5096),
-    oubliette:      new Position(1904, 5080),
-    costume_room:   new Position(1904, 5064, 0)
+    combat_room: new Position(1880, 5088),
+    games_room: new Position(1896, 5088),
+    treasure_room: new Position(1912, 5088),
+    chapel: new Position(1872, 5096),
+    study: new Position(1888, 5096),
+    throne_room: new Position(1904, 5096),
+    workshop: new Position(1856, 5096),
+    oubliette: new Position(1904, 5080),
+    costume_room: new Position(1904, 5064, 0),
 };
-
 
 /**
  * A map of room builder widget button ids to their respective room types.
@@ -88,9 +83,8 @@ export const roomBuilderButtonMap: { [key: number]: RoomType } = {
     177: 'treasure_room', // @TODO dungeon corridor
     178: 'treasure_room', // @TODO dungeon junction
     179: 'treasure_room', // @TODO dungeon stair
-    180: 'treasure_room'
+    180: 'treasure_room',
 };
-
 
 export const instance1 = new Position(6400, 6400);
 export const instance1PohSpawn = new Position(6400 + 36, 6400 + 36);

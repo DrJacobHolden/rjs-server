@@ -23,13 +23,11 @@
                 "ranged": -15
             },
             "animations": {
-                "attack": [ 310, 309 ],
+                "attack": [310, 309],
                 "defend": 312,
                 "death": 313
             },
-            "drop_table": [
-                [ "rs:bones", "always", 1 ]
-            ]
+            "drop_table": [["rs:bones", "always", 1]]
         }
     },
 

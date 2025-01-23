@@ -14,19 +14,19 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'gfx', 'graphics' ],
+            commands: ['gfx', 'graphics'],
             args: [
                 {
                     name: 'graphicsId',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'height',
                     type: 'number',
-                    defaultValue: 120
-                }
+                    defaultValue: 120,
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

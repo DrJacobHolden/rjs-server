@@ -6,16 +6,38 @@ import { take } from 'rxjs/operators';
 import { logger } from '@runejs/common';
 import { LandscapeObject } from '@runejs/filestore';
 
-import { schedule, WorldInstance, Direction, Position, activeWorld } from '@engine/world';
-import { findItem, findNpc, findObject, itemSpawns, npcSpawns, NpcDetails, NpcSpawn } from '@engine/config';
+import {
+    schedule,
+    WorldInstance,
+    Direction,
+    Position,
+    activeWorld,
+} from '@engine/world';
+import {
+    findItem,
+    findNpc,
+    findObject,
+    itemSpawns,
+    npcSpawns,
+    NpcDetails,
+    NpcSpawn,
+} from '@engine/config';
 import { Player, Npc, Actor } from '@engine/world/actor';
 import { loadActionFiles } from '@engine/action';
-import { ChunkManager, ConstructedRegion, getTemplateLocalX, getTemplateLocalY } from '@engine/world/map';
-import { TravelLocations, ExamineCache, parseScenerySpawns } from '@engine/world/config';
+import {
+    ChunkManager,
+    ConstructedRegion,
+    getTemplateLocalX,
+    getTemplateLocalY,
+} from '@engine/world/map';
+import {
+    TravelLocations,
+    ExamineCache,
+    parseScenerySpawns,
+} from '@engine/world/config';
 import { loadPlugins } from '@engine/plugins';
 import { TaskScheduler, Task } from '@engine/task';
 import { Isaac } from '@engine/net';
-
 
 export interface QuadtreeKey {
     x: number;
@@ -27,12 +49,13 @@ export interface QuadtreeKey {
  * Controls the game world and all entities within it.
  */
 export class World {
-
     public static readonly MAX_PLAYERS = 1600;
     public static readonly MAX_NPCS = 30000;
     public static readonly TICK_LENGTH = 600;
 
-    public readonly playerList: Player[] = new Array(World.MAX_PLAYERS).fill(null);
+    public readonly playerList: Player[] = new Array(World.MAX_PLAYERS).fill(
+        null,
+    );
     public readonly npcList: Npc[] = new Array(World.MAX_NPCS).fill(null);
     public readonly chunkManager: ChunkManager = new ChunkManager();
     public readonly examine: ExamineCache = new ExamineCache();
@@ -44,17 +67,18 @@ export class World {
     public readonly tickComplete: Subject<void> = new Subject<void>();
     private readonly scheduler = new TaskScheduler();
 
-    private readonly debugCycleDuration: boolean = process.argv.indexOf('-tickTime') !== -1;
+    private readonly debugCycleDuration: boolean =
+        process.argv.indexOf('-tickTime') !== -1;
 
     public constructor() {
         this.scenerySpawns = parseScenerySpawns();
         this.playerTree = new Quadtree<QuadtreeKey>({
             width: 10000,
-            height: 10000
+            height: 10000,
         });
         this.npcTree = new Quadtree<QuadtreeKey>({
             width: 10000,
-            height: 10000
+            height: 10000,
         });
 
         this.setupWorldTick();
@@ -92,18 +116,26 @@ export class World {
      * @param objectId The game ID of the object.
      * @param objectPosition The game world position that the object is expected at.
      */
-    public findObjectAtLocation(actor: Actor, objectId: number,
-                                objectPosition: Position): { object: LandscapeObject | null, cacheOriginal: boolean } {
+    public findObjectAtLocation(
+        actor: Actor,
+        objectId: number,
+        objectPosition: Position,
+    ): { object: LandscapeObject | null; cacheOriginal: boolean } {
         const x = objectPosition.x;
         const y = objectPosition.y;
 
-        const objectChunk = this.chunkManager.getChunkForWorldPosition(objectPosition);
+        const objectChunk =
+            this.chunkManager.getChunkForWorldPosition(objectPosition);
 
         let customMap = false;
-        if(actor instanceof Player && actor.metadata.customMap) {
+        if (actor instanceof Player && actor.metadata.customMap) {
             customMap = true;
-            const templateMapObject = this.findCustomMapObject(actor, objectId, objectPosition);
-            if(templateMapObject) {
+            const templateMapObject = this.findCustomMapObject(
+                actor,
+                objectId,
+                objectPosition,
+            );
+            if (templateMapObject) {
                 return { object: templateMapObject, cacheOriginal: true };
             }
         }
@@ -113,51 +145,73 @@ export class World {
         let tileModifications;
         let personalTileModifications;
 
-        if(actor.isPlayer) {
+        if (actor.isPlayer) {
             const instance = (actor as Player).instance;
 
             if (!instance) {
-                throw new Error(`Player ${(actor as Player).username} has no instance.`);
+                throw new Error(
+                    `Player ${(actor as Player).username} has no instance.`,
+                );
             }
 
             tileModifications = instance.getTileModifications(objectPosition);
-            personalTileModifications = (actor as Player).personalInstance.getTileModifications(objectPosition);
+            personalTileModifications = (
+                actor as Player
+            ).personalInstance.getTileModifications(objectPosition);
         } else {
-            tileModifications = this.globalInstance.getTileModifications(objectPosition);
+            tileModifications =
+                this.globalInstance.getTileModifications(objectPosition);
         }
 
-        let landscapeObject = customMap ? null : objectChunk.getFilestoreLandscapeObject(objectId, objectPosition);
-        if(!landscapeObject) {
-            const tileObjects = [ ...tileModifications.mods.spawnedObjects ];
+        let landscapeObject = customMap
+            ? null
+            : objectChunk.getFilestoreLandscapeObject(objectId, objectPosition);
+        if (!landscapeObject) {
+            const tileObjects = [...tileModifications.mods.spawnedObjects];
 
-            if(actor.isPlayer) {
-                tileObjects.push(...personalTileModifications.mods.spawnedObjects);
+            if (actor.isPlayer) {
+                tileObjects.push(
+                    ...personalTileModifications.mods.spawnedObjects,
+                );
             }
 
-            landscapeObject = tileObjects.find(spawnedObject =>
-                spawnedObject.objectId === objectId && spawnedObject.x === x && spawnedObject.y === y) || null;
+            landscapeObject =
+                tileObjects.find(
+                    (spawnedObject) =>
+                        spawnedObject.objectId === objectId &&
+                        spawnedObject.x === x &&
+                        spawnedObject.y === y,
+                ) || null;
 
             cacheOriginal = false;
 
-            if(!landscapeObject) {
+            if (!landscapeObject) {
                 return { object: null, cacheOriginal: false };
             }
         }
 
-        const hiddenTileObjects = [ ...tileModifications.mods.hiddenObjects ];
+        const hiddenTileObjects = [...tileModifications.mods.hiddenObjects];
 
-        if(actor.isPlayer) {
-            hiddenTileObjects.push(...personalTileModifications.mods.hiddenObjects);
+        if (actor.isPlayer) {
+            hiddenTileObjects.push(
+                ...personalTileModifications.mods.hiddenObjects,
+            );
         }
 
-        if(hiddenTileObjects.findIndex(spawnedObject =>
-            spawnedObject.objectId === objectId && spawnedObject.x === x && spawnedObject.y === y) !== -1) {
+        if (
+            hiddenTileObjects.findIndex(
+                (spawnedObject) =>
+                    spawnedObject.objectId === objectId &&
+                    spawnedObject.x === x &&
+                    spawnedObject.y === y,
+            ) !== -1
+        ) {
             return { object: null, cacheOriginal: false };
         }
 
         return {
             object: landscapeObject,
-            cacheOriginal
+            cacheOriginal,
         };
     }
 
@@ -167,48 +221,81 @@ export class World {
      * @param objectId The ID of the object to find.
      * @param objectPosition The position of the copied object to find the template of.
      */
-    public findCustomMapObject(actor: Actor, objectId: number, objectPosition: Position): LandscapeObject | null {
-        const map = actor?.metadata?.customMap as ConstructedRegion || null;
+    public findCustomMapObject(
+        actor: Actor,
+        objectId: number,
+        objectPosition: Position,
+    ): LandscapeObject | null {
+        const map = (actor?.metadata?.customMap as ConstructedRegion) || null;
 
-        if(!map) {
+        if (!map) {
             return null;
         }
 
         const objectConfig = findObject(objectId);
 
-        if(!objectConfig) {
+        if (!objectConfig) {
             return null;
         }
 
-        const objectChunk = this.chunkManager.getChunkForWorldPosition(objectPosition);
-        const mapChunk = activeWorld.chunkManager.getChunkForWorldPosition(map.renderPosition);
+        const objectChunk =
+            this.chunkManager.getChunkForWorldPosition(objectPosition);
+        const mapChunk = activeWorld.chunkManager.getChunkForWorldPosition(
+            map.renderPosition,
+        );
 
         const chunkIndexX = objectChunk.position.x - (mapChunk.position.x - 2);
         const chunkIndexY = objectChunk.position.y - (mapChunk.position.y - 2);
 
-        const objectTile = map.chunks[actor.position.level][chunkIndexX][chunkIndexY];
+        const objectTile =
+            map.chunks[actor.position.level][chunkIndexX][chunkIndexY];
 
         const tileX = objectTile.templatePosition.x;
         const tileY = objectTile.templatePosition.y;
         const tileOrientation = objectTile.orientation;
 
-        const objectLocalX = objectPosition.x - (objectChunk.position.x + 6) * 8;
-        const objectLocalY = objectPosition.y - (objectChunk.position.y + 6) * 8;
+        const objectLocalX =
+            objectPosition.x - (objectChunk.position.x + 6) * 8;
+        const objectLocalY =
+            objectPosition.y - (objectChunk.position.y + 6) * 8;
 
         const mapTemplateWorldX = tileX;
         const mapTemplateWorldY = tileY;
-        const mapTemplateChunk = activeWorld.chunkManager.getChunkForWorldPosition(new Position(mapTemplateWorldX, mapTemplateWorldY, objectPosition.level));
+        const mapTemplateChunk =
+            activeWorld.chunkManager.getChunkForWorldPosition(
+                new Position(
+                    mapTemplateWorldX,
+                    mapTemplateWorldY,
+                    objectPosition.level,
+                ),
+            );
 
-        const templateLocalX = getTemplateLocalX(tileOrientation, objectLocalX, objectLocalY,
-            objectConfig?.rendering?.sizeX || 1, objectConfig?.rendering?.sizeY || 1);
-        const templateLocalY = getTemplateLocalY(tileOrientation, objectLocalX, objectLocalY,
-            objectConfig?.rendering?.sizeX || 1, objectConfig?.rendering?.sizeY || 1);
+        const templateLocalX = getTemplateLocalX(
+            tileOrientation,
+            objectLocalX,
+            objectLocalY,
+            objectConfig?.rendering?.sizeX || 1,
+            objectConfig?.rendering?.sizeY || 1,
+        );
+        const templateLocalY = getTemplateLocalY(
+            tileOrientation,
+            objectLocalX,
+            objectLocalY,
+            objectConfig?.rendering?.sizeX || 1,
+            objectConfig?.rendering?.sizeY || 1,
+        );
 
-        const templateObjectPosition = new Position(mapTemplateWorldX + templateLocalX,
-            mapTemplateWorldY + templateLocalY, objectPosition.level);
-        const realObject = mapTemplateChunk.getFilestoreLandscapeObject(objectId, templateObjectPosition);
+        const templateObjectPosition = new Position(
+            mapTemplateWorldX + templateLocalX,
+            mapTemplateWorldY + templateLocalY,
+            objectPosition.level,
+        );
+        const realObject = mapTemplateChunk.getFilestoreLandscapeObject(
+            objectId,
+            templateObjectPosition,
+        );
 
-        if(!realObject) {
+        if (!realObject) {
             return null;
         }
 
@@ -217,7 +304,7 @@ export class World {
         realObject.level = objectPosition.level;
 
         let rotation = realObject.orientation + objectTile.orientation;
-        if(rotation > 3) {
+        if (rotation > 3) {
             rotation -= 4;
         }
 
@@ -231,15 +318,15 @@ export class World {
      * them out for a gentle game server shutdown.
      */
     public kickAllPlayers(): void {
-        if(!this.playerList) {
+        if (!this.playerList) {
             return;
         }
 
         logger.info('Kicking all players...');
 
         this.playerList
-            .filter(player => player !== null)
-            .forEach(player => player.logout());
+            .filter((player) => player !== null)
+            .forEach((player) => player.logout());
 
         logger.info('Player data save complete, world is now empty.');
     }
@@ -248,15 +335,15 @@ export class World {
      * Saves player data for every active player within the game world.
      */
     public saveOnlinePlayers(): void {
-        if(!this.playerList) {
+        if (!this.playerList) {
             return;
         }
 
         logger.info('Saving player data...');
 
         this.playerList
-            .filter(player => player !== null)
-            .forEach(player => player.save());
+            .filter((player) => player !== null)
+            .forEach((player) => player.save());
 
         logger.info('Player data saved.');
     }
@@ -268,16 +355,24 @@ export class World {
      * @param volume The volume the sound should play at.
      * @param distance The distance which the sound should reach.
      */
-    public playLocationSound(position: Position, instanceId: string, soundId: number, volume: number, distance: number = 10): void {
-        this.findNearbyPlayers(position, distance, instanceId).forEach(player => {
-            player.outgoingPackets.updateReferencePosition(position);
-            player.outgoingPackets.playSoundAtPosition(
-                soundId,
-                position.x,
-                position.y,
-                volume
-            );
-        });
+    public playLocationSound(
+        position: Position,
+        instanceId: string,
+        soundId: number,
+        volume: number,
+        distance: number = 10,
+    ): void {
+        this.findNearbyPlayers(position, distance, instanceId).forEach(
+            (player) => {
+                player.outgoingPackets.updateReferencePosition(position);
+                player.outgoingPackets.playSoundAtPosition(
+                    soundId,
+                    position.x,
+                    position.y,
+                    volume,
+                );
+            },
+        );
     }
 
     /**
@@ -287,13 +382,21 @@ export class World {
      * @param distance The maximum distance to search for NPCs.
      * @param instanceId The NPC's active instance.
      */
-    public findNearbyNpcsById(position: Position, npcId: number, distance: number, instanceId: string = activeWorld.globalInstance.instanceId): Npc[] {
-        return this.npcTree.colliding({
-            x: position.x - (distance / 2),
-            y: position.y - (distance / 2),
-            width: distance,
-            height: distance
-        }).map(quadree => quadree.actor as Npc).filter(npc => npc.id === npcId && npc.instanceId === instanceId);
+    public findNearbyNpcsById(
+        position: Position,
+        npcId: number,
+        distance: number,
+        instanceId: string = activeWorld.globalInstance.instanceId,
+    ): Npc[] {
+        return this.npcTree
+            .colliding({
+                x: position.x - distance / 2,
+                y: position.y - distance / 2,
+                width: distance,
+                height: distance,
+            })
+            .map((quadree) => quadree.actor as Npc)
+            .filter((npc) => npc.id === npcId && npc.instanceId === instanceId);
     }
 
     /**
@@ -301,8 +404,13 @@ export class World {
      * @param npcKey The Key of the NPCs to find.
      * @param instanceId The NPC's active instance.
      */
-    public findNpcsByKey(npcKey: string, instanceId: string = activeWorld.globalInstance.instanceId): Npc[] {
-        return this.npcList.filter(npc => npc && npc.key === npcKey && npc.instanceId === instanceId);
+    public findNpcsByKey(
+        npcKey: string,
+        instanceId: string = activeWorld.globalInstance.instanceId,
+    ): Npc[] {
+        return this.npcList.filter(
+            (npc) => npc && npc.key === npcKey && npc.instanceId === instanceId,
+        );
     }
 
     /**
@@ -310,8 +418,13 @@ export class World {
      * @param npcId The ID of the NPCs to find.
      * @param instanceId The NPC's active instance.
      */
-    public findNpcsById(npcId: number, instanceId: string = activeWorld.globalInstance.instanceId): Npc[] {
-        return this.npcList.filter(npc => npc && npc.id === npcId && npc.instanceId === instanceId);
+    public findNpcsById(
+        npcId: number,
+        instanceId: string = activeWorld.globalInstance.instanceId,
+    ): Npc[] {
+        return this.npcList.filter(
+            (npc) => npc && npc.id === npcId && npc.instanceId === instanceId,
+        );
     }
 
     /**
@@ -319,7 +432,9 @@ export class World {
      * @param instanceId The NPC's active instance.
      */
     public findNpcsByInstance(instanceId: string): Npc[] {
-        return this.npcList.filter(npc => npc && npc.instanceId === instanceId);
+        return this.npcList.filter(
+            (npc) => npc && npc.instanceId === instanceId,
+        );
     }
 
     /**
@@ -328,13 +443,20 @@ export class World {
      * @param distance The maximum distance to search for NPCs.
      * @param instanceId The NPC's active instance.
      */
-    public findNearbyNpcs(position: Position, distance: number, instanceId: string = activeWorld.globalInstance.instanceId): Npc[] {
-        return this.npcTree.colliding({
-            x: position.x - (distance / 2),
-            y: position.y - (distance / 2),
-            width: distance,
-            height: distance
-        }).map(quadree => quadree.actor as Npc).filter(npc => npc.instanceId === instanceId);
+    public findNearbyNpcs(
+        position: Position,
+        distance: number,
+        instanceId: string = activeWorld.globalInstance.instanceId,
+    ): Npc[] {
+        return this.npcTree
+            .colliding({
+                x: position.x - distance / 2,
+                y: position.y - distance / 2,
+                width: distance,
+                height: distance,
+            })
+            .map((quadree) => quadree.actor as Npc)
+            .filter((npc) => npc.instanceId === instanceId);
     }
 
     /**
@@ -343,18 +465,24 @@ export class World {
      * @param distance The maximum distance to search for Players.
      * @param instanceId The player's active instance.
      */
-    public findNearbyPlayers(position: Position, distance: number, instanceId: string): Player[] {
-        return this.playerTree.colliding({
-            x: position.x - (distance / 2),
-            y: position.y - (distance / 2),
-            width: distance,
-            height: distance
-        })
-            .map(quadree => quadree.actor as Player)
-            .filter(player => (
-                player.personalInstance.instanceId === instanceId
-                || player.instance?.instanceId === instanceId
-            ));
+    public findNearbyPlayers(
+        position: Position,
+        distance: number,
+        instanceId: string,
+    ): Player[] {
+        return this.playerTree
+            .colliding({
+                x: position.x - distance / 2,
+                y: position.y - distance / 2,
+                width: distance,
+                height: distance,
+            })
+            .map((quadree) => quadree.actor as Player)
+            .filter(
+                (player) =>
+                    player.personalInstance.instanceId === instanceId ||
+                    player.instance?.instanceId === instanceId,
+            );
     }
 
     /**
@@ -363,7 +491,11 @@ export class World {
      */
     public findActivePlayerByUsername(username: string): Player | null {
         username = username.toLowerCase();
-        return this.playerList.find(p => p && p.username.toLowerCase() === username) || null;
+        return (
+            this.playerList.find(
+                (p) => p && p.username.toLowerCase() === username,
+            ) || null
+        );
     }
 
     /**
@@ -373,43 +505,74 @@ export class World {
     public spawnWorldItems(player?: Player): void {
         const instance = player ? player.personalInstance : this.globalInstance;
 
-        itemSpawns.filter(spawn => player ? spawn.instance === 'player' : spawn.instance === 'global')
-            .forEach(itemSpawn => {
+        itemSpawns
+            .filter((spawn) =>
+                player
+                    ? spawn.instance === 'player'
+                    : spawn.instance === 'global',
+            )
+            .forEach((itemSpawn) => {
                 const itemDetails = findItem(itemSpawn.itemKey);
-                if(itemDetails && itemDetails.gameId !== undefined) {
-                    instance.spawnWorldItem({ itemId: itemDetails.gameId, amount: itemSpawn.amount },
-                        itemSpawn.spawnPosition, { respawns: itemSpawn.respawn, owner: player || undefined });
+                if (itemDetails && itemDetails.gameId !== undefined) {
+                    instance.spawnWorldItem(
+                        {
+                            itemId: itemDetails.gameId,
+                            amount: itemSpawn.amount,
+                        },
+                        itemSpawn.spawnPosition,
+                        {
+                            respawns: itemSpawn.respawn,
+                            owner: player || undefined,
+                        },
+                    );
                 } else {
-                    logger.error(`Item ${itemSpawn.itemKey} can not be spawned; it has not yet been registered on the server.`);
+                    logger.error(
+                        `Item ${itemSpawn.itemKey} can not be spawned; it has not yet been registered on the server.`,
+                    );
                 }
             });
     }
 
     public spawnGlobalNpcs(): void {
-        npcSpawns.forEach(npcSpawn => {
+        npcSpawns.forEach((npcSpawn) => {
             const npcDetails = findNpc(npcSpawn.npcKey) || null;
-            if(npcDetails && npcDetails.gameId !== undefined) {
+            if (npcDetails && npcDetails.gameId !== undefined) {
                 this.registerNpc(new Npc(npcDetails, npcSpawn));
             } else {
-                logger.error(`NPC ${npcSpawn.npcKey} can not be spawned; it has not yet been registered on the server.`);
+                logger.error(
+                    `NPC ${npcSpawn.npcKey} can not be spawned; it has not yet been registered on the server.`,
+                );
             }
         });
     }
 
-    public async spawnNpc(npcKey: string | number, position: Position, face: Direction,
-                          movementRadius: number = 0, instanceId: string = activeWorld.globalInstance.instanceId): Promise<Npc> {
-        if(!npcKey) {
+    public async spawnNpc(
+        npcKey: string | number,
+        position: Position,
+        face: Direction,
+        movementRadius: number = 0,
+        instanceId: string = activeWorld.globalInstance.instanceId,
+    ): Promise<Npc> {
+        if (!npcKey) {
             throw new Error('NPC key must be provided.');
         }
 
         const npcData = findNpc(npcKey);
-        if(!npcData) {
+        if (!npcData) {
             throw new Error(`NPC ${npcKey} not found in the cache`);
         }
 
-        const npc = new Npc(npcData,
-            new NpcSpawn(typeof npcData === 'number' ? `unknown_${npcData}` : npcData.key,
-                position, movementRadius, face));
+        const npc = new Npc(
+            npcData,
+            new NpcSpawn(
+                typeof npcData === 'number'
+                    ? `unknown_${npcData}`
+                    : npcData.key,
+                position,
+                movementRadius,
+                face,
+            ),
+        );
 
         // TODO (jkm) this function doesn't use the passed in `instanceId`!
 
@@ -419,8 +582,9 @@ export class World {
     }
 
     public spawnScenery(): void {
-        this.scenerySpawns.forEach(locationObject =>
-            this.globalInstance.spawnGameObject(locationObject));
+        this.scenerySpawns.forEach((locationObject) =>
+            this.globalInstance.spawnGameObject(locationObject),
+        );
     }
 
     public async setupWorldTick(): Promise<void> {
@@ -434,25 +598,37 @@ export class World {
         let xOffset: number = 0;
         let yOffset: number = 0;
 
-        const spawnChunk = this.chunkManager.getChunkForWorldPosition(new Position(x, y, 0));
+        const spawnChunk = this.chunkManager.getChunkForWorldPosition(
+            new Position(x, y, 0),
+        );
 
-        for(let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 1000; i++) {
             // TODO (Jameskmonger) we should be able to create a player without a connection, and without passing nulls in
-            const player = new Player(null as any, null as any, null as any, i, `test${i}`, 'abs', true);
+            const player = new Player(
+                null as any,
+                null as any,
+                null as any,
+                i,
+                `test${i}`,
+                'abs',
+                true,
+            );
             this.registerPlayer(player);
             player.interfaceState.closeAllSlots();
 
             xOffset++;
 
-            if(xOffset > 20) {
+            if (xOffset > 20) {
                 xOffset = 0;
                 yOffset--;
             }
 
             player.position = new Position(x + xOffset, y + yOffset, 0);
-            const newChunk = this.chunkManager.getChunkForWorldPosition(player.position);
+            const newChunk = this.chunkManager.getChunkForWorldPosition(
+                player.position,
+            );
 
-            if(!spawnChunk.equals(newChunk)) {
+            if (!spawnChunk.equals(newChunk)) {
                 spawnChunk.removePlayer(player);
                 newChunk.addPlayer(player);
             }
@@ -466,29 +642,39 @@ export class World {
 
         this.scheduler.tick();
 
-        const activePlayers: Player[] = this.playerList.filter(player => player !== null);
+        const activePlayers: Player[] = this.playerList.filter(
+            (player) => player !== null,
+        );
 
-        if(activePlayers.length === 0) {
+        if (activePlayers.length === 0) {
             return Promise.resolve().then(() => {
-                setTimeout(async() => this.worldTick(), World.TICK_LENGTH); //TODO: subtract processing time
+                setTimeout(async () => this.worldTick(), World.TICK_LENGTH); //TODO: subtract processing time
             });
         }
 
-        const activeNpcs: Npc[] = this.npcList.filter(npc => npc !== null);
+        const activeNpcs: Npc[] = this.npcList.filter((npc) => npc !== null);
 
-        await Promise.all([ ...activePlayers.map(async player => player.tick()), ...activeNpcs.map(async npc => npc.tick()) ]);
-        await Promise.all(activePlayers.map(async player => player.update()));
-        await Promise.all([ ...activePlayers.map(async player => player.reset()), ...activeNpcs.map(async npc => npc.reset()) ]);
+        await Promise.all([
+            ...activePlayers.map(async (player) => player.tick()),
+            ...activeNpcs.map(async (npc) => npc.tick()),
+        ]);
+        await Promise.all(activePlayers.map(async (player) => player.update()));
+        await Promise.all([
+            ...activePlayers.map(async (player) => player.reset()),
+            ...activeNpcs.map(async (npc) => npc.reset()),
+        ]);
 
         const hrEnd = Date.now();
         const duration = hrEnd - hrStart;
         const delay = Math.max(World.TICK_LENGTH - duration, 0);
 
-        if(this.debugCycleDuration) {
-            logger.info(`World tick completed in ${duration} ms, next tick in ${delay} ms.`);
+        if (this.debugCycleDuration) {
+            logger.info(
+                `World tick completed in ${duration} ms, next tick in ${delay} ms.`,
+            );
         }
 
-        setTimeout(async() => this.worldTick(), delay);
+        setTimeout(async () => this.worldTick(), delay);
         this.tickComplete.next();
         return Promise.resolve();
     }
@@ -510,25 +696,34 @@ export class World {
      * Returns the number of remaining open player slots before this world reaches maximum capacity.
      */
     public playerSlotsRemaining(): number {
-        return this.playerList.filter(player => !player).length;
+        return this.playerList.filter((player) => !player).length;
     }
 
     public findPlayer(playerUsername: string): Player | null {
         playerUsername = playerUsername.toLowerCase();
-        return this.playerList?.find(p => Boolean(p) && p.username.toLowerCase() === playerUsername) || null;
+        return (
+            this.playerList?.find(
+                (p) =>
+                    Boolean(p) && p.username.toLowerCase() === playerUsername,
+            ) || null
+        );
     }
 
     public playerOnline(player: Player | string): boolean {
-        if(typeof player === 'string') {
+        if (typeof player === 'string') {
             player = player.toLowerCase();
-            return this.playerList.findIndex(p => Boolean(p) && p.username.toLowerCase() === player) !== -1;
+            return (
+                this.playerList.findIndex(
+                    (p) => Boolean(p) && p.username.toLowerCase() === player,
+                ) !== -1
+            );
         }
-            const foundPlayer = this.playerList[player.worldIndex];
-            if(!foundPlayer) {
-                return false;
-            }
+        const foundPlayer = this.playerList[player.worldIndex];
+        if (!foundPlayer) {
+            return false;
+        }
 
-            return foundPlayer.equals(player);
+        return foundPlayer.equals(player);
     }
 
     /**
@@ -537,13 +732,13 @@ export class World {
      * @param player The player to register.
      */
     public registerPlayer(player: Player): boolean {
-        if(!player) {
+        if (!player) {
             return false;
         }
 
-        const index = this.playerList.findIndex(p => p === null);
+        const index = this.playerList.findIndex((p) => p === null);
 
-        if(index === -1) {
+        if (index === -1) {
             logger.warn('World full!');
             return false;
         }
@@ -563,7 +758,7 @@ export class World {
 
     public npcExists(npc: Npc): boolean {
         const foundNpc = this.npcList[npc.worldIndex];
-        if(!foundNpc || !foundNpc.exists) {
+        if (!foundNpc || !foundNpc.exists) {
             return false;
         }
 
@@ -571,13 +766,13 @@ export class World {
     }
 
     public async registerNpc(npc: Npc): Promise<boolean> {
-        if(!npc) {
+        if (!npc) {
             return false;
         }
 
-        const index = this.npcList.findIndex(n => n === null);
+        const index = this.npcList.findIndex((n) => n === null);
 
-        if(index === -1) {
+        if (index === -1) {
             logger.warn('NPC list full!');
             return false;
         }
@@ -592,5 +787,4 @@ export class World {
         npc.exists = false;
         delete this.npcList[npc.worldIndex];
     }
-
 }

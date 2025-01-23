@@ -31,7 +31,7 @@ export interface Animation {
 export enum DamageType {
     NO_DAMAGE = 0,
     DAMAGE = 1,
-    POISON = 2
+    POISON = 2,
 }
 
 /**
@@ -48,7 +48,6 @@ export interface Damage {
  * Various player updating flags.
  */
 export class UpdateFlags {
-
     private _mapRegionUpdateRequired: boolean;
     private _appearanceUpdateRequired: boolean;
     private _chatMessages: ChatMessage[];
@@ -72,21 +71,27 @@ export class UpdateFlags {
         this._animation = null;
         this._damage = null;
 
-        if(this._chatMessages.length !== 0) {
+        if (this._chatMessages.length !== 0) {
             this._chatMessages.shift();
         }
     }
 
-    public addDamage(amount: number, type: DamageType, remainingHitpoints: number, maxHitpoints: number): void {
+    public addDamage(
+        amount: number,
+        type: DamageType,
+        remainingHitpoints: number,
+        maxHitpoints: number,
+    ): void {
         this.damage = {
             damageDealt: amount,
             damageType: type,
-            remainingHitpoints, maxHitpoints
+            remainingHitpoints,
+            maxHitpoints,
         };
     }
 
     public addChatMessage(chatMessage: ChatMessage): void {
-        if(this._chatMessages.length > 4) {
+        if (this._chatMessages.length > 4) {
             return;
         }
 
@@ -94,8 +99,15 @@ export class UpdateFlags {
     }
 
     public get updateBlockRequired(): boolean {
-        return this._appearanceUpdateRequired || this._chatMessages.length !== 0 || this._facePosition !== null ||
-            this._graphics !== null || (this._animation !== undefined && this._animation !== null) || (this._faceActor !== undefined && this._faceActor !== null) || this._damage !== null;
+        return (
+            this._appearanceUpdateRequired ||
+            this._chatMessages.length !== 0 ||
+            this._facePosition !== null ||
+            this._graphics !== null ||
+            (this._animation !== undefined && this._animation !== null) ||
+            (this._faceActor !== undefined && this._faceActor !== null) ||
+            this._damage !== null
+        );
     }
 
     public get mapRegionUpdateRequired(): boolean {

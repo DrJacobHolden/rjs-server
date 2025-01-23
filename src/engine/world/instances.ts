@@ -9,12 +9,10 @@ import { LandscapeObject } from '@runejs/filestore';
 import { logger } from '@runejs/common';
 import { activeWorld } from '@engine/world/index';
 
-
 /**
  * Additional configuration info for an item being spawned in an instance.
  */
 interface ItemSpawnConfig {
-
     /**
      * optional] The original owner of the spawned item.
      */
@@ -35,7 +33,6 @@ interface ItemSpawnConfig {
  * A game world chunk that is tied to a specific instance.
  */
 export interface InstancedChunk {
-
     /**
      * A specific instanced game chunk's collision map.
      */
@@ -45,14 +42,12 @@ export interface InstancedChunk {
      * Tile modifications made to this instanced chunk.
      */
     mods: Map<string, TileModifications>;
-
 }
 
 /**
  * Modifications made to a single game tile within an instance.
  */
 export class TileModifications {
-
     /**
      * New game objects that have been introduced to an instance.
      */
@@ -72,16 +67,18 @@ export class TileModifications {
      * Checks if this tile is devoid of any modifications.
      */
     public get empty(): boolean {
-        return this.spawnedObjects.length === 0 && this.hiddenObjects.length === 0 && this.worldItems.length === 0;
+        return (
+            this.spawnedObjects.length === 0 &&
+            this.hiddenObjects.length === 0 &&
+            this.worldItems.length === 0
+        );
     }
-
 }
 
 /**
  * A player or group instance within the world.
  */
 export class WorldInstance {
-
     /**
      * A list of game world chunks that have modifications made to them in this instance.
      */
@@ -96,8 +93,7 @@ export class WorldInstance {
      * Creates a new game world instance.
      * @param instanceId The instanceId to apply to this new world instance.
      */
-    public constructor(public readonly instanceId: string) {
-    }
+    public constructor(public readonly instanceId: string) {}
 
     /**
      * Spawns a new world item in this instance.
@@ -106,10 +102,14 @@ export class WorldInstance {
      * @param config Additional item spawn config.
      * If not provided, the item will stay within the instance indefinitely.
      */
-    public spawnWorldItem(item: Item | number, position: Position, config?: ItemSpawnConfig): WorldItem {
+    public spawnWorldItem(
+        item: Item | number,
+        position: Position,
+        config?: ItemSpawnConfig,
+    ): WorldItem {
         const { owner, respawns, expires } = config || {};
 
-        if(typeof item === 'number') {
+        if (typeof item === 'number') {
             item = { itemId: item, amount: 1 };
         }
         const worldItem: WorldItem = {
@@ -119,18 +119,25 @@ export class WorldInstance {
             owner,
             expires,
             respawns,
-            instance: this
+            instance: this,
         };
 
-        const { chunk: instancedChunk, mods } = this.getTileModifications(position);
+        const { chunk: instancedChunk, mods } =
+            this.getTileModifications(position);
 
-        if(owner) {
+        if (owner) {
             // If this world item is only visible to one player initially, we setup a timeout to spawn it for all other
             // players after 100 game cycles.
             try {
-                owner.outgoingPackets.setWorldItem(worldItem, worldItem.position);
-            } catch(error) {
-                logger.error(`Error spawning world item ${worldItem?.itemId} at ${worldItem?.position?.key}`, error);
+                owner.outgoingPackets.setWorldItem(
+                    worldItem,
+                    worldItem.position,
+                );
+            } catch (error) {
+                logger.error(
+                    `Error spawning world item ${worldItem?.itemId} at ${worldItem?.position?.key}`,
+                    error,
+                );
                 throw error;
             }
         }
@@ -138,9 +145,9 @@ export class WorldInstance {
         mods.worldItems.push(worldItem);
         instancedChunk.mods.set(position.key, mods);
 
-        if(owner) {
+        if (owner) {
             setTimeout(() => {
-                if(worldItem.removed) {
+                if (worldItem.removed) {
                     return;
                 }
 
@@ -151,11 +158,11 @@ export class WorldInstance {
             this.worldItemAdded(worldItem);
         }
 
-        if(expires) {
+        if (expires) {
             // If the world item is set to expire, set up a timeout to remove it from the game world after the
             // specified number of game cycles.
             setTimeout(() => {
-                if(worldItem.removed) {
+                if (worldItem.removed) {
                     return;
                 }
 
@@ -174,26 +181,30 @@ export class WorldInstance {
         const chunkMap = this.getInstancedChunk(worldItem.position);
 
         const chunkMod = chunkMap.mods.get(worldItem.position.key);
-        if(!chunkMod) {
+        if (!chunkMod) {
             // Object no longer exists
             return;
         }
 
-        if(chunkMod.worldItems && chunkMod.worldItems.length !== 0) {
-            const idx = chunkMod.worldItems.findIndex(i => i.itemId === worldItem.itemId && i.amount === worldItem.amount);
-            if(idx !== -1) {
+        if (chunkMod.worldItems && chunkMod.worldItems.length !== 0) {
+            const idx = chunkMod.worldItems.findIndex(
+                (i) =>
+                    i.itemId === worldItem.itemId &&
+                    i.amount === worldItem.amount,
+            );
+            if (idx !== -1) {
                 chunkMod.worldItems.splice(idx, 1);
             }
         }
 
-        if(chunkMod.worldItems.length === 0) {
+        if (chunkMod.worldItems.length === 0) {
             this.clearTileIfEmpty(worldItem.position);
         }
 
         worldItem.removed = true;
         this.worldItemRemoved(worldItem);
 
-        if(worldItem.respawns !== undefined) {
+        if (worldItem.respawns !== undefined) {
             this.respawnItem(worldItem);
         }
     }
@@ -204,20 +215,26 @@ export class WorldInstance {
      */
     public async respawnItem(worldItem: WorldItem): Promise<void> {
         if (worldItem.respawns === undefined) {
-            logger.warn(`Attempting to respawn item ${worldItem.itemId} at ${worldItem.position.key} that does not have a respawn time.`);
+            logger.warn(
+                `Attempting to respawn item ${worldItem.itemId} at ${worldItem.position.key} that does not have a respawn time.`,
+            );
             return;
         }
 
         await schedule(worldItem.respawns);
 
-        this.spawnWorldItem({
-            itemId: worldItem.itemId,
-            amount: worldItem.amount
-        }, worldItem.position, {
-            respawns: worldItem.respawns,
-            owner: worldItem.owner,
-            expires: worldItem.expires
-        });
+        this.spawnWorldItem(
+            {
+                itemId: worldItem.itemId,
+                amount: worldItem.amount,
+            },
+            worldItem.position,
+            {
+                respawns: worldItem.respawns,
+                owner: worldItem.owner,
+                expires: worldItem.expires,
+            },
+        );
     }
 
     /**
@@ -228,10 +245,15 @@ export class WorldInstance {
      * before being shown to other players in the instance.
      */
     public worldItemAdded(worldItem: WorldItem, excludePlayer?: Player): void {
-        const nearbyPlayers = activeWorld.findNearbyPlayers(worldItem.position, 16, this.instanceId) || [];
+        const nearbyPlayers =
+            activeWorld.findNearbyPlayers(
+                worldItem.position,
+                16,
+                this.instanceId,
+            ) || [];
 
-        nearbyPlayers.forEach(player => {
-            if(excludePlayer?.equals(player)) {
+        nearbyPlayers.forEach((player) => {
+            if (excludePlayer?.equals(player)) {
                 return;
             }
 
@@ -244,24 +266,34 @@ export class WorldInstance {
      * @param worldItem The world item that was removed.
      */
     public worldItemRemoved(worldItem: WorldItem): void {
-        const nearbyPlayers = activeWorld.findNearbyPlayers(worldItem.position, 16, this.instanceId) || [];
+        const nearbyPlayers =
+            activeWorld.findNearbyPlayers(
+                worldItem.position,
+                16,
+                this.instanceId,
+            ) || [];
 
-        nearbyPlayers.forEach(player =>
-            player.outgoingPackets.removeWorldItem(worldItem, worldItem.position));
+        nearbyPlayers.forEach((player) =>
+            player.outgoingPackets.removeWorldItem(
+                worldItem,
+                worldItem.position,
+            ),
+        );
     }
-
 
     /**
      * Temporarily hides a game object from the game world.
      * @param object The game object to temporarily hide from view.
      * @param hideTicks The number of game cycles/ticks before the object will be shown again.
      */
-    public async hideGameObjectTemporarily(object: LandscapeObject, hideTicks: number): Promise<void> {
+    public async hideGameObjectTemporarily(
+        object: LandscapeObject,
+        hideTicks: number,
+    ): Promise<void> {
         this.hideGameObject(object);
         await schedule(hideTicks);
         this.showGameObject(object);
     }
-
 
     /**
      * Spawns a temporary game object within the game world.
@@ -269,7 +301,11 @@ export class WorldInstance {
      * @param position The position to spawn the object at.
      * @param despawnTicks The number of game cycles/ticks before the object will de-spawn.
      */
-    public async spawnTemporaryGameObject(object: LandscapeObject, position: Position, despawnTicks: number): Promise<void> {
+    public async spawnTemporaryGameObject(
+        object: LandscapeObject,
+        position: Position,
+        despawnTicks: number,
+    ): Promise<void> {
         this.spawnGameObject(object);
         await schedule(despawnTicks);
         this.despawnGameObject(object);
@@ -283,8 +319,12 @@ export class WorldInstance {
      * @param oldObject The game object being removed.
      * @param newObjectInCache Whether or not the object being added is the original game-cache object.
      */
-    public toggleGameObjects(newObject: LandscapeObject, oldObject: LandscapeObject, newObjectInCache: boolean): void {
-        if(newObjectInCache) {
+    public toggleGameObjects(
+        newObject: LandscapeObject,
+        oldObject: LandscapeObject,
+        newObjectInCache: boolean,
+    ): void {
+        if (newObjectInCache) {
             this.showGameObject(newObject);
             this.despawnGameObject(oldObject);
         } else {
@@ -303,22 +343,26 @@ export class WorldInstance {
      * If not provided, the original game object will never re-spawn and the new location object will forever
      * remain in it's place (in this instance).
      */
-    public async replaceGameObject(newObject: LandscapeObject | number, oldObject: LandscapeObject, respawnTicks?: number): Promise<void> {
-        if(typeof newObject === 'number') {
+    public async replaceGameObject(
+        newObject: LandscapeObject | number,
+        oldObject: LandscapeObject,
+        respawnTicks?: number,
+    ): Promise<void> {
+        if (typeof newObject === 'number') {
             newObject = {
                 objectId: newObject,
                 x: oldObject.x,
                 y: oldObject.y,
                 level: oldObject.level,
                 type: oldObject.type,
-                orientation: oldObject.orientation
+                orientation: oldObject.orientation,
             } as LandscapeObject;
         }
 
         this.hideGameObject(oldObject);
         this.spawnGameObject(newObject);
 
-        if(respawnTicks !== undefined) {
+        if (respawnTicks !== undefined) {
             await schedule(respawnTicks);
             this.despawnGameObject(newObject as LandscapeObject);
             this.showGameObject(oldObject);
@@ -331,12 +375,24 @@ export class WorldInstance {
      * @param reference Whether or not the object being spawned is a reference to an existing object or if it should
      * be sent to the game client for forced rendering. Defaults to false for forced rendering.
      */
-    public spawnGameObject(object: LandscapeObject, reference: boolean = false): void {
+    public spawnGameObject(
+        object: LandscapeObject,
+        reference: boolean = false,
+    ): void {
         const position = new Position(object.x, object.y, object.level);
 
-        const { chunk: instancedChunk, mods } = this.getTileModifications(position);
+        const { chunk: instancedChunk, mods } =
+            this.getTileModifications(position);
 
-        if(mods.spawnedObjects.find(o => o.x === object.x && o.y === object.y && o.level === object.level && o.type === object.type)) {
+        if (
+            mods.spawnedObjects.find(
+                (o) =>
+                    o.x === object.x &&
+                    o.y === object.y &&
+                    o.level === object.level &&
+                    o.type === object.type,
+            )
+        ) {
             return;
         }
 
@@ -345,8 +401,11 @@ export class WorldInstance {
 
         instancedChunk.collisionMap.markGameObject(object, true);
 
-        const nearbyPlayers = activeWorld.findNearbyPlayers(position, 16, this.instanceId) || [];
-        nearbyPlayers.forEach(player => player.outgoingPackets.setLocationObject(object, position));
+        const nearbyPlayers =
+            activeWorld.findNearbyPlayers(position, 16, this.instanceId) || [];
+        nearbyPlayers.forEach((player) =>
+            player.outgoingPackets.setLocationObject(object, position),
+        );
     }
 
     /**
@@ -358,27 +417,37 @@ export class WorldInstance {
         const instancedChunk = this.getInstancedChunk(position);
 
         const tileModifications = instancedChunk.mods.get(position.key);
-        if(!tileModifications) {
+        if (!tileModifications) {
             // Object no longer exists
             return;
         }
 
-        if(tileModifications.spawnedObjects && tileModifications.spawnedObjects.length !== 0) {
-            const idx = tileModifications.spawnedObjects.findIndex(o => o.objectId === object.objectId &&
-                o.type === object.type && o.orientation === object.orientation);
-            if(idx !== -1) {
+        if (
+            tileModifications.spawnedObjects &&
+            tileModifications.spawnedObjects.length !== 0
+        ) {
+            const idx = tileModifications.spawnedObjects.findIndex(
+                (o) =>
+                    o.objectId === object.objectId &&
+                    o.type === object.type &&
+                    o.orientation === object.orientation,
+            );
+            if (idx !== -1) {
                 tileModifications.spawnedObjects.splice(idx, 1);
             }
         }
 
-        if(tileModifications.spawnedObjects.length === 0) {
+        if (tileModifications.spawnedObjects.length === 0) {
             this.clearTileIfEmpty(position);
         }
 
         instancedChunk.collisionMap.markGameObject(object, false);
 
-        const nearbyPlayers = activeWorld.findNearbyPlayers(position, 16, this.instanceId) || [];
-        nearbyPlayers.forEach(player => player.outgoingPackets.removeLocationObject(object, position));
+        const nearbyPlayers =
+            activeWorld.findNearbyPlayers(position, 16, this.instanceId) || [];
+        nearbyPlayers.forEach((player) =>
+            player.outgoingPackets.removeLocationObject(object, position),
+        );
     }
 
     /**
@@ -388,15 +457,19 @@ export class WorldInstance {
     public hideGameObject(object: LandscapeObject): void {
         const position = new Position(object.x, object.y, object.level);
 
-        const { chunk: instancedChunk, mods } = this.getTileModifications(position);
+        const { chunk: instancedChunk, mods } =
+            this.getTileModifications(position);
 
         mods.hiddenObjects.push(object);
         instancedChunk.mods.set(position.key, mods);
 
         instancedChunk.collisionMap.markGameObject(object, false);
 
-        const nearbyPlayers = activeWorld.findNearbyPlayers(position, 16, this.instanceId) || [];
-        nearbyPlayers.forEach(player => player.outgoingPackets.removeLocationObject(object, position));
+        const nearbyPlayers =
+            activeWorld.findNearbyPlayers(position, 16, this.instanceId) || [];
+        nearbyPlayers.forEach((player) =>
+            player.outgoingPackets.removeLocationObject(object, position),
+        );
     }
 
     /**
@@ -409,27 +482,37 @@ export class WorldInstance {
 
         const tileModifications = instancedChunk.mods.get(position.key);
 
-        if(!tileModifications) {
+        if (!tileModifications) {
             // Object no longer exists
             return;
         }
 
-        if(tileModifications.hiddenObjects && tileModifications.hiddenObjects.length !== 0) {
-            const idx = tileModifications.hiddenObjects.findIndex(o => o.objectId === object.objectId &&
-                o.type === object.type && o.orientation === object.orientation);
-            if(idx !== -1) {
+        if (
+            tileModifications.hiddenObjects &&
+            tileModifications.hiddenObjects.length !== 0
+        ) {
+            const idx = tileModifications.hiddenObjects.findIndex(
+                (o) =>
+                    o.objectId === object.objectId &&
+                    o.type === object.type &&
+                    o.orientation === object.orientation,
+            );
+            if (idx !== -1) {
                 tileModifications.hiddenObjects.splice(idx, 1);
             }
         }
 
-        if(tileModifications.hiddenObjects.length === 0) {
+        if (tileModifications.hiddenObjects.length === 0) {
             this.clearTileIfEmpty(position);
         }
 
         instancedChunk.collisionMap.markGameObject(object, true);
 
-        const nearbyPlayers = activeWorld.findNearbyPlayers(position, 16, this.instanceId) || [];
-        nearbyPlayers.forEach(player => player.outgoingPackets.setLocationObject(object, position));
+        const nearbyPlayers =
+            activeWorld.findNearbyPlayers(position, 16, this.instanceId) || [];
+        nearbyPlayers.forEach((player) =>
+            player.outgoingPackets.setLocationObject(object, position),
+        );
     }
 
     /**
@@ -438,51 +521,71 @@ export class WorldInstance {
      */
     public getInstancedChunk(worldPosition: Position): InstancedChunk;
 
-
     /**
      * Fetch a list of world modifications from this instance.
      * @param x The X coordinate to find the chunk of.
      * @param y The Y coordinate to find the chunk of.
      * @param level The height level of the chunk.
      */
-    public getInstancedChunk(x: number, y: number, level: number): InstancedChunk;
+    public getInstancedChunk(
+        x: number,
+        y: number,
+        level: number,
+    ): InstancedChunk;
 
-    public getInstancedChunk(worldPositionOrX: Position | number, y?: number, level?: number): InstancedChunk {
+    public getInstancedChunk(
+        worldPositionOrX: Position | number,
+        y?: number,
+        level?: number,
+    ): InstancedChunk {
         let chunkPosition: Position | null = null;
 
-        if(typeof worldPositionOrX === 'number') {
+        if (typeof worldPositionOrX === 'number') {
             const chunk = activeWorld.chunkManager.getChunk({
                 x: worldPositionOrX,
 
                 // using ! here because we know that if the first parameter is a number, the other two will be too
                 /* eslint-disable @typescript-eslint/no-non-null-assertion */
                 y: y!,
-                level: level!
+                level: level!,
                 /* eslint-enable @typescript-eslint/no-non-null-assertion */
             });
 
-            if(chunk) {
+            if (chunk) {
                 chunkPosition = chunk.position;
             }
         } else {
-            chunkPosition = activeWorld.chunkManager.getChunkForWorldPosition(worldPositionOrX)?.position || null;
+            chunkPosition =
+                activeWorld.chunkManager.getChunkForWorldPosition(
+                    worldPositionOrX,
+                )?.position || null;
         }
 
-        if(!chunkPosition) {
+        if (!chunkPosition) {
             // Chunk not found - fail gracefully
-            logger.error('Failed to find chunk for world position', worldPositionOrX, y, level);
+            logger.error(
+                'Failed to find chunk for world position',
+                worldPositionOrX,
+                y,
+                level,
+            );
             logger.error('Something has likely gone horribly wrong!');
 
             return {
                 collisionMap: new CollisionMap(0, 0, 0, { instance: this }),
-                mods: new Map<string, TileModifications>()
+                mods: new Map<string, TileModifications>(),
             };
         }
 
-        if(!this.chunkModifications.has(chunkPosition.key)) {
+        if (!this.chunkModifications.has(chunkPosition.key)) {
             this.chunkModifications.set(chunkPosition.key, {
-                collisionMap: new CollisionMap(chunkPosition.x, chunkPosition.y, chunkPosition.level, { instance: this }),
-                mods: new Map<string, TileModifications>()
+                collisionMap: new CollisionMap(
+                    chunkPosition.x,
+                    chunkPosition.y,
+                    chunkPosition.level,
+                    { instance: this },
+                ),
+                mods: new Map<string, TileModifications>(),
             });
         }
 
@@ -495,14 +598,17 @@ export class WorldInstance {
      * Fetches the list of tile modifications for a specific game tile in this instance.
      * @param worldPosition The world position to find the modifications for.
      */
-    public getTileModifications(worldPosition: Position): { chunk: InstancedChunk, mods: TileModifications } {
+    public getTileModifications(worldPosition: Position): {
+        chunk: InstancedChunk;
+        mods: TileModifications;
+    } {
         const instancedChunk = this.getInstancedChunk(worldPosition);
-        if(instancedChunk.mods.has(worldPosition.key)) {
+        if (instancedChunk.mods.has(worldPosition.key)) {
             return {
                 chunk: instancedChunk,
                 // using ! here because we know it exists
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                mods: instancedChunk.mods.get(worldPosition.key)!
+                mods: instancedChunk.mods.get(worldPosition.key)!,
             };
         }
 
@@ -526,10 +632,15 @@ export class WorldInstance {
     public removePlayer(player: Player): void {
         this.players.delete(player.username);
 
-        if(this.instanceId !== activeWorld.globalInstance.instanceId && this.players.size === 0) {
+        if (
+            this.instanceId !== activeWorld.globalInstance.instanceId &&
+            this.players.size === 0
+        ) {
             this.chunkModifications.clear();
-            const instancedNpcs = activeWorld.findNpcsByInstance(this.instanceId);
-            instancedNpcs?.forEach(npc => activeWorld.deregisterNpc(npc));
+            const instancedNpcs = activeWorld.findNpcsByInstance(
+                this.instanceId,
+            );
+            instancedNpcs?.forEach((npc) => activeWorld.deregisterNpc(npc));
         }
     }
 
@@ -548,9 +659,8 @@ export class WorldInstance {
             return;
         }
 
-        if(mods.empty) {
+        if (mods.empty) {
             instancedChunk.mods.delete(worldPosition.key);
         }
     }
-
 }

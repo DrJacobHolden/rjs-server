@@ -5,11 +5,11 @@ import { Player } from '@engine/world/actor';
 import { SpawnedItemInteractionHook } from '../spawned-item-interaction.action';
 
 /**
-* This is a task to migrate old `walkTo` item interaction actions to the new task system.
-*
-* This is a first-pass implementation to allow for removal of the old action system.
-* It will be refactored in future to be more well suited to our plugin system.
-*/
+ * This is a task to migrate old `walkTo` item interaction actions to the new task system.
+ *
+ * This is a first-pass implementation to allow for removal of the old action system.
+ * It will be refactored in future to be more well suited to our plugin system.
+ */
 export class WalkToItemPluginTask extends ActorWorldItemInteractionTask<Player> {
     /**
      * The plugins to execute when the player arrives at the item.
@@ -21,11 +21,13 @@ export class WalkToItemPluginTask extends ActorWorldItemInteractionTask<Player> 
      */
     private itemDetails: ItemDetails;
 
-    constructor(plugins: SpawnedItemInteractionHook[], player: Player, worldItem: WorldItem, itemDetails: ItemDetails) {
-        super(
-            player,
-            worldItem
-        );
+    constructor(
+        plugins: SpawnedItemInteractionHook[],
+        player: Player,
+        worldItem: WorldItem,
+        itemDetails: ItemDetails,
+    ) {
+        super(player, worldItem);
 
         this.plugins = plugins;
         this.itemDetails = itemDetails;
@@ -45,7 +47,7 @@ export class WalkToItemPluginTask extends ActorWorldItemInteractionTask<Player> 
         }
 
         // call the relevant plugins
-        this.plugins.forEach(plugin => {
+        this.plugins.forEach((plugin) => {
             if (!plugin || !plugin.handler) {
                 return;
             }
@@ -53,7 +55,7 @@ export class WalkToItemPluginTask extends ActorWorldItemInteractionTask<Player> 
             plugin.handler({
                 player: this.actor,
                 worldItem: worldItem,
-                itemDetails: this.itemDetails
+                itemDetails: this.itemDetails,
             });
         });
 

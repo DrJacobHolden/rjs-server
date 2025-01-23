@@ -6,20 +6,30 @@ import { findItem } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
 import { fromNote } from '@engine/world/items/item';
 
-
 export interface ContainerUpdateEvent {
     slot?: number;
     item?: Item | null;
-    type: 'ADD' | 'REMOVE' | 'SWAP' | 'SET' | 'SET_ALL' | 'UPDATE_AMOUNT' | 'CLEAR_ALL';
+    type:
+        | 'ADD'
+        | 'REMOVE'
+        | 'SWAP'
+        | 'SET'
+        | 'SET_ALL'
+        | 'UPDATE_AMOUNT'
+        | 'CLEAR_ALL';
 }
 
-export const getItemFromContainer = (itemId: number, slot: number, container: ItemContainer): Item | null => {
-    if(slot < 0 || slot > container.items.length - 1) {
+export const getItemFromContainer = (
+    itemId: number,
+    slot: number,
+    container: ItemContainer,
+): Item | null => {
+    if (slot < 0 || slot > container.items.length - 1) {
         return null;
     }
 
     const item = container.items[slot];
-    if(!item || item.itemId !== itemId) {
+    if (!item || item.itemId !== itemId) {
         return null;
     }
 
@@ -34,7 +44,6 @@ export const getItemFromContainer = (itemId: number, slot: number, container: It
 type InventoryMapType = (Item | null)[];
 
 export class ItemContainer {
-
     private readonly _size: number;
     private readonly _items: InventoryMapType;
     private readonly _containerUpdated: Subject<ContainerUpdateEvent>;
@@ -44,15 +53,15 @@ export class ItemContainer {
         this._items = new Array(size);
         this._containerUpdated = new Subject<ContainerUpdateEvent>();
 
-        for(let i = 0; i < size; i++) {
+        for (let i = 0; i < size; i++) {
             this._items[i] = null;
         }
     }
 
     public clear(fireEvent: boolean = true): void {
-        this._items.forEach((item, index) => this._items[index] = null);
+        this._items.forEach((item, index) => (this._items[index] = null));
 
-        if(fireEvent) {
+        if (fireEvent) {
             this._containerUpdated.next({ type: 'CLEAR_ALL' });
         }
     }
@@ -63,7 +72,10 @@ export class ItemContainer {
 
     public amount(item: number | Item): number {
         const itemId = typeof item === 'number' ? item : item.itemId;
-        return this._items.map(item => item && item.itemId === itemId ? (item.amount || 0) : 0)
+        return this._items
+            .map((item) =>
+                item && item.itemId === itemId ? item.amount || 0 : 0,
+            )
             .reduce((accumulator, currentValue) => accumulator + currentValue);
     }
 
@@ -73,72 +85,80 @@ export class ItemContainer {
      * @returns An array of slot numbers.
      */
     public findAll(search: number | Item): number[] {
-        if(typeof search !== 'number') {
+        if (typeof search !== 'number') {
             search = search.itemId;
         }
 
         const searchItem = findItem(search);
 
         if (!searchItem) {
-            logger.error(`Could not find item '${search}' when searching for items in container.`);
+            logger.error(
+                `Could not find item '${search}' when searching for items in container.`,
+            );
             return [];
         }
 
         const stackable = searchItem.stackable;
 
-        if(stackable) {
+        if (stackable) {
             const index = this.findIndex(search);
 
-            if(!hasValueNotNull(index) || index === -1) {
+            if (!hasValueNotNull(index) || index === -1) {
                 return [];
             }
-                return [ index ];
+            return [index];
         }
-            const slots: number[] = [];
+        const slots: number[] = [];
 
-            for(let i = 0; i < this.size; i++) {
-                const item = this.items[i];
+        for (let i = 0; i < this.size; i++) {
+            const item = this.items[i];
 
-                if(item?.itemId === search) {
-                    slots.push(i);
-                }
+            if (item?.itemId === search) {
+                slots.push(i);
             }
+        }
 
-            return slots;
+        return slots;
     }
 
     public findIndex(item: number | Item): number {
-        const itemId = (typeof item === 'number') ? item : item.itemId;
-        return this._items.findIndex(i => i?.itemId === itemId);
+        const itemId = typeof item === 'number' ? item : item.itemId;
+        return this._items.findIndex((i) => i?.itemId === itemId);
     }
 
     public setAll(items: (Item | null)[], fireEvent: boolean = true): void {
-        for(let i = 0; i < this._size; i++) {
+        for (let i = 0; i < this._size; i++) {
             this._items[i] = items[i];
         }
 
-        if(fireEvent) {
+        if (fireEvent) {
             this._containerUpdated.next({ type: 'SET_ALL' });
         }
     }
 
-    public set(slot: number, item: Item | null, fireEvent: boolean = true): void {
+    public set(
+        slot: number,
+        item: Item | null,
+        fireEvent: boolean = true,
+    ): void {
         this._items[slot] = item;
-        if(fireEvent) {
+        if (fireEvent) {
             this._containerUpdated.next({ type: 'SET', slot, item });
         }
     }
 
     public findItemIndex(item: Item): number {
-        for(let i = 0; i < this._size; i++) {
+        for (let i = 0; i < this._size; i++) {
             const inventoryItem = this._items[i];
 
             if (inventoryItem === null) {
                 continue;
             }
 
-            if(inventoryItem.itemId === item.itemId &&
-                inventoryItem.amount >= item.amount) {
+            if (
+                inventoryItem.itemId === item.itemId &&
+                inventoryItem.amount >= item.amount
+            ) {
                 return i;
             }
         }
@@ -146,12 +166,15 @@ export class ItemContainer {
         return -1;
     }
 
-    public add(item: number | string | Item, fireEvent: boolean = true): { item: Item, slot: number } | null {
+    public add(
+        item: number | string | Item,
+        fireEvent: boolean = true,
+    ): { item: Item; slot: number } | null {
         if (typeof item === 'number') {
             item = { itemId: item, amount: 1 } as Item;
         } else if (typeof item === 'string') {
             const itemDetails = findItem(item);
-            if(!itemDetails) {
+            if (!itemDetails) {
                 logger.warn(`Item ${item} not configured on the server.`);
                 return null;
             }
@@ -159,85 +182,115 @@ export class ItemContainer {
             item = { itemId: itemDetails.gameId, amount: 1 };
         }
 
-        const existingItemIndex = this.findItemIndex({ itemId: item.itemId, amount: 1 });
+        const existingItemIndex = this.findItemIndex({
+            itemId: item.itemId,
+            amount: 1,
+        });
         const cacheItem = findItem(item.itemId);
 
         if (!cacheItem) {
-            logger.error(`Could not find item '${item.itemId}' in cache when adding item to container.`);
+            logger.error(
+                `Could not find item '${item.itemId}' in cache when adding item to container.`,
+            );
             return null;
         }
 
-        if (existingItemIndex !== -1 && (cacheItem.stackable || cacheItem.bankNoteId != null)) {
+        if (
+            existingItemIndex !== -1 &&
+            (cacheItem.stackable || cacheItem.bankNoteId != null)
+        ) {
             const newItem = {
                 itemId: item.itemId,
                 // using ! here because we know the item exists in the inventory
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                amount: this._items[existingItemIndex]!.amount += item.amount
+                amount: (this._items[existingItemIndex]!.amount += item.amount),
             } as Item;
 
             this.set(existingItemIndex, newItem, false);
 
             if (fireEvent) {
-                this._containerUpdated.next({ type: 'UPDATE_AMOUNT', slot: existingItemIndex, item });
+                this._containerUpdated.next({
+                    type: 'UPDATE_AMOUNT',
+                    slot: existingItemIndex,
+                    item,
+                });
             }
 
             // Item already in inventory and is stackable
             return { item: newItem, slot: existingItemIndex };
         }
-            const newItemIndex = this.getFirstOpenSlot();
-            if (newItemIndex === -1 || item.amount === 0) {
-                // Not enough container space, or the amount of item being added is 0.
-                return null;
-            }
+        const newItemIndex = this.getFirstOpenSlot();
+        if (newItemIndex === -1 || item.amount === 0) {
+            // Not enough container space, or the amount of item being added is 0.
+            return null;
+        }
 
-            this._items[newItemIndex] = item;
+        this._items[newItemIndex] = item;
 
-            if (fireEvent) {
-                this._containerUpdated.next({ type: 'ADD', slot: newItemIndex, item });
-            }
+        if (fireEvent) {
+            this._containerUpdated.next({
+                type: 'ADD',
+                slot: newItemIndex,
+                item,
+            });
+        }
 
-            // Item added to inventory
-            return { item, slot: newItemIndex };
+        // Item added to inventory
+        return { item, slot: newItemIndex };
     }
 
-    public addStacking(item: number | Item, fireEvent: boolean = true): { item: Item, slot: number } | null {
+    public addStacking(
+        item: number | Item,
+        fireEvent: boolean = true,
+    ): { item: Item; slot: number } | null {
         if (typeof item === 'number') {
             item = { itemId: item, amount: 1 } as Item;
         }
 
-        const existingItemIndex = this.findItemIndex({ itemId: item.itemId, amount: 1 });
+        const existingItemIndex = this.findItemIndex({
+            itemId: item.itemId,
+            amount: 1,
+        });
 
         if (existingItemIndex !== -1) {
             const newItem = {
                 itemId: item.itemId,
                 // using ! here because we know the item exists in the inventory
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                amount: this._items[existingItemIndex]!.amount += item.amount
+                amount: (this._items[existingItemIndex]!.amount += item.amount),
             } as Item;
 
             this.set(existingItemIndex, newItem, false);
 
             if (fireEvent) {
-                this._containerUpdated.next({ type: 'UPDATE_AMOUNT', slot: existingItemIndex, item });
+                this._containerUpdated.next({
+                    type: 'UPDATE_AMOUNT',
+                    slot: existingItemIndex,
+                    item,
+                });
             }
 
             // Item already in inventory and is stackable
             return { item: newItem, slot: existingItemIndex };
         }
-            const newItemIndex = this.getFirstOpenSlot();
-            if(newItemIndex === -1) {
-                // Not enough container space
-                return null;
-            }
+        const newItemIndex = this.getFirstOpenSlot();
+        if (newItemIndex === -1) {
+            // Not enough container space
+            return null;
+        }
 
-            this._items[newItemIndex] = item;
+        this._items[newItemIndex] = item;
 
-            if (fireEvent) {
-                this._containerUpdated.next({ type: 'ADD', slot: newItemIndex, item });
-            }
+        if (fireEvent) {
+            this._containerUpdated.next({
+                type: 'ADD',
+                slot: newItemIndex,
+                item,
+            });
+        }
 
-            // Item added to inventory
-            return { item, slot: newItemIndex };
+        // Item added to inventory
+        return { item, slot: newItemIndex };
     }
 
     public amountInStack(slot: number): number {
@@ -246,13 +299,13 @@ export class ItemContainer {
 
     public removeFirst(item: number | Item, fireEvent: boolean = true): number {
         const slot = this.findIndex(item);
-        if(slot === -1) {
+        if (slot === -1) {
             return -1;
         }
 
         this._items[slot] = null;
 
-        if(fireEvent) {
+        if (fireEvent) {
             this._containerUpdated.next({ type: 'REMOVE', slot });
         }
 
@@ -263,14 +316,14 @@ export class ItemContainer {
         const item = this._items[slot];
         this._items[slot] = null;
 
-        if(fireEvent) {
+        if (fireEvent) {
             this._containerUpdated.next({ type: 'REMOVE', slot });
         }
         return item;
     }
 
     public getFirstOpenSlot(): number {
-        return this._items.findIndex(item => !hasValueNotNull(item));
+        return this._items.findIndex((item) => !hasValueNotNull(item));
     }
 
     public hasSpace(): boolean {
@@ -279,8 +332,8 @@ export class ItemContainer {
 
     public getOpenSlotCount(): number {
         let count = 0;
-        for(let i = 0; i < this._size; i++) {
-            if(!hasValueNotNull(this._items[i])) {
+        for (let i = 0; i < this._size; i++) {
+            if (!hasValueNotNull(this._items[i])) {
                 count++;
             }
         }
@@ -291,8 +344,8 @@ export class ItemContainer {
     public getOpenSlots(): number[] {
         const slots: number[] = [];
 
-        for(let i = 0; i < this._size; i++) {
-            if(!hasValueNotNull(this._items[i])) {
+        for (let i = 0; i < this._size; i++) {
+            if (!hasValueNotNull(this._items[i])) {
                 slots.push(i);
             }
         }
@@ -311,14 +364,14 @@ export class ItemContainer {
     public weight(): number {
         let weight = 0;
 
-        for(const item of this._items) {
-            if(!item) {
+        for (const item of this._items) {
+            if (!item) {
                 continue;
             }
 
             const itemData = findItem(item.itemId);
 
-            if(!itemData?.weight) {
+            if (!itemData?.weight) {
                 continue;
             }
 
@@ -329,12 +382,18 @@ export class ItemContainer {
     }
 
     public canFit(item: Item, everythingStacks: boolean = false): boolean {
-        const itemDefinition = filestore.configStore.itemStore.getItem(item.itemId);
-        if(!itemDefinition) {
-            throw new Error(`Item ID ${ item.itemId } not found!`);
+        const itemDefinition = filestore.configStore.itemStore.getItem(
+            item.itemId,
+        );
+        if (!itemDefinition) {
+            throw new Error(`Item ID ${item.itemId} not found!`);
         }
-        if(itemDefinition.stackable || everythingStacks || fromNote(item) > -1) {
-            if(this.has(item.itemId)) {
+        if (
+            itemDefinition.stackable ||
+            everythingStacks ||
+            fromNote(item) > -1
+        ) {
+            if (this.has(item.itemId)) {
                 // using ! here because we know that we have the item in the inventory
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const invItem = this.items[this.findIndex(item.itemId)]!;
@@ -342,9 +401,8 @@ export class ItemContainer {
             }
             return this.hasSpace();
         }
-            return this.getOpenSlotCount() >= item.amount;
+        return this.getOpenSlotCount() >= item.amount;
     }
-
 
     public get size(): number {
         return this._size;
@@ -357,5 +415,4 @@ export class ItemContainer {
     public get containerUpdated(): Subject<ContainerUpdateEvent> {
         return this._containerUpdated;
     }
-
 }

@@ -12,14 +12,14 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'anim', 'animation', 'playanim' ],
+            commands: ['anim', 'animation', 'playanim'],
             args: [
                 {
                     name: 'animationId',
-                    type: 'number'
-                }
+                    type: 'number',
+                },
             ],
-            handler: action
-        } as PlayerCommandActionHook
-    ]
+            handler: action,
+        } as PlayerCommandActionHook,
+    ],
 };

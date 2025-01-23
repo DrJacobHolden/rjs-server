@@ -22,8 +22,8 @@
                 "death": 512
             },
             "drop_table": [
-                [ "rs:bones",           "always",   1 ],
-                [ "rs:bronze_dagger",   "1/128",    1, 12 ]
+                ["rs:bones", "always", 1],
+                ["rs:bronze_dagger", "1/128", 1, 12]
             ]
         }
     },

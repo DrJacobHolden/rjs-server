@@ -13,20 +13,28 @@ type ObjectAction = ObjectInteractionAction | ItemOnObjectAction;
 /**
  * An ActionHook for a supported ObjectAction.
  */
-type ObjectActionHook<TAction extends ObjectAction> = ActionHook<TAction, (data: TAction) => void>;
+type ObjectActionHook<TAction extends ObjectAction> = ActionHook<
+    TAction,
+    (data: TAction) => void
+>;
 
 /**
  * The data unique to the action being executed (i.e. excluding shared data)
  */
-type ObjectActionData<TAction extends ObjectAction> = Omit<TAction, 'player' | 'object' | 'position'>;
+type ObjectActionData<TAction extends ObjectAction> = Omit<
+    TAction,
+    'player' | 'object' | 'position'
+>;
 
 /**
-* This is a task to migrate old `walkTo` item interaction actions to the new task system.
-*
-* This is a first-pass implementation to allow for removal of the old action system.
-* It will be refactored in future to be more well suited to our plugin system.
-*/
-export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorLandscapeObjectInteractionTask<Player> {
+ * This is a task to migrate old `walkTo` item interaction actions to the new task system.
+ *
+ * This is a first-pass implementation to allow for removal of the old action system.
+ * It will be refactored in future to be more well suited to our plugin system.
+ */
+export class WalkToObjectPluginTask<
+    TAction extends ObjectAction,
+> extends ActorLandscapeObjectInteractionTask<Player> {
     /**
      * The plugins to execute when the player arrives at the object.
      */
@@ -34,7 +42,12 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
 
     private data: ObjectActionData<TAction>;
 
-    constructor(plugins: ObjectActionHook<TAction>[], player: Player, landscapeObject: LandscapeObject, data: ObjectActionData<TAction>) {
+    constructor(
+        plugins: ObjectActionHook<TAction>[],
+        player: Player,
+        landscapeObject: LandscapeObject,
+        data: ObjectActionData<TAction>,
+    ) {
         super(
             player,
             landscapeObject,
@@ -63,7 +76,7 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
         }
 
         // call the relevant plugins
-        this.plugins.forEach(plugin => {
+        this.plugins.forEach((plugin) => {
             if (!plugin || !plugin.handler) {
                 return;
             }
@@ -72,7 +85,7 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
                 player: this.actor,
                 object: landscapeObject,
                 position: landscapeObjectPosition,
-                ...this.data
+                ...this.data,
             } as TAction;
 
             plugin.handler(action);

@@ -1,15 +1,20 @@
 import { Player, Npc } from '@engine/world/actor';
 import { Position } from '@engine/world';
 import {
-    ActionHook, getActionHooks, stringHookFilter, questHookFilter, ActionPipe, RunnableHooks
+    ActionHook,
+    getActionHooks,
+    stringHookFilter,
+    questHookFilter,
+    ActionPipe,
+    RunnableHooks,
 } from '@engine/action';
 import { WalkToActorPluginTask } from './task/walk-to-actor-plugin-task';
-
 
 /**
  * Defines an npc action hook.
  */
-export interface NpcInteractionActionHook extends ActionHook<NpcInteractionAction, npcInteractionActionHandler> {
+export interface NpcInteractionActionHook
+    extends ActionHook<NpcInteractionAction, npcInteractionActionHandler> {
     // A single NPC key or a list of NPC keys that this action applies to.
     npcs?: string | string[];
     // A single option name or a list of option names that this action applies to.
@@ -18,12 +23,12 @@ export interface NpcInteractionActionHook extends ActionHook<NpcInteractionActio
     walkTo: boolean;
 }
 
-
 /**
  * The npc action hook handler function to be called when the hook's conditions are met.
  */
-export type npcInteractionActionHandler = (npcInteractionAction: NpcInteractionAction) => void;
-
+export type npcInteractionActionHandler = (
+    npcInteractionAction: NpcInteractionAction,
+) => void;
 
 /**
  * Details about an npc action being performed.
@@ -39,7 +44,6 @@ export interface NpcInteractionAction {
     option: string;
 }
 
-
 /**
  * The pipe that the game engine hands npc actions off to.
  * @param player
@@ -47,52 +51,75 @@ export interface NpcInteractionAction {
  * @param position
  * @param option
  */
-const npcInteractionActionPipe = (player: Player, npc: Npc, position: Position, option: string): RunnableHooks<NpcInteractionAction> | null => {
-    if(player.busy) {
+const npcInteractionActionPipe = (
+    player: Player,
+    npc: Npc,
+    position: Position,
+    option: string,
+): RunnableHooks<NpcInteractionAction> | null => {
+    if (player.busy) {
         return null;
     }
 
     const morphedNpc = player.getMorphedNpcDetails(npc);
 
     // Find all NPC action plugins that reference this NPC
-    let matchingHooks = getActionHooks<NpcInteractionActionHook>('npc_interaction')
-        .filter(plugin => questHookFilter(player, plugin) &&
-            (!plugin.npcs || stringHookFilter(plugin.npcs, morphedNpc?.key || npc.key)) &&
-            (!plugin.options || stringHookFilter(plugin.options, option)));
-    const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
+    let matchingHooks = getActionHooks<NpcInteractionActionHook>(
+        'npc_interaction',
+    ).filter(
+        (plugin) =>
+            questHookFilter(player, plugin) &&
+            (!plugin.npcs ||
+                stringHookFilter(plugin.npcs, morphedNpc?.key || npc.key)) &&
+            (!plugin.options || stringHookFilter(plugin.options, option)),
+    );
+    const questActions = matchingHooks.filter(
+        (plugin) => plugin.questRequirement !== undefined,
+    );
 
-
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
-        player.outgoingPackets.chatboxMessage(`Unhandled NPC interaction: ${option} ${morphedNpc?.key || npc.key} (id-${morphedNpc?.gameId || npc.id}) @ ${position.x},${position.y},${position.level}`);
+    if (matchingHooks.length === 0) {
+        player.outgoingPackets.chatboxMessage(
+            `Unhandled NPC interaction: ${option} ${morphedNpc?.key || npc.key} (id-${morphedNpc?.gameId || npc.id}) @ ${position.x},${position.y},${position.level}`,
+        );
         if (morphedNpc) {
-            player.outgoingPackets.chatboxMessage(`Note: (id-${morphedNpc.gameId}) is a morphed NPC. The parent NPC is (id-${npc.id}).`);
+            player.outgoingPackets.chatboxMessage(
+                `Note: (id-${morphedNpc.gameId}) is a morphed NPC. The parent NPC is (id-${npc.id}).`,
+            );
         }
         return null;
     }
 
-    const walkToPlugins = matchingHooks.filter(plugin => plugin.walkTo);
+    const walkToPlugins = matchingHooks.filter((plugin) => plugin.walkTo);
 
     if (walkToPlugins.length > 0) {
-        player.enqueueBaseTask(new WalkToActorPluginTask(walkToPlugins, player, 'npc', npc, { option }));
+        player.enqueueBaseTask(
+            new WalkToActorPluginTask(walkToPlugins, player, 'npc', npc, {
+                option,
+            }),
+        );
 
         return null;
     }
 
-    console.log(`WE ARE INTERACTING WITH NPC quests: ${questActions.length} ${matchingHooks.length}`);
+    console.log(
+        `WE ARE INTERACTING WITH NPC quests: ${questActions.length} ${matchingHooks.length}`,
+    );
     return {
         hooks: matchingHooks,
         action: {
-            player, npc, position, option
-        }
-    }
+            player,
+            npc,
+            position,
+            option,
+        },
+    };
 };
-
 
 /**
  * Npc action pipe definition.
  */
-export default [ 'npc_interaction', npcInteractionActionPipe ] as ActionPipe;
+export default ['npc_interaction', npcInteractionActionPipe] as ActionPipe;

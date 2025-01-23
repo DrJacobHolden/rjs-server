@@ -12,8 +12,8 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'quest-list', 'quests' ],
-            handler: action
-        }
-    ]
+            commands: ['quest-list', 'quests'],
+            handler: action,
+        },
+    ],
 };

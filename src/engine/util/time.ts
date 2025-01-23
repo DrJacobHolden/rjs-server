@@ -4,9 +4,12 @@ export const rsTime = (date: Date): number => {
 };
 
 export const daysSinceLastLogin = (lastLogin: Date): number => {
-    if(!lastLogin) {
+    if (!lastLogin) {
         return -1;
     }
 
-    return Math.floor(Math.abs(new Date().valueOf() - lastLogin.valueOf()) / (1000 * 60 * 60 * 24));
+    return Math.floor(
+        Math.abs(new Date().valueOf() - lastLogin.valueOf()) /
+            (1000 * 60 * 60 * 24),
+    );
 };

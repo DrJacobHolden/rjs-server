@@ -7,18 +7,21 @@ import { ByteBuffer } from '@runejs/common';
 export enum PacketType {
     FIXED = 'FIXED',
     DYNAMIC_SMALL = 'DYNAMIC_SMALL',
-    DYNAMIC_LARGE = 'DYNAMIC_LARGE'
+    DYNAMIC_LARGE = 'DYNAMIC_LARGE',
 }
 
 /**
  * A single packet to be sent to the game client.
  */
 export class Packet extends ByteBuffer {
-
     private readonly _packetId: number;
     private readonly _type: PacketType = PacketType.FIXED;
 
-    public constructor(packetId: number, type: PacketType = PacketType.FIXED, allocatedSize: number = 5000) {
+    public constructor(
+        packetId: number,
+        type: PacketType = PacketType.FIXED,
+        allocatedSize: number = 5000,
+    ) {
         super(allocatedSize);
         this._packetId = packetId;
         this._type = type;
@@ -28,19 +31,22 @@ export class Packet extends ByteBuffer {
         const packetSize = this.writerIndex;
         let bufferSize = packetSize + 1; // +1 for the packet id
 
-        if(this.type !== PacketType.FIXED) {
+        if (this.type !== PacketType.FIXED) {
             bufferSize += this.type === PacketType.DYNAMIC_SMALL ? 1 : 2;
         }
 
         const buffer = new ByteBuffer(bufferSize);
-        buffer.put((this.packetId + (cipher !== null ? cipher.rand() : 0)) & 0xff, 'BYTE');
+        buffer.put(
+            (this.packetId + (cipher !== null ? cipher.rand() : 0)) & 0xff,
+            'BYTE',
+        );
 
         let copyStart = 1;
 
-        if(this.type === PacketType.DYNAMIC_SMALL) {
+        if (this.type === PacketType.DYNAMIC_SMALL) {
             buffer.put(packetSize, 'BYTE');
             copyStart = 2;
-        } else if(this.type === PacketType.DYNAMIC_LARGE) {
+        } else if (this.type === PacketType.DYNAMIC_LARGE) {
             buffer.put(packetSize, 'SHORT');
             copyStart = 3;
         }

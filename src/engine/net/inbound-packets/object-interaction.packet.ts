@@ -6,7 +6,6 @@ import { getVarbitMorphIndex } from '@engine/util';
 import { Position, activeWorld } from '@engine/world';
 import { Player, Rights } from '@engine/world/actor';
 
-
 interface ObjectInteractionData {
     objectId: number;
     x: number;
@@ -15,8 +14,7 @@ interface ObjectInteractionData {
 
 type objectInteractionPacket = (packet: PacketData) => ObjectInteractionData;
 
-
-const option1: objectInteractionPacket = packet => {
+const option1: objectInteractionPacket = (packet) => {
     const { buffer } = packet;
     const objectId = buffer.get('short', 'u');
     const y = buffer.get('short', 'u');
@@ -24,7 +22,7 @@ const option1: objectInteractionPacket = packet => {
     return { objectId, x, y };
 };
 
-const option2: objectInteractionPacket = packet => {
+const option2: objectInteractionPacket = (packet) => {
     const { buffer } = packet;
     const x = buffer.get('short', 'u', 'le');
     const y = buffer.get('short', 'u', 'le');
@@ -32,7 +30,7 @@ const option2: objectInteractionPacket = packet => {
     return { objectId, x, y };
 };
 
-const option3: objectInteractionPacket = packet => {
+const option3: objectInteractionPacket = (packet) => {
     const { buffer } = packet;
     const y = buffer.get('short', 'u');
     const objectId = buffer.get('short', 'u');
@@ -40,7 +38,7 @@ const option3: objectInteractionPacket = packet => {
     return { objectId, x, y };
 };
 
-const option4: objectInteractionPacket = packet => {
+const option4: objectInteractionPacket = (packet) => {
     const { buffer } = packet;
     const x = buffer.get('short', 'u', 'le');
     const objectId = buffer.get('short', 'u', 'le');
@@ -48,7 +46,7 @@ const option4: objectInteractionPacket = packet => {
     return { objectId, x, y };
 };
 
-const option5: objectInteractionPacket = packet => {
+const option5: objectInteractionPacket = (packet) => {
     const { buffer } = packet;
     const objectId = buffer.get('short', 'u');
     const y = buffer.get('short', 'u', 'le');
@@ -56,26 +54,30 @@ const option5: objectInteractionPacket = packet => {
     return { objectId, x, y };
 };
 
-
-const objectInteractionPackets: { [key: number]: { packetDef: objectInteractionPacket, index: number } } = {
-    30:  { packetDef: option1, index: 0 },
+const objectInteractionPackets: {
+    [key: number]: { packetDef: objectInteractionPacket; index: number };
+} = {
+    30: { packetDef: option1, index: 0 },
     164: { packetDef: option2, index: 1 },
     183: { packetDef: option3, index: 2 },
     229: { packetDef: option4, index: 3 },
-    62:  { packetDef: option5, index: 4 },
+    62: { packetDef: option5, index: 4 },
 };
-
 
 const objectInteractionPacket = (player: Player, packet: PacketData) => {
     const { packetId } = packet;
 
-    const { objectId, x, y } = objectInteractionPackets[packetId].packetDef(packet);
+    const { objectId, x, y } =
+        objectInteractionPackets[packetId].packetDef(packet);
     const level = player.position.level;
     const objectPosition = new Position(x, y, level);
-    const { object: landscapeObject, cacheOriginal } = activeWorld.findObjectAtLocation(player, objectId, objectPosition);
-    if(!landscapeObject) {
-        if(player.rights === Rights.ADMIN) {
-            player.sendMessage(`Custom object ${objectId} @[${objectPosition.key}]`);
+    const { object: landscapeObject, cacheOriginal } =
+        activeWorld.findObjectAtLocation(player, objectId, objectPosition);
+    if (!landscapeObject) {
+        if (player.rights === Rights.ADMIN) {
+            player.sendMessage(
+                `Custom object ${objectId} @[${objectPosition.key}]`,
+            );
         }
         return;
     }
@@ -83,52 +85,73 @@ const objectInteractionPacket = (player: Player, packet: PacketData) => {
     let objectConfig = filestore.configStore.objectStore.getObject(objectId);
 
     if (!objectConfig) {
-        logger.error(`[object-interaction] Could not find object config for object id ${objectId}!`);
+        logger.error(
+            `[object-interaction] Could not find object config for object id ${objectId}!`,
+        );
         return;
     }
 
     if (objectConfig.configChangeDest) {
         let morphIndex = -1;
-        if(objectConfig.varbitId === -1) {
-            if(objectConfig.configId !== -1) {
-                morphIndex = player.metadata.configs?.[objectConfig.configId] ?
-                    player.metadata.configs[objectConfig.configId] : 0;
+        if (objectConfig.varbitId === -1) {
+            if (objectConfig.configId !== -1) {
+                morphIndex = player.metadata.configs?.[objectConfig.configId]
+                    ? player.metadata.configs[objectConfig.configId]
+                    : 0;
             }
         } else {
-            morphIndex = getVarbitMorphIndex(objectConfig.varbitId, player.metadata.configs);
+            morphIndex = getVarbitMorphIndex(
+                objectConfig.varbitId,
+                player.metadata.configs,
+            );
         }
-        if(morphIndex !== -1) {
-            objectConfig = filestore.configStore.objectStore.getObject(objectConfig.configChangeDest[morphIndex]);
+        if (morphIndex !== -1) {
+            objectConfig = filestore.configStore.objectStore.getObject(
+                objectConfig.configChangeDest[morphIndex],
+            );
         }
     }
 
     if (!objectConfig) {
-        logger.error(`[object-interaction - after morph] Could not find object config for object id ${objectId}!`);
+        logger.error(
+            `[object-interaction - after morph] Could not find object config for object id ${objectId}!`,
+        );
         return;
     }
 
     const actionIdx = objectInteractionPackets[packetId].index;
     let optionName = `action-${actionIdx + 1}`;
-    if(objectConfig.options && objectConfig.options.length >= actionIdx) {
-        if(!objectConfig.options[actionIdx]) {
+    if (objectConfig.options && objectConfig.options.length >= actionIdx) {
+        if (!objectConfig.options[actionIdx]) {
             // Invalid action
-            logger.error(`1: Invalid object ${objectId} option ${actionIdx + 1}, options: ${JSON.stringify(objectConfig.options)}`);
+            logger.error(
+                `1: Invalid object ${objectId} option ${actionIdx + 1}, options: ${JSON.stringify(objectConfig.options)}`,
+            );
             return;
         }
 
         optionName = objectConfig.options[actionIdx];
     } else {
         // Invalid action
-        logger.error(`2: Invalid object ${objectId} option ${actionIdx + 1}, options: ${JSON.stringify(objectConfig.options)}`);
+        logger.error(
+            `2: Invalid object ${objectId} option ${actionIdx + 1}, options: ${JSON.stringify(objectConfig.options)}`,
+        );
         return;
     }
 
-    player.actionPipeline.call('object_interaction', player, landscapeObject, objectConfig, objectPosition, optionName.toLowerCase(), cacheOriginal);
+    player.actionPipeline.call(
+        'object_interaction',
+        player,
+        landscapeObject,
+        objectConfig,
+        objectPosition,
+        optionName.toLowerCase(),
+        cacheOriginal,
+    );
 };
 
-
-export default Object.keys(objectInteractionPackets).map(opcode => ({
+export default Object.keys(objectInteractionPackets).map((opcode) => ({
     opcode: Number.parseInt(opcode, 10),
     size: 6,
-    handler: objectInteractionPacket
+    handler: objectInteractionPacket,
 }));

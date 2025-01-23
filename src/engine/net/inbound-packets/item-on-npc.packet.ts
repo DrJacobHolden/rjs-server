@@ -13,23 +13,27 @@ const itemOnNpcPacket = (player: Player, packet: PacketData) => {
     const itemContainerId = buffer.get('short');
 
     let usedItem;
-    if (itemWidgetId === widgets.inventory.widgetId && itemContainerId === widgets.inventory.containerId) {
-        if(itemSlot < 0 || itemSlot > 27) {
+    if (
+        itemWidgetId === widgets.inventory.widgetId &&
+        itemContainerId === widgets.inventory.containerId
+    ) {
+        if (itemSlot < 0 || itemSlot > 27) {
             return;
         }
 
         usedItem = player.inventory.items[itemSlot];
-        if(!usedItem) {
+        if (!usedItem) {
             return;
         }
 
-        if(usedItem.itemId !== itemId) {
+        if (usedItem.itemId !== itemId) {
             return;
         }
     } else {
-        logger.warn(`Unhandled item on object case using widget ${ itemWidgetId }:${ itemContainerId }`);
+        logger.warn(
+            `Unhandled item on object case using widget ${itemWidgetId}:${itemContainerId}`,
+        );
     }
-
 
     if (npcIndex < 0 || npcIndex > World.MAX_NPCS - 1) {
         return;
@@ -48,11 +52,19 @@ const itemOnNpcPacket = (player: Player, packet: PacketData) => {
         return;
     }
 
-    player.actionPipeline.call('item_on_npc', player, npc, position, usedItem, itemWidgetId, itemContainerId)
+    player.actionPipeline.call(
+        'item_on_npc',
+        player,
+        npc,
+        position,
+        usedItem,
+        itemWidgetId,
+        itemContainerId,
+    );
 };
 
 export default {
     opcode: 208,
     size: 10,
-    handler: itemOnNpcPacket
+    handler: itemOnNpcPacket,
 };

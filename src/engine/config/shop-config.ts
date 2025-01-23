@@ -1,4 +1,7 @@
-import { ContainerUpdateEvent, ItemContainer } from '@engine/world/items/item-container';
+import {
+    ContainerUpdateEvent,
+    ItemContainer,
+} from '@engine/world/items/item-container';
 import { findItem, widgets } from '@engine/config/config-handler';
 import { loadConfigurationFiles } from '@runejs/common/fs';
 import { Player } from '@engine/world/actor/player/player';
@@ -6,11 +9,9 @@ import { ItemDetails } from '@engine/config/item-config';
 import { WidgetClosedEvent } from '@engine/interface';
 import { Subscription } from 'rxjs';
 
-
-export type ShopStock = { itemKey: string, amount: number, restock?: number }[];
+export type ShopStock = { itemKey: string; amount: number; restock?: number }[];
 
 export class Shop {
-
     public readonly key: string;
     public readonly originalStock: ShopStock;
     public readonly container: ItemContainer;
@@ -24,7 +25,15 @@ export class Shop {
     private customers: Player[];
     private containerSubscription: Subscription;
 
-    public constructor(key: string, name: string, generalStore: boolean, stock: ShopStock, sellRate: number, buyRate: number, modifier: number) {
+    public constructor(
+        key: string,
+        name: string,
+        generalStore: boolean,
+        stock: ShopStock,
+        sellRate: number,
+        buyRate: number,
+        modifier: number,
+    ) {
         this.key = key;
         this.name = name;
         this.generalStore = generalStore;
@@ -35,7 +44,9 @@ export class Shop {
         this.rateModifier = modifier;
         this.originalStock = stock;
         this.container = new ItemContainer(40);
-        this.containerSubscription = this.container.containerUpdated.subscribe((_update: ContainerUpdateEvent) => this.updateCustomers());
+        this.containerSubscription = this.container.containerUpdated.subscribe(
+            (_update: ContainerUpdateEvent) => this.updateCustomers(),
+        );
         this.customers = [];
         this.resetShopStock();
     }
@@ -45,7 +56,13 @@ export class Shop {
             if (this.originalStock[i]) {
                 const { itemKey, amount } = this.originalStock[i];
                 const itemDetails = findItem(itemKey);
-                this.container.set(i, !itemDetails ? null : { itemId: itemDetails.gameId, amount: amount || 0 }, false);
+                this.container.set(
+                    i,
+                    !itemDetails
+                        ? null
+                        : { itemId: itemDetails.gameId, amount: amount || 0 },
+                    false,
+                );
             } else {
                 this.container.set(i, null, false);
             }
@@ -64,12 +81,13 @@ export class Shop {
         const itemStock = this.container.amount(item.gameId);
 
         if (itemSoldHere) {
-            const foundStock = this.originalStock.find(stock => stock && stock.itemKey === itemKey);
+            const foundStock = this.originalStock.find(
+                (stock) => stock && stock.itemKey === itemKey,
+            );
             if (foundStock) {
                 originalStockAmount = foundStock.amount;
             }
         } else {
-
             return -1; // Cannot buy from this shop
         }
 
@@ -77,16 +95,16 @@ export class Shop {
         if (itemStock === originalStockAmount) {
             finalAmount = Math.round(item.value * this.sellRate);
         } else if (itemStock > originalStockAmount) {
-            const overstockAmount = (itemStock - originalStockAmount);
+            const overstockAmount = itemStock - originalStockAmount;
             let shopSellRate = this.sellRate;
-            shopSellRate -= (this.rateModifier * overstockAmount);
+            shopSellRate -= this.rateModifier * overstockAmount;
             finalAmount = item.value * shopSellRate;
 
             finalAmount = Math.round(finalAmount);
         } else {
-            const understockAmount = (originalStockAmount - itemStock);
+            const understockAmount = originalStockAmount - itemStock;
             let shopSellRate = this.sellRate;
-            shopSellRate += (this.rateModifier * understockAmount);
+            shopSellRate += this.rateModifier * understockAmount;
             finalAmount = item.value * shopSellRate;
 
             finalAmount = Math.round(finalAmount);
@@ -106,9 +124,11 @@ export class Shop {
         let originalStockAmount: number = 0;
         const itemStock = this.container.amount(item.gameId);
 
-
         if (itemSoldHere) {
-            originalStockAmount = this.originalStock.find(stock => stock && stock.itemKey === itemKey)?.amount || 0;
+            originalStockAmount =
+                this.originalStock.find(
+                    (stock) => stock && stock.itemKey === itemKey,
+                )?.amount || 0;
         } else if (!this.generalStore) {
             return -1; // Can not sell this item to this shop (shop is not a general store!)
         }
@@ -118,16 +138,16 @@ export class Shop {
         if (itemStock === originalStockAmount) {
             finalAmount = Math.round(item.value * this.buyRate);
         } else if (itemStock > originalStockAmount) {
-            const overstockAmount = (itemStock - originalStockAmount);
+            const overstockAmount = itemStock - originalStockAmount;
             let shopBuyRate = this.buyRate;
-            shopBuyRate -= (this.rateModifier * overstockAmount);
+            shopBuyRate -= this.rateModifier * overstockAmount;
             finalAmount = item.value * shopBuyRate;
 
             finalAmount = Math.round(finalAmount);
         } else {
-            const understockAmount = (originalStockAmount - itemStock);
+            const understockAmount = originalStockAmount - itemStock;
             let shopBuyRate = this.buyRate;
-            shopBuyRate += (this.rateModifier * understockAmount);
+            shopBuyRate += this.rateModifier * understockAmount;
             finalAmount = item.value * shopBuyRate;
 
             finalAmount = Math.round(finalAmount);
@@ -138,28 +158,46 @@ export class Shop {
     }
 
     public isItemSoldHere(itemKey: string): boolean {
-        return this.originalStock.some(stockedItem => stockedItem.itemKey === itemKey);
+        return this.originalStock.some(
+            (stockedItem) => stockedItem.itemKey === itemKey,
+        );
     }
 
     public open(player: Player): void {
         player.metadata.lastOpenedShopKey = this.key;
-        player.metadata.shopCloseListener = player.interfaceState.closed.subscribe((whatClosed: WidgetClosedEvent) => {
-            if (whatClosed?.widget && whatClosed.widget.widgetId === widgets.shop.widgetId) {
-                this.removePlayerFromShop(player);
-            }
-        });
+        player.metadata.shopCloseListener =
+            player.interfaceState.closed.subscribe(
+                (whatClosed: WidgetClosedEvent) => {
+                    if (
+                        whatClosed?.widget &&
+                        whatClosed.widget.widgetId === widgets.shop.widgetId
+                    ) {
+                        this.removePlayerFromShop(player);
+                    }
+                },
+            );
 
-        player.outgoingPackets.updateWidgetString(widgets.shop.widgetId, widgets.shop.title, this.name);
-        player.outgoingPackets.sendUpdateAllWidgetItems(widgets.shop, this.container);
-        player.outgoingPackets.sendUpdateAllWidgetItems(widgets.shopPlayerInventory, player.inventory);
+        player.outgoingPackets.updateWidgetString(
+            widgets.shop.widgetId,
+            widgets.shop.title,
+            this.name,
+        );
+        player.outgoingPackets.sendUpdateAllWidgetItems(
+            widgets.shop,
+            this.container,
+        );
+        player.outgoingPackets.sendUpdateAllWidgetItems(
+            widgets.shopPlayerInventory,
+            player.inventory,
+        );
 
         player.interfaceState.openWidget(widgets.shop.widgetId, {
             slot: 'screen',
-            multi: true
+            multi: true,
         });
         player.interfaceState.openWidget(widgets.shopPlayerInventory.widgetId, {
             slot: 'tabarea',
-            multi: true
+            multi: true,
         });
         this.customers.push(player);
     }
@@ -167,7 +205,10 @@ export class Shop {
     private updateCustomers() {
         for (const player of this.customers) {
             if (player.metadata.lastOpenedShopKey === this.key) {
-                player.outgoingPackets.sendUpdateAllWidgetItems(widgets.shop, this.container);
+                player.outgoingPackets.sendUpdateAllWidgetItems(
+                    widgets.shop,
+                    this.container,
+                );
             } else {
                 this.removePlayerFromShop(player);
             }
@@ -193,17 +234,28 @@ export interface ShopConfiguration {
 }
 
 export function shopFactory(key: string, config: ShopConfiguration): Shop {
-    return new Shop(key, config.name, config.general_store || false, config.stock,
-        config.shop_sell_rate || 1.00, config.shop_buy_rate || 0.65, config.rate_modifier || 0.2);
+    return new Shop(
+        key,
+        config.name,
+        config.general_store || false,
+        config.stock,
+        config.shop_sell_rate || 1.0,
+        config.shop_buy_rate || 0.65,
+        config.rate_modifier || 0.2,
+    );
 }
 
-export async function loadShopConfigurations(path: string): Promise<{ [key: string]: Shop }> {
+export async function loadShopConfigurations(
+    path: string,
+): Promise<{ [key: string]: Shop }> {
     const shops: { [key: string]: Shop } = {};
 
-    const files = await loadConfigurationFiles<{ [key: string]: ShopConfiguration }>(path);
-    files.forEach(shopConfigs => {
+    const files = await loadConfigurationFiles<{
+        [key: string]: ShopConfiguration;
+    }>(path);
+    files.forEach((shopConfigs) => {
         const shopKeys = Object.keys(shopConfigs);
-        shopKeys.forEach(key => {
+        shopKeys.forEach((key) => {
             shops[key] = shopFactory(key, shopConfigs[key]);
         });
     });

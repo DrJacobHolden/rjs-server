@@ -23,12 +23,18 @@ type ObjectAction = ObjectInteractionAction | ItemOnObjectAction;
 /**
  * An ActionHook for a supported ObjectAction.
  */
-type ObjectActionHook<TAction extends ObjectAction> = ActionHook<TAction, (data: TAction) => void>;
+type ObjectActionHook<TAction extends ObjectAction> = ActionHook<
+    TAction,
+    (data: TAction) => void
+>;
 
 /**
  * The data unique to the action being executed (i.e. excluding shared data)
  */
-type ObjectActionData<TAction extends ObjectAction> = Omit<TAction, 'player' | 'actor' | 'object' | 'position'>;
+type ObjectActionData<TAction extends ObjectAction> = Omit<
+    TAction,
+    'player' | 'actor' | 'object' | 'position'
+>;
 
 /**
  * Processes the provided callback function on every single tick, and also allows any
@@ -36,8 +42,10 @@ type ObjectActionData<TAction extends ObjectAction> = Omit<TAction, 'player' | '
  * movements, as well as other things.
  *
  * Can loop infinitely based on the result of the passed in `callback` function.
-*/
-export class QueueableTask<TAction extends ObjectAction> extends ActorTask <Player | Actor> {
+ */
+export class QueueableTask<TAction extends ObjectAction> extends ActorTask<
+    Player | Actor
+> {
     /**
      * The plugins to execute on each tick. These will not get called if the
      * `callback` indicates a halting condition.
@@ -58,10 +66,14 @@ export class QueueableTask<TAction extends ObjectAction> extends ActorTask <Play
      */
     private callback: () => QueueableTaskEval;
 
-    constructor(plugins: ObjectActionHook<TAction>[], actor: Player | Actor, callback: () => QueueableTaskEval, task: Task | null, data: ObjectActionData<TAction> | null) {
-        super(
-            actor,
-        );
+    constructor(
+        plugins: ObjectActionHook<TAction>[],
+        actor: Player | Actor,
+        callback: () => QueueableTaskEval,
+        task: Task | null,
+        data: ObjectActionData<TAction> | null,
+    ) {
+        super(actor);
 
         this.plugins = plugins;
         this.data = data;
@@ -77,33 +89,33 @@ export class QueueableTask<TAction extends ObjectAction> extends ActorTask <Play
         const ev = this.callback();
         if (!ev.callbackResult) {
             if (!ev.shouldContinueLooping) {
-                this.stop()
+                this.stop();
             }
             return;
         }
 
-        if (this.task) { // only gets executed if the callback returns true for its result
-            this.actor.enqueueBaseTask(this.task)
+        if (this.task) {
+            // only gets executed if the callback returns true for its result
+            this.actor.enqueueBaseTask(this.task);
         }
 
         // call the relevant plugins on each tick, if provided
-        this.plugins.forEach(plugin => {
+        this.plugins.forEach((plugin) => {
             if (!plugin || !plugin.handler) {
                 return;
             }
 
             const action = {
                 player: this.actor,
-                ...this.data
+                ...this.data,
             } as TAction;
 
             plugin.handler(action);
         });
 
-
         if (!ev.shouldContinueLooping) {
             this.stop();
-            return
+            return;
         }
     }
 }

@@ -1,21 +1,25 @@
 import { Player } from '@engine/world/actor';
-import { ActionHook, getActionHooks, numberHookFilter, ActionPipe, RunnableHooks } from '@engine/action';
-
+import {
+    ActionHook,
+    getActionHooks,
+    numberHookFilter,
+    ActionPipe,
+    RunnableHooks,
+} from '@engine/action';
 
 /**
  * Defines a move item action hook.
  */
-export interface MoveItemActionHook extends ActionHook<MoveItemAction, moveItemActionHandler> {
+export interface MoveItemActionHook
+    extends ActionHook<MoveItemAction, moveItemActionHandler> {
     widgetId?: number;
     widgetIds?: number[];
 }
-
 
 /**
  * The move item action hook handler function to be called when the hook's conditions are met.
  */
 export type moveItemActionHandler = (moveItemAction: MoveItemAction) => void;
-
 
 /**
  * Details about a move item action being performed.
@@ -33,7 +37,6 @@ export interface MoveItemAction {
     toSlot: number;
 }
 
-
 /**
  * The pipe that the game engine hands move item actions off to.
  * @param player
@@ -41,17 +44,28 @@ export interface MoveItemAction {
  * @param toSlot
  * @param widget
  */
-const moveItemActionPipe = (player: Player, fromSlot: number, toSlot: number,
-                            widget: { widgetId: number, containerId: number }): RunnableHooks<MoveItemAction> | null => {
-    const matchingHooks = getActionHooks<MoveItemActionHook>('move_item')
-        .filter(plugin => (
-            (plugin.widgetId || plugin.widgetIds)
+const moveItemActionPipe = (
+    player: Player,
+    fromSlot: number,
+    toSlot: number,
+    widget: { widgetId: number; containerId: number },
+): RunnableHooks<MoveItemAction> | null => {
+    const matchingHooks = getActionHooks<MoveItemActionHook>(
+        'move_item',
+    ).filter(
+        (plugin) =>
+            (plugin.widgetId || plugin.widgetIds) &&
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            && numberHookFilter((plugin.widgetId || plugin.widgetIds)!, widget.widgetId)
-        ));
+            numberHookFilter(
+                (plugin.widgetId || plugin.widgetIds)!,
+                widget.widgetId,
+            ),
+    );
 
-    if(!matchingHooks || matchingHooks.length === 0) {
-        player.sendMessage(`Unhandled Move Item action: widget[${widget.widgetId}] container[${widget.containerId}] fromSlot[${fromSlot} toSlot${toSlot}`);
+    if (!matchingHooks || matchingHooks.length === 0) {
+        player.sendMessage(
+            `Unhandled Move Item action: widget[${widget.widgetId}] container[${widget.containerId}] fromSlot[${fromSlot} toSlot${toSlot}`,
+        );
         return null;
     }
 
@@ -62,13 +76,12 @@ const moveItemActionPipe = (player: Player, fromSlot: number, toSlot: number,
             widgetId: widget.widgetId,
             containerId: widget.containerId,
             fromSlot,
-            toSlot
-        }
+            toSlot,
+        },
     };
 };
-
 
 /**
  * Move item action pipe definition.
  */
-export default [ 'move_item', moveItemActionPipe ] as ActionPipe;
+export default ['move_item', moveItemActionPipe] as ActionPipe;

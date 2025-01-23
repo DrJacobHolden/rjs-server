@@ -5,11 +5,9 @@ import { soundIds } from '@engine/world/config/sound-ids';
 import { animationIds } from '@engine/world/config/animation-ids';
 import { npcInitActionHandler } from '@engine/action';
 
-
 const initAction: npcInitActionHandler = ({ npc }) => {
     // this used to use `setInterval` but will need rewriting to be synced with ticks
     // see https://github.com/runejs/server/issues/417
-
     // setInterval(() => {
     //     if(Math.random() >= 0.66) {
     //         npc.say(`Baa!`);
@@ -53,14 +51,14 @@ export default {
         {
             type: 'npc_init',
             npcs: 'rs:sheep',
-            handler: initAction
+            handler: initAction,
         },
         {
             type: 'item_on_npc',
             npcs: 'rs:sheep',
-            itemIds: [ itemIds.shears, itemIds.recruitmentDrive.shears ],
+            itemIds: [itemIds.shears, itemIds.recruitmentDrive.shears],
             walkTo: true,
-            handler: shearAction
-        }
-    ]
+            handler: shearAction,
+        },
+    ],
 };

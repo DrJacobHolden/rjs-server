@@ -1,7 +1,10 @@
 import { objectInteractionActionHandler } from '@engine/action';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { World } from '@engine/world';
-import { getAllOreIds, getOreFromRock } from '@engine/world/config/harvestable-object';
+import {
+    getAllOreIds,
+    getOreFromRock,
+} from '@engine/world/config/harvestable-object';
 import { findItem } from '@engine/config/config-handler';
 
 const action: objectInteractionActionHandler = (details) => {
@@ -10,11 +13,14 @@ const action: objectInteractionActionHandler = (details) => {
     const ore = getOreFromRock(details.object.objectId);
     details.player.playSound(soundIds.oreEmpty, 7, 0);
 
-    const itemConfigId = typeof ore.items === 'string' ? ore.items : ore.items[0].itemConfigId;
+    const itemConfigId =
+        typeof ore.items === 'string' ? ore.items : ore.items[0].itemConfigId;
     const oreItem = findItem(itemConfigId);
 
     if (!oreItem) {
-        details.player.sendMessage('Sorry, something went wrong. Please report this to a developer.');
+        details.player.sendMessage(
+            'Sorry, something went wrong. Please report this to a developer.',
+        );
         return;
     }
 
@@ -34,11 +40,13 @@ const action: objectInteractionActionHandler = (details) => {
 
 export default {
     pluginId: 'rs:prospecting',
-    hooks: [ {
-        type: 'object_interaction',
-        options: [ 'prospect' ],
-        objectIds: getAllOreIds(),
-        walkTo: true,
-        handler: action
-    } ]
+    hooks: [
+        {
+            type: 'object_interaction',
+            options: ['prospect'],
+            objectIds: getAllOreIds(),
+            walkTo: true,
+            handler: action,
+        },
+    ],
 };

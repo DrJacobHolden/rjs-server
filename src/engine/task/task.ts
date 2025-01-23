@@ -1,4 +1,9 @@
-import { TaskBreakType, TaskConfig, TaskStackGroup, TaskStackType } from './types';
+import {
+    TaskBreakType,
+    TaskConfig,
+    TaskStackGroup,
+    TaskStackType,
+} from './types';
 
 const DEFAULT_TASK_CONFIG: Required<TaskConfig> = {
     interval: 1,
@@ -6,7 +11,7 @@ const DEFAULT_TASK_CONFIG: Required<TaskConfig> = {
     stackGroup: TaskStackGroup.ACTION,
     immediate: false,
     breakTypes: [],
-    repeat: true
+    repeat: true,
 };
 
 function readConfigValue(key: keyof TaskConfig, config?: TaskConfig): any {

@@ -23,7 +23,7 @@ enum Teleports {
     Ardougne = 388,
     Watchtower = 389,
     Trollheim = 492,
-    Ape_atoll = 569
+    Ape_atoll = 569,
 }
 
 /**
@@ -79,7 +79,7 @@ const MagicCosts: Record<number, MagicCost> = {
         [itemIds.runes.water]: 2,
         [itemIds.banana]: 1,
     },
-}
+};
 
 /**
  * Mapping of the various teleport locations. Some are usable directly from
@@ -93,9 +93,11 @@ const TeleportLocations: Record<number, Position> = {
     [Teleports.Camelot]: new Position(2757, 3478),
     [Teleports.Ardougne]: new Position(2662, 3307),
     [Teleports.Watchtower]: new Position(2934, 4714, 2),
-    [Teleports.Trollheim]: (activeWorld.travelLocations.find('Trollheim') as TravelLocation).position,
+    [Teleports.Trollheim]: (
+        activeWorld.travelLocations.find('Trollheim') as TravelLocation
+    ).position,
     [Teleports.Ape_atoll]: new Position(2798, 2798, 1),
-}
+};
 
 const TeleportXP: Record<number, number> = {
     [Teleports.Varrock]: 35,
@@ -107,7 +109,7 @@ const TeleportXP: Record<number, number> = {
     [Teleports.Watchtower]: 68,
     [Teleports.Trollheim]: 68,
     [Teleports.Ape_atoll]: 74,
-}
+};
 
 const buttonIds: number[] = [
     Teleports.Home,
@@ -123,14 +125,22 @@ const buttonIds: number[] = [
 ];
 
 function queueTeleport(player: Player, pos: Position) {
-    player.enqueueBaseTask(new QueueableTask([], player, () => {
-        player.teleport(pos);
-        player.metadata.castingStationarySpell = false;
-        return {
-            callbackResult: false,
-            shouldContinueLooping: false,
-        }
-    }, null, null))
+    player.enqueueBaseTask(
+        new QueueableTask(
+            [],
+            player,
+            () => {
+                player.teleport(pos);
+                player.metadata.castingStationarySpell = false;
+                return {
+                    callbackResult: false,
+                    shouldContinueLooping: false,
+                };
+            },
+            null,
+            null,
+        ),
+    );
 }
 
 /**
@@ -144,25 +154,44 @@ function queueTeleport(player: Player, pos: Position) {
 function homeTeleport(player: Player, elapsedTicks: number): boolean {
     if (elapsedTicks === 0) {
         player.playAnimation(animationIds.homeTeleportDraw);
-        player.playGraphics({ id: gfxIds.homeTeleportDraw, delay: 0, height: 0 });
+        player.playGraphics({
+            id: gfxIds.homeTeleportDraw,
+            delay: 0,
+            height: 0,
+        });
         player.outgoingPackets.playSound(soundIds.homeTeleportDraw, 10);
     } else if (elapsedTicks === 7) {
         player.playAnimation(animationIds.homeTeleportSit);
-        player.playGraphics({ id: gfxIds.homeTeleportFullDrawnCircle, delay: 0, height: 0 });
+        player.playGraphics({
+            id: gfxIds.homeTeleportFullDrawnCircle,
+            delay: 0,
+            height: 0,
+        });
         player.outgoingPackets.playSound(soundIds.homeTeleportSit, 10);
     } else if (elapsedTicks === 12) {
         player.playAnimation(animationIds.homeTeleportPullOutAndReadBook);
-        player.playGraphics({ id: gfxIds.homeTeleportPullOutBook, delay: 0, height: 0 });
+        player.playGraphics({
+            id: gfxIds.homeTeleportPullOutBook,
+            delay: 0,
+            height: 0,
+        });
         player.outgoingPackets.playSound(soundIds.homeTeleportPullOutBook, 10);
     } else if (elapsedTicks === 16) {
         player.playAnimation(animationIds.homeTeleportReadBookAndGlowCircle);
-        player.playGraphics({ id: gfxIds.homeTeleportCircleGlow, delay: 0, height: 0 });
-        player.outgoingPackets.playSound(soundIds.homeTeleportCircleGlowAndTeleport, 10);
+        player.playGraphics({
+            id: gfxIds.homeTeleportCircleGlow,
+            delay: 0,
+            height: 0,
+        });
+        player.outgoingPackets.playSound(
+            soundIds.homeTeleportCircleGlowAndTeleport,
+            10,
+        );
     } else if (elapsedTicks === 20) {
         player.playAnimation(animationIds.homeTeleport);
         player.playGraphics({ id: gfxIds.homeTeleport, delay: 0, height: 0 });
     } else if (elapsedTicks === 22) {
-        queueTeleport(player, TeleportLocations[Teleports.Home])
+        queueTeleport(player, TeleportLocations[Teleports.Home]);
         return true;
     }
 
@@ -233,7 +262,7 @@ function expenseMagic(player: Player, cost: MagicCost): boolean {
         const newItem: Item = {
             amount: player.inventory.amount(itemId) - cost[requiredItemId],
             itemId: itemId,
-        }
+        };
 
         if (newItem.amount < 0) {
             return false;
@@ -245,18 +274,26 @@ function expenseMagic(player: Player, cost: MagicCost): boolean {
 
     for (let i = 0; i < indexesToUpdate.length; i++) {
         if (itemsToUpdate[indexesToUpdate[i]].amount === 0) {
-            player.inventory.remove(indexesToUpdate[i])
+            player.inventory.remove(indexesToUpdate[i]);
         } else {
-            player.inventory.set(indexesToUpdate[i], itemsToUpdate[indexesToUpdate[i]]);
+            player.inventory.set(
+                indexesToUpdate[i],
+                itemsToUpdate[indexesToUpdate[i]],
+            );
         }
     }
 
     return true;
 }
 
-function genericTeleport(player: Player, elapsedTicks: number, target: Position, teleportId?: number): boolean {
+function genericTeleport(
+    player: Player,
+    elapsedTicks: number,
+    target: Position,
+    teleportId?: number,
+): boolean {
     if (elapsedTicks === 0) {
-        player.playAnimation(animationIds.teleport)
+        player.playAnimation(animationIds.teleport);
         player.outgoingPackets.playSound(soundIds.teleport, 10);
         player.playGraphics({ id: gfxIds.teleport, delay: 0, height: 100 });
     } else if (elapsedTicks === 3) {
@@ -266,20 +303,34 @@ function genericTeleport(player: Player, elapsedTicks: number, target: Position,
                 break;
             }
             default: {
-                queueTeleport(player, target)
+                queueTeleport(player, target);
 
                 // warning: undefined xp values cause the xp to reset to 0,
                 // so make sure to always assert that it's defined
                 if (teleportId && TeleportXP[teleportId]) {
-                    player.enqueueBaseTask(new QueueableTask([], player, () => {
-                        player.skills.addExp(Skill.MAGIC, TeleportXP[teleportId])
-                        return { callbackResult: false, shouldContinueLooping: false };
-                    }, null, null));
+                    player.enqueueBaseTask(
+                        new QueueableTask(
+                            [],
+                            player,
+                            () => {
+                                player.skills.addExp(
+                                    Skill.MAGIC,
+                                    TeleportXP[teleportId],
+                                );
+                                return {
+                                    callbackResult: false,
+                                    shouldContinueLooping: false,
+                                };
+                            },
+                            null,
+                            null,
+                        ),
+                    );
                 }
                 break;
             }
         }
-        player.playAnimation(animationIds.reset)
+        player.playAnimation(animationIds.reset);
         return true;
     }
 
@@ -288,7 +339,10 @@ function genericTeleport(player: Player, elapsedTicks: number, target: Position,
 
 const insufficient = 'You do not have enough runes to cast this spell.';
 
-const activate = (task: TaskExecutor<ButtonAction>, elapsedTicks: number = 0) => {
+const activate = (
+    task: TaskExecutor<ButtonAction>,
+    elapsedTicks: number = 0,
+) => {
     const { player, buttonId } = task.actionData;
 
     let completed: boolean = false;
@@ -322,10 +376,18 @@ const activate = (task: TaskExecutor<ButtonAction>, elapsedTicks: number = 0) =>
                     break;
                 }
 
-                player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, player.inventory);
+                player.outgoingPackets.sendUpdateAllWidgetItems(
+                    widgets.inventory,
+                    player.inventory,
+                );
             }
 
-            completed = genericTeleport(player, elapsedTicks, TeleportLocations[buttonId], buttonId);
+            completed = genericTeleport(
+                player,
+                elapsedTicks,
+                TeleportLocations[buttonId],
+                buttonId,
+            );
 
             break;
         }
@@ -346,8 +408,8 @@ export default {
             buttonIds: buttonIds,
             task: {
                 activate,
-                interval: 1
-            }
-        } as ButtonActionHook
-    ]
+                interval: 1,
+            },
+        } as ButtonActionHook,
+    ],
 };

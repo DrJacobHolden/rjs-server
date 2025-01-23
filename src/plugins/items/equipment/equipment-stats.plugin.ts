@@ -8,22 +8,33 @@ export const handler: buttonActionHandler = (details) => {
     player.updateBonuses();
     player.syncBonuses();
 
-    player.outgoingPackets.sendUpdateAllWidgetItems(widgets.equipmentStats, player.equipment);
-    player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, player.inventory);
+    player.outgoingPackets.sendUpdateAllWidgetItems(
+        widgets.equipmentStats,
+        player.equipment,
+    );
+    player.outgoingPackets.sendUpdateAllWidgetItems(
+        widgets.inventory,
+        player.inventory,
+    );
 
     player.interfaceState.openWidget(widgets.equipmentStats.widgetId, {
         multi: true,
-        slot: 'screen'
+        slot: 'screen',
     });
     player.interfaceState.openWidget(widgets.inventory.widgetId, {
         multi: true,
-        slot: 'tabarea'
+        slot: 'tabarea',
     });
 };
 
 export default {
     pluginId: 'rs:equipment_stat_view',
     hooks: [
-        { type: 'button', widgetId: widgets.equipment.widgetId, buttonIds: 24, handler }
-    ]
+        {
+            type: 'button',
+            widgetId: widgets.equipment.widgetId,
+            buttonIds: 24,
+            handler,
+        },
+    ],
 };

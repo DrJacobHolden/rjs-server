@@ -5,17 +5,17 @@ import { getItemFromContainer } from '@engine/world';
 export const shopSellValueHandler: itemInteractionActionHandler = (details) => {
     const { player, itemId, itemSlot, widgetId, option } = details;
 
-    if(!player.interfaceState.findWidget(widgetId)) {
+    if (!player.interfaceState.findWidget(widgetId)) {
         return;
     }
 
     const openedShopKey = player.metadata.lastOpenedShopKey;
-    if(!openedShopKey) {
+    if (!openedShopKey) {
         return;
     }
 
     const shop = findShop(openedShopKey);
-    if(!shop) {
+    if (!shop) {
         return;
     }
 
@@ -23,43 +23,50 @@ export const shopSellValueHandler: itemInteractionActionHandler = (details) => {
     const shopItem = getItemFromContainer(itemId, itemSlot, shopContainer);
     console.log(itemId, itemSlot, openedShopKey, shopContainer);
 
-    if(!shopItem) {
+    if (!shopItem) {
         // The specified item was not found in the specified slot.
         player.sendMessage('ERROR item not in shopslot.');
         return;
     }
 
-    if(shopItem.amount <= 0) {
+    if (shopItem.amount <= 0) {
         player.sendMessage('The shop has ran out of stock.');
         // Out of stock
         return;
     }
     const buyItem = findItem(itemId);
-    if(!buyItem) {
+    if (!buyItem) {
         // The specified item was not found in the specified slot.
         player.sendMessage(`Error item does not exist. [id:${itemId}]`);
         return;
     }
-    player.sendMessage(`${buyItem.name}: currently costs ${shop.getBuyFromShopPrice(buyItem)} coins.`);
+    player.sendMessage(
+        `${buyItem.name}: currently costs ${shop.getBuyFromShopPrice(buyItem)} coins.`,
+    );
 };
 
-export const shopPurchaseValueHandler: itemInteractionActionHandler = ({ player, itemDetails }) => {
+export const shopPurchaseValueHandler: itemInteractionActionHandler = ({
+    player,
+    itemDetails,
+}) => {
     const openedShopKey = player.metadata.lastOpenedShopKey;
-    if(!openedShopKey) {
+    if (!openedShopKey) {
         return;
     }
 
     const shop = findShop(openedShopKey);
-    if(!shop) {
+    if (!shop) {
         return;
     }
 
     const shopBuyPrice = shop.getBuyFromShopPrice(itemDetails);
 
-    if(shopBuyPrice === -1) {
+    if (shopBuyPrice === -1) {
         player.sendMessage(`You can't sell this item to this shop.`);
     } else {
-        player.sendMessage(`${ itemDetails.name }: shop will buy for ${ shopBuyPrice } coins.`);
+        player.sendMessage(
+            `${itemDetails.name}: shop will buy for ${shopBuyPrice} coins.`,
+        );
     }
 };
 
@@ -71,13 +78,14 @@ export default {
             widgets: widgets.shop,
             options: 'value',
             handler: shopSellValueHandler,
-            cancelOtherActions: false
-        }, {
+            cancelOtherActions: false,
+        },
+        {
             type: 'item_interaction',
             widgets: widgets.shopPlayerInventory,
             options: 'value',
             handler: shopPurchaseValueHandler,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

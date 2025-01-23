@@ -7,17 +7,19 @@ export function parseScenerySpawns(): LandscapeObject[] {
     try {
         logger.info('Parsing scenery spawns...');
 
-        const scenerySpawns = load(readFileSync('data/config/scenery-spawns.yaml', 'utf8'),
-            { schema: JSON_SCHEMA }) as LandscapeObject[];
+        const scenerySpawns = load(
+            readFileSync('data/config/scenery-spawns.yaml', 'utf8'),
+            { schema: JSON_SCHEMA },
+        ) as LandscapeObject[];
 
-        if(!scenerySpawns || scenerySpawns.length === 0) {
+        if (!scenerySpawns || scenerySpawns.length === 0) {
             throw new Error('Unable to read scenery spawns.');
         }
 
         logger.info(`${scenerySpawns.length} scenery spawns found.`);
 
         return scenerySpawns;
-    } catch(error) {
+    } catch (error) {
         logger.error(`Error parsing scenery spawns: ${error}`);
         return [];
     }

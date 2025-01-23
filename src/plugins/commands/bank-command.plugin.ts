@@ -6,9 +6,17 @@ import { advancedNumberHookFilter } from '@engine/action/hook/hook-filters';
 import { objectIds } from '@engine/world/config/object-ids';
 
 const action: commandActionHandler = (details) => {
-    const interactionActions = getActionHooks<ObjectInteractionActionHook>('object_interaction')
-        .filter(plugin => advancedNumberHookFilter(plugin.objectIds, objectIds.bankBooth, plugin.options, 'use-quickly'));
-    interactionActions.forEach(plugin => {
+    const interactionActions = getActionHooks<ObjectInteractionActionHook>(
+        'object_interaction',
+    ).filter((plugin) =>
+        advancedNumberHookFilter(
+            plugin.objectIds,
+            objectIds.bankBooth,
+            plugin.options,
+            'use-quickly',
+        ),
+    );
+    interactionActions.forEach((plugin) => {
         if (!plugin.handler) {
             return;
         }
@@ -21,13 +29,13 @@ const action: commandActionHandler = (details) => {
                 x: details.player.position.x,
                 y: details.player.position.y,
                 orientation: 0,
-                type: 0
+                type: 0,
             },
             option: 'use-quickly',
             position: details.player.position,
             objectConfig: undefined as any,
-            cacheOriginal: undefined as any
-        })
+            cacheOriginal: undefined as any,
+        });
     });
 };
 
@@ -36,8 +44,8 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'bank' ],
-            handler: action
-        }
-    ]
+            commands: ['bank'],
+            handler: action,
+        },
+    ],
 };

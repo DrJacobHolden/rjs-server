@@ -8,11 +8,19 @@ const dropItemPacket = (player: Player, packet: PacketData) => {
     const slot = buffer.get('short', 'u');
     const itemId = buffer.get('short', 'u', 'le');
 
-    player.actionPipeline.call('item_interaction', player, itemId, slot, widgetId, containerId, 'drop');
+    player.actionPipeline.call(
+        'item_interaction',
+        player,
+        itemId,
+        slot,
+        widgetId,
+        containerId,
+        'drop',
+    );
 };
 
 export default {
     opcode: 29,
     size: 8,
-    handler: dropItemPacket
+    handler: dropItemPacket,
 };

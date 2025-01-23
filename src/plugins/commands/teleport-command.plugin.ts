@@ -7,9 +7,9 @@ const action: commandActionHandler = (details) => {
 
     const x = args.XorPlayerName;
 
-    if(typeof x === 'string') {
+    if (typeof x === 'string') {
         const playerWithName = activeWorld.findPlayer(x);
-        if(playerWithName) {
+        if (playerWithName) {
             player.teleport(playerWithName.position);
             return;
         }
@@ -17,7 +17,7 @@ const action: commandActionHandler = (details) => {
 
     const xCoord: number = typeof x === 'string' ? Number.parseInt(x, 10) : x;
 
-    if(Number.isNaN(xCoord)) {
+    if (Number.isNaN(xCoord)) {
         return;
     }
     const y: number = args.y as number;
@@ -31,24 +31,24 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'move', 'goto', 'teleport', 'tele', 'moveto', 'setpos' ],
+            commands: ['move', 'goto', 'teleport', 'tele', 'moveto', 'setpos'],
             args: [
                 {
                     name: 'XorPlayerName',
-                    type: 'string'
+                    type: 'string',
                 },
                 {
                     name: 'y',
                     type: 'number',
-                    defaultValue: 3222
+                    defaultValue: 3222,
                 },
                 {
                     name: 'level',
                     type: 'number',
-                    defaultValue: 0
-                }
+                    defaultValue: 0,
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

@@ -17,7 +17,6 @@ export interface IHarvestable {
     break: number;
 }
 
-
 // Object maps work with key is mineable object, value is empty ore
 const CLAY_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.default.clay.map((tree) => [tree.default, tree.empty]),
@@ -51,7 +50,6 @@ const MITHRIL_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.default.mithril.map((tree) => [tree.default, tree.empty]),
 ] as [number, number][]);
 
-
 const ADAMANT_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.default.adamant.map((tree) => [tree.default, tree.empty]),
 ] as [number, number][]);
@@ -73,11 +71,9 @@ const OAK_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.tree.oak.map((tree) => [tree.default, tree.stump]),
 ] as [number, number][]);
 
-
 const WILLOW_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.tree.willow.map((tree) => [tree.default, tree.stump]),
 ] as [number, number][]);
-
 
 const TEAK_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.tree.teak.map((tree) => [tree.default, tree.stump]),
@@ -87,11 +83,9 @@ const DRAMEN_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.tree.dramen.map((tree) => [tree.default, tree.stump]),
 ] as [number, number][]);
 
-
 const MAPLE_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.tree.maple.map((tree) => [tree.default, tree.stump]),
 ] as [number, number][]);
-
 
 const HOLLOW_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.tree.hollow.map((tree) => [tree.default, tree.stump]),
@@ -100,7 +94,6 @@ const HOLLOW_OBJECTS: Map<number, number> = new Map<number, number>([
 const MAHOGANY_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.tree.mahogany.map((tree) => [tree.default, tree.stump]),
 ] as [number, number][]);
-
 
 const YEW_OBJECTS: Map<number, number> = new Map<number, number>([
     ...objectIds.tree.yew.map((tree) => [tree.default, tree.stump]),
@@ -122,9 +115,8 @@ export enum Ore {
     ADAMANT = 8,
     RUNITE = 9,
     RUNE_ESS = 10,
-    GEM = 11
+    GEM = 11,
 }
-
 
 export enum Tree {
     NORMAL = 0,
@@ -139,7 +131,6 @@ export enum Tree {
     HOLLOW = 9,
     DRAMEN = 10,
 }
-
 
 export function selectWeightedItem(items: WeightedItem[]): string {
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
@@ -164,7 +155,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 5,
         respawnHigh: 10,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: COPPER_OBJECTS,
@@ -174,7 +165,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 10,
         respawnHigh: 20,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: TIN_OBJECTS,
@@ -184,7 +175,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 10,
         respawnHigh: 20,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: IRON_OBJECTS,
@@ -194,7 +185,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 9,
         respawnHigh: 9,
         baseChance: 0.0085,
-        break: 100
+        break: 100,
     },
     {
         objects: COAL_OBJECTS,
@@ -204,7 +195,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 20,
         respawnHigh: 30,
         baseChance: 50,
-        break: 100
+        break: 100,
     },
     {
         objects: SILVER_OBJECTS,
@@ -214,7 +205,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 30,
         respawnHigh: 40,
         baseChance: 40,
-        break: 100
+        break: 100,
     },
     {
         objects: GOLD_OBJECTS,
@@ -224,7 +215,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 50,
         respawnHigh: 70,
         baseChance: 30,
-        break: 100
+        break: 100,
     },
     {
         objects: MITHRIL_OBJECTS,
@@ -234,7 +225,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 90,
         respawnHigh: 120,
         baseChance: 20,
-        break: 100
+        break: 100,
     },
     {
         objects: ADAMANT_OBJECTS,
@@ -244,7 +235,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 200,
         respawnHigh: 400,
         baseChance: 0,
-        break: 100
+        break: 100,
     },
     {
         objects: RUNITE_OBJECTS,
@@ -254,26 +245,26 @@ const Ores: IHarvestable[] = [
         respawnLow: 1200,
         respawnHigh: 1200,
         baseChance: -10,
-        break: 100
+        break: 100,
     },
     {
         objects: new Map<number, number>([[2111, 450]]),
         items: [
-            { itemConfigId: 'rs:uncut_opal', weight: 60 },      // 60/128
-            { itemConfigId: 'rs:uncut_jade', weight: 30 },      // 30/128
+            { itemConfigId: 'rs:uncut_opal', weight: 60 }, // 60/128
+            { itemConfigId: 'rs:uncut_jade', weight: 30 }, // 30/128
             { itemConfigId: 'rs:uncut_red_topaz', weight: 15 }, // 15/128
-            { itemConfigId: 'rs:uncut_sapphire', weight: 9 },   // 9/128
-            { itemConfigId: 'rs:uncut_emerald', weight: 5 },    // 5/128
-            { itemConfigId: 'rs:uncut_ruby', weight: 5 },       // 5/128
-            { itemConfigId: 'rs:uncut_diamond', weight: 4 }     // 4/128
+            { itemConfigId: 'rs:uncut_sapphire', weight: 9 }, // 9/128
+            { itemConfigId: 'rs:uncut_emerald', weight: 5 }, // 5/128
+            { itemConfigId: 'rs:uncut_ruby', weight: 5 }, // 5/128
+            { itemConfigId: 'rs:uncut_diamond', weight: 4 }, // 4/128
         ],
         level: 40,
         experience: 65.0,
         respawnLow: 200,
         respawnHigh: 400,
         baseChance: 28, // Base success chance at level 40
-        break: 100      // Always depletes after successful mining
-    }
+        break: 100, // Always depletes after successful mining
+    },
 ];
 
 const Trees: IHarvestable[] = [
@@ -285,7 +276,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 59,
         respawnHigh: 98,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: ACHEY_OBJECTS,
@@ -295,7 +286,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 59,
         respawnHigh: 98,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: OAK_OBJECTS,
@@ -305,7 +296,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 14,
         respawnHigh: 14,
         baseChance: 50,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: WILLOW_OBJECTS,
@@ -315,7 +306,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 14,
         respawnHigh: 14,
         baseChance: 30,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: TEAK_OBJECTS,
@@ -325,7 +316,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 15,
         respawnHigh: 15,
         baseChance: 0,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: DRAMEN_OBJECTS,
@@ -335,7 +326,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 0,
         respawnHigh: 0,
         baseChance: 100,
-        break: 0
+        break: 0,
     },
     {
         objects: MAPLE_OBJECTS,
@@ -345,7 +336,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 59,
         respawnHigh: 59,
         baseChance: 0,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: HOLLOW_OBJECTS,
@@ -355,7 +346,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 43,
         respawnHigh: 44,
         baseChance: 0,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: MAHOGANY_OBJECTS,
@@ -365,7 +356,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 14,
         respawnHigh: 14,
         baseChance: -5,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: YEW_OBJECTS,
@@ -375,7 +366,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 99,
         respawnHigh: 99,
         baseChance: -15,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: MAGIC_OBJECTS,
@@ -385,7 +376,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 199,
         respawnHigh: 199,
         baseChance: -25,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: DRAMEN_OBJECTS,
@@ -395,7 +386,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 0,
         respawnHigh: 0,
         baseChance: 100,
-        break: 0
+        break: 0,
     },
     {
         objects: HOLLOW_OBJECTS,
@@ -405,7 +396,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 43,
         respawnHigh: 44,
         baseChance: 0,
-        break: 100 / 8
+        break: 100 / 8,
     },
 ];
 
@@ -414,15 +405,15 @@ export function getOre(ore: Ore): IHarvestable {
 }
 
 export function getOreFromRock(id: number): IHarvestable {
-    return Ores.find(ore => ore.objects.has(id)) as IHarvestable;
+    return Ores.find((ore) => ore.objects.has(id)) as IHarvestable;
 }
 
 export function getTreeFromHealthy(id: number): IHarvestable {
-    return Trees.find(tree => tree.objects.has(id)) as IHarvestable;
+    return Trees.find((tree) => tree.objects.has(id)) as IHarvestable;
 }
 
 export function getOreFromDepletedRock(id: number): IHarvestable {
-    return Ores.find(ore => {
+    return Ores.find((ore) => {
         for (const [rock, expired] of ore.objects) {
             if (expired === id) {
                 return true;

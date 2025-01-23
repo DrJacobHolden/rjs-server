@@ -7,15 +7,18 @@ export interface MusicRegionsConfiguration {
     regionIds: number[];
 }
 
-
 export class MusicTrack {
-
     public songId: number;
     public songName: string;
     public musicTabButtonId: number;
     public regionIds: number[];
 
-    public constructor(songId: number, songName: string, musicTabButtonId: number, regionIds: number[]) {
+    public constructor(
+        songId: number,
+        songName: string,
+        musicTabButtonId: number,
+        regionIds: number[],
+    ) {
         this.songId = songId;
         this.songName = songName;
         this.musicTabButtonId = musicTabButtonId;
@@ -23,13 +26,22 @@ export class MusicTrack {
     }
 }
 
-export function translateMusicRegionsConfig(config: MusicRegionsConfiguration): MusicTrack {
-    return new MusicTrack(config.songId, config.songName, config.musicTabButtonId, config.regionIds);
+export function translateMusicRegionsConfig(
+    config: MusicRegionsConfiguration,
+): MusicTrack {
+    return new MusicTrack(
+        config.songId,
+        config.songName,
+        config.musicTabButtonId,
+        config.regionIds,
+    );
 }
 
 export async function loadMusicRegionConfigurations(): Promise<MusicTrack[]> {
     const regions: MusicTrack[] = [];
 
-    await musicRegionsFile.musicRegions.forEach(musicRegion => regions.push(translateMusicRegionsConfig(musicRegion)));
+    await musicRegionsFile.musicRegions.forEach((musicRegion) =>
+        regions.push(translateMusicRegionsConfig(musicRegion)),
+    );
     return regions;
 }

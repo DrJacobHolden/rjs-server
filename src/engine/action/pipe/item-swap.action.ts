@@ -1,21 +1,25 @@
 import { Player } from '@engine/world/actor';
-import { ActionHook, getActionHooks, numberHookFilter, ActionPipe, RunnableHooks } from '@engine/action';
-
+import {
+    ActionHook,
+    getActionHooks,
+    numberHookFilter,
+    ActionPipe,
+    RunnableHooks,
+} from '@engine/action';
 
 /**
  * Defines a swap items action hook.
  */
-export interface ItemSwapActionHook extends ActionHook<ItemSwapAction, itemSwapActionHandler> {
+export interface ItemSwapActionHook
+    extends ActionHook<ItemSwapAction, itemSwapActionHandler> {
     widgetId?: number;
     widgetIds?: number[];
 }
-
 
 /**
  * The swap items action hook handler function to be called when the hook's conditions are met.
  */
 export type itemSwapActionHandler = (itemSwapAction: ItemSwapAction) => void;
-
 
 /**
  * Details about a swap items action being performed.
@@ -33,7 +37,6 @@ export interface ItemSwapAction {
     toSlot: number;
 }
 
-
 /**
  * The pipe that the game engine hands swap items actions off to.
  * @param player
@@ -41,17 +44,28 @@ export interface ItemSwapAction {
  * @param toSlot
  * @param widget
  */
-const itemSwapActionPipe = (player: Player, fromSlot: number, toSlot: number,
-                            widget: { widgetId: number, containerId: number }): RunnableHooks<ItemSwapAction> | null => {
-    const matchingHooks = getActionHooks<ItemSwapActionHook>('item_swap')
-        .filter(plugin => (
-            (plugin.widgetId || plugin.widgetIds)
+const itemSwapActionPipe = (
+    player: Player,
+    fromSlot: number,
+    toSlot: number,
+    widget: { widgetId: number; containerId: number },
+): RunnableHooks<ItemSwapAction> | null => {
+    const matchingHooks = getActionHooks<ItemSwapActionHook>(
+        'item_swap',
+    ).filter(
+        (plugin) =>
+            (plugin.widgetId || plugin.widgetIds) &&
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            && numberHookFilter((plugin.widgetId || plugin.widgetIds)!, widget.widgetId)
-        ));
+            numberHookFilter(
+                (plugin.widgetId || plugin.widgetIds)!,
+                widget.widgetId,
+            ),
+    );
 
-    if(!matchingHooks || matchingHooks.length === 0) {
-        player.sendMessage(`Unhandled Swap Items action: widget[${widget.widgetId}] container[${widget.containerId}] fromSlot[${fromSlot} toSlot${toSlot}`);
+    if (!matchingHooks || matchingHooks.length === 0) {
+        player.sendMessage(
+            `Unhandled Swap Items action: widget[${widget.widgetId}] container[${widget.containerId}] fromSlot[${fromSlot} toSlot${toSlot}`,
+        );
         return null;
     }
 
@@ -62,13 +76,12 @@ const itemSwapActionPipe = (player: Player, fromSlot: number, toSlot: number,
             widgetId: widget.widgetId,
             containerId: widget.containerId,
             fromSlot,
-            toSlot
-        }
+            toSlot,
+        },
     };
 };
-
 
 /**
  * Swap items action pipe definition.
  */
-export default [ 'item_swap', itemSwapActionPipe ] as ActionPipe;
+export default ['item_swap', itemSwapActionPipe] as ActionPipe;

@@ -5,7 +5,6 @@ import { join } from 'node:path';
 import { ActionHook } from '@engine/action/hook';
 import { Quest } from '@engine/world/actor/player/quest';
 
-
 /**
  * The definition of a single content plugin.
  */
@@ -15,7 +14,6 @@ export class ContentPlugin {
     public quests?: Quest[];
 }
 
-
 /**
  * Searches for and parses all plugin files within the /plugins directory.
  */
@@ -24,32 +22,46 @@ export async function loadPluginFiles(): Promise<ContentPlugin[]> {
     const relativeDir = join('..', '..', 'plugins');
     const plugins: ContentPlugin[] = [];
 
-    for await(const path of getFiles(pluginDir, { type: 'whitelist', list: ['.plugin.js', 'index.js'] })) {
-        const location = join(relativeDir, path.substring(pluginDir.length).replace('.js', ''));
+    for await (const path of getFiles(pluginDir, {
+        type: 'whitelist',
+        list: ['.plugin.js', 'index.js'],
+    })) {
+        const location = join(
+            relativeDir,
+            path.substring(pluginDir.length).replace('.js', ''),
+        );
 
         try {
             let pluginFile = require(location);
-            if(!pluginFile) {
+            if (!pluginFile) {
                 continue;
             }
 
-            if(pluginFile.default) {
+            if (pluginFile.default) {
                 pluginFile = pluginFile.default;
             }
 
             const plugin = pluginFile as ContentPlugin;
-            if(!plugin.pluginId) {
-                logger.error(`Error loading plugin: Plugin ID not provided for .plugin file at ${path}`);
+            if (!plugin.pluginId) {
+                logger.error(
+                    `Error loading plugin: Plugin ID not provided for .plugin file at ${path}`,
+                );
                 continue;
             }
 
-            if(plugins.find(loadedPlugin => loadedPlugin.pluginId === plugin.pluginId)) {
-                logger.error(`Error loading plugin: Duplicate plugin ID ${plugin.pluginId} at ${path}`);
+            if (
+                plugins.find(
+                    (loadedPlugin) => loadedPlugin.pluginId === plugin.pluginId,
+                )
+            ) {
+                logger.error(
+                    `Error loading plugin: Duplicate plugin ID ${plugin.pluginId} at ${path}`,
+                );
                 continue;
             }
 
             plugins.push(plugin);
-        } catch(error) {
+        } catch (error) {
             logger.error(`Error loading plugin file at ${location}:`);
             logger.error(error);
         }

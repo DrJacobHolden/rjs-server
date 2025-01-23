@@ -23,11 +23,11 @@ export const PACKET_DIRECTORY = `${BUILD_DIR}/net/inbound-packets`;
 export async function loadPackets(): Promise<Map<number, InboundPacket>> {
     incomingPackets.clear();
 
-    for await(const path of getFiles(PACKET_DIRECTORY, ['.packet.js'], true)) {
+    for await (const path of getFiles(PACKET_DIRECTORY, ['.packet.js'], true)) {
         const location = `./inbound-packets${path.substring(PACKET_DIRECTORY.length).replace('.js', '')}`;
         const packet = require(location).default;
         if (Array.isArray(packet)) {
-            packet.forEach(p => incomingPackets.set(p.opcode, p));
+            packet.forEach((p) => incomingPackets.set(p.opcode, p));
         } else {
             incomingPackets.set(packet.opcode, packet);
         }
@@ -36,19 +36,28 @@ export async function loadPackets(): Promise<Map<number, InboundPacket>> {
     return incomingPackets;
 }
 
-export function handlePacket(player: Player, packetId: number, packetSize: number, buffer: ByteBuffer): boolean {
+export function handlePacket(
+    player: Player,
+    packetId: number,
+    packetSize: number,
+    buffer: ByteBuffer,
+): boolean {
     const incomingPacket = incomingPackets.get(packetId);
 
-    if(!incomingPacket) {
-        logger.info(`Unknown packet ${packetId} with size ${packetSize} received.`);
+    if (!incomingPacket) {
+        logger.info(
+            `Unknown packet ${packetId} with size ${packetSize} received.`,
+        );
         return false;
     }
 
-    new Promise<void>(resolve => {
+    new Promise<void>((resolve) => {
         try {
             incomingPacket.handler(player, { packetId, packetSize, buffer });
-        } catch(error) {
-            logger.error(`Error handling inbound packet ${packetId} with size ${packetSize}`);
+        } catch (error) {
+            logger.error(
+                `Error handling inbound packet ${packetId} with size ${packetSize}`,
+            );
             logger.error(error);
         }
         resolve();

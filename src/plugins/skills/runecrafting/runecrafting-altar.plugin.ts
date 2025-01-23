@@ -9,14 +9,19 @@ import {
     talismans,
 } from '@plugins/skills/runecrafting/runecrafting-constants';
 import { itemOnObjectActionHandler, ItemOnObjectAction } from '@engine/action';
-import { objectInteractionActionHandler, ObjectInteractionAction } from '@engine/action';
-import { RunecraftingAltar, RunecraftingRune } from '@plugins/skills/runecrafting/runecrafting-types';
+import {
+    objectInteractionActionHandler,
+    ObjectInteractionAction,
+} from '@engine/action';
+import {
+    RunecraftingAltar,
+    RunecraftingRune,
+} from '@plugins/skills/runecrafting/runecrafting-types';
 import { itemIds } from '@engine/world/config/item-ids';
 import { Player } from '@engine/world/actor/player/player';
 import { Item } from '@engine/world/items/item';
 import { findItem } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
-
 
 const enterAltar: itemOnObjectActionHandler = (details: ItemOnObjectAction) => {
     const { player, object, item } = details;
@@ -24,20 +29,26 @@ const enterAltar: itemOnObjectActionHandler = (details: ItemOnObjectAction) => {
     const rune = getEntityByAttr(runes, 'altar.entranceId', object.objectId);
 
     if (!altar) {
-        logger.error(`No altar [entrance] found for runecrafting altar plugin: ${object.objectId}`);
+        logger.error(
+            `No altar [entrance] found for runecrafting altar plugin: ${object.objectId}`,
+        );
         return;
     }
 
     if (!rune) {
-        logger.error(`No rune found for runecrafting altar plugin: ${object.objectId}`);
+        logger.error(
+            `No rune found for runecrafting altar plugin: ${object.objectId}`,
+        );
         return;
     }
 
     if (item.itemId === itemIds.talismans.elemental) {
-        if (rune.talisman.id === itemIds.talismans.air
-            || rune.talisman.id === itemIds.talismans.water
-            || rune.talisman.id === itemIds.talismans.earth
-            || rune.talisman.id === itemIds.talismans.fire) {
+        if (
+            rune.talisman.id === itemIds.talismans.air ||
+            rune.talisman.id === itemIds.talismans.water ||
+            rune.talisman.id === itemIds.talismans.earth ||
+            rune.talisman.id === itemIds.talismans.fire
+        ) {
             finishEnterAltar(player, item, altar);
             return;
         }
@@ -52,36 +63,45 @@ const enterAltar: itemOnObjectActionHandler = (details: ItemOnObjectAction) => {
     // Correct talisman.
     if (item.itemId === rune.talisman.id) {
         finishEnterAltar(player, item, altar);
-
     }
 };
 
-function finishEnterAltar(player: Player, item: Item, altar: RunecraftingAltar): void {
+function finishEnterAltar(
+    player: Player,
+    item: Item,
+    altar: RunecraftingAltar,
+): void {
     const talisman = findItem(item.itemId);
 
     if (!talisman) {
-        logger.error(`No talisman found for runecrafting altar plugin: ${item.itemId}`);
+        logger.error(
+            `No talisman found for runecrafting altar plugin: ${item.itemId}`,
+        );
         return;
     }
 
-    player.sendMessage(`You hold the ${talisman.name} towards the mysterious ruins.`);
+    player.sendMessage(
+        `You hold the ${talisman.name} towards the mysterious ruins.`,
+    );
     player.sendMessage('You feel a powerful force take hold of you..');
     player.teleport(altar.entrance);
 }
 
-
-const exitAltar: objectInteractionActionHandler = (details: ObjectInteractionAction) => {
+const exitAltar: objectInteractionActionHandler = (
+    details: ObjectInteractionAction,
+) => {
     const { player, object } = details;
     const altar = getEntityByAttr(altars, 'portalId', object.objectId);
 
     if (!altar) {
-        logger.error(`No altar [exit] found for runecrafting altar plugin: ${object.objectId}`);
+        logger.error(
+            `No altar [exit] found for runecrafting altar plugin: ${object.objectId}`,
+        );
         return;
     }
 
     player.teleport(altar.exit);
 };
-
 
 export default {
     pluginId: 'rs:runecrafting_altars',
@@ -91,12 +111,13 @@ export default {
             itemIds: getEntityIds(talismans, 'id'),
             objectIds: getEntityIds(altars, 'entranceId'),
             walkTo: true,
-            handler: enterAltar
-        }, {
+            handler: enterAltar,
+        },
+        {
             type: 'object_interaction',
             objectIds: getEntityIds(altars, 'portalId'),
             walkTo: true,
-            handler: exitAltar
-        }
-    ]
+            handler: exitAltar,
+        },
+    ],
 };

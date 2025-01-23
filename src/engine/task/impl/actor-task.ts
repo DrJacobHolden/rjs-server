@@ -25,7 +25,7 @@ export abstract class ActorTask<TActor extends Actor = Actor> extends Task {
      */
     constructor(
         protected readonly actor: TActor,
-        config?: TaskConfig
+        config?: TaskConfig,
     ) {
         super(config);
 
@@ -57,9 +57,10 @@ export abstract class ActorTask<TActor extends Actor = Actor> extends Task {
         }
 
         setImmediate(() => {
-            this.walkingQueueSubscription = this.actor.walkingQueue.movementQueued$.subscribe(() => {
-                this.stop();
-            });
+            this.walkingQueueSubscription =
+                this.actor.walkingQueue.movementQueued$.subscribe(() => {
+                    this.stop();
+                });
         });
     }
 }

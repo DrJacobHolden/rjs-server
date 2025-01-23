@@ -1,8 +1,9 @@
-import { QuestCompletion, QuestJournalHandler } from '@engine/config/quest-config';
-
+import {
+    QuestCompletion,
+    QuestJournalHandler,
+} from '@engine/config/quest-config';
 
 export class Quest {
-
     public id: string;
     public questTabId: number;
     public name: string;
@@ -25,5 +26,4 @@ export class Quest {
         this.journalHandler = options.journalHandler;
         this.onComplete = options.onComplete;
     }
-
 }

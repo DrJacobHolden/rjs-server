@@ -19,17 +19,17 @@ export class ExamineCache {
         this.objects = new Map<number, Examine>();
     }
 
-    public getItem (id: number): string | null {
+    public getItem(id: number): string | null {
         const examine = this.items.get(id);
         return examine ? examine.examine : null;
     }
 
-    public getNpc (id: number): string | null {
+    public getNpc(id: number): string | null {
         const examine = this.npcs.get(id);
         return examine ? examine.examine : null;
     }
 
-    public getObject (id: number): string | null {
+    public getObject(id: number): string | null {
         const examine = this.objects.get(id);
         return examine ? examine.examine : null;
     }
@@ -38,16 +38,18 @@ export class ExamineCache {
 function parseData(fileName: string): Map<number, Examine> {
     const examineMap: Map<number, Examine> = new Map<number, Examine>();
     try {
-        const examineItems = load(readFileSync(fileName, 'utf8'), { schema: JSON_SCHEMA }) as Examine[];
+        const examineItems = load(readFileSync(fileName, 'utf8'), {
+            schema: JSON_SCHEMA,
+        }) as Examine[];
 
-        if(!examineItems || examineItems.length === 0) {
+        if (!examineItems || examineItems.length === 0) {
             throw new Error('Unable to read examine data.');
         }
 
         for (const item of examineItems) {
             examineMap.set(item.id, item);
         }
-    } catch(error) {
+    } catch (error) {
         logger.error(`Error parsing examine data: ${error}`);
     }
 

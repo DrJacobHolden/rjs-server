@@ -14,7 +14,11 @@ export class ForgingTask extends ActorTask<Player> {
     private elapsedTicks = 0;
     private amountForged = 0;
 
-    constructor(player: Player, private readonly smithable: Smithable, private readonly amount: number) {
+    constructor(
+        player: Player,
+        private readonly smithable: Smithable,
+        private readonly amount: number,
+    ) {
         super(player);
     }
 
@@ -50,10 +54,13 @@ export class ForgingTask extends ActorTask<Player> {
         // Add item to inventory
         this.actor.inventory.add({
             itemId: this.smithable.item.itemId,
-            amount: this.smithable.item.amount
+            amount: this.smithable.item.amount,
         });
 
-        this.actor.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, this.actor.inventory);
+        this.actor.outgoingPackets.sendUpdateAllWidgetItems(
+            widgets.inventory,
+            this.actor.inventory,
+        );
         this.actor.skills.addExp(Skill.SMITHING, this.smithable.experience);
 
         this.amountForged++;
@@ -64,6 +71,10 @@ export class ForgingTask extends ActorTask<Player> {
      * @returns {boolean} True if the player has the required materials, false otherwise.
      */
     private hasMaterials() {
-        return this.smithable.ingredient.amount <= this.actor.inventory.findAll(this.smithable.ingredient.itemId).length
+        return (
+            this.smithable.ingredient.amount <=
+            this.actor.inventory.findAll(this.smithable.ingredient.itemId)
+                .length
+        );
     }
 }

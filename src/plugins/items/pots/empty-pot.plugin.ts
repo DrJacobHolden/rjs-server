@@ -27,9 +27,9 @@ export default {
             type: 'item_interaction',
             widgets: widgets.inventory,
             options: 'empty',
-            itemIds: [ itemIds.potOfFlour ],
+            itemIds: [itemIds.potOfFlour],
             handler: action,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

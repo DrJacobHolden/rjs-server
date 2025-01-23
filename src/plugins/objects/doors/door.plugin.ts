@@ -8,80 +8,90 @@ const doors = [
     {
         closed: 1530,
         open: 1531,
-        hinge: 'RIGHT'
+        hinge: 'RIGHT',
     },
     {
         closed: 11707,
         open: 11708,
-        hinge: 'RIGHT'
+        hinge: 'RIGHT',
     },
     {
         closed: 1533,
         open: 1534,
-        hinge: 'RIGHT'
+        hinge: 'RIGHT',
     },
     {
         closed: 1516,
         open: 1517,
-        hinge: 'LEFT'
+        hinge: 'LEFT',
     },
     {
         closed: 1519,
         open: 1520,
-        hinge: 'RIGHT'
+        hinge: 'RIGHT',
     },
     {
         closed: 1536,
         open: 1537,
-        hinge: 'LEFT'
+        hinge: 'LEFT',
     },
     {
         closed: 11993,
         open: 11994,
-        hinge: 'RIGHT'
+        hinge: 'RIGHT',
     },
     {
         closed: 13001,
         open: 13002,
-        hinge: 'RIGHT'
-    }
+        hinge: 'RIGHT',
+    },
 ];
 
 const leftHingeDir: { [key: string]: string } = {
-    'NORTH': 'WEST',
-    'SOUTH': 'EAST',
-    'WEST': 'SOUTH',
-    'EAST': 'NORTH'
+    NORTH: 'WEST',
+    SOUTH: 'EAST',
+    WEST: 'SOUTH',
+    EAST: 'NORTH',
 };
 const rightHingeDir: { [key: string]: string } = {
-    'NORTH': 'EAST',
-    'SOUTH': 'WEST',
-    'WEST': 'NORTH',
-    'EAST': 'SOUTH'
+    NORTH: 'EAST',
+    SOUTH: 'WEST',
+    WEST: 'NORTH',
+    EAST: 'SOUTH',
 };
 
-export const action: objectInteractionActionHandler = ({ player, object: door, position, cacheOriginal }): void => {
+export const action: objectInteractionActionHandler = ({
+    player,
+    object: door,
+    position,
+    cacheOriginal,
+}): void => {
     let opening = true;
-    let doorConfig = doors.find(d => d.closed === door.objectId);
+    let doorConfig = doors.find((d) => d.closed === door.objectId);
     let hingeConfig;
     let replacementDoorId: number;
-    if(!doorConfig) {
-        doorConfig = doors.find(d => d.open === door.objectId);
-        if(!doorConfig) {
+    if (!doorConfig) {
+        doorConfig = doors.find((d) => d.open === door.objectId);
+        if (!doorConfig) {
             return;
         }
 
         opening = false;
-        hingeConfig = doorConfig.hinge === 'LEFT' ? rightHingeDir : leftHingeDir;
+        hingeConfig =
+            doorConfig.hinge === 'LEFT' ? rightHingeDir : leftHingeDir;
         replacementDoorId = doorConfig.closed;
     } else {
-        hingeConfig = doorConfig.hinge === 'LEFT' ? leftHingeDir : rightHingeDir;
+        hingeConfig =
+            doorConfig.hinge === 'LEFT' ? leftHingeDir : rightHingeDir;
         replacementDoorId = doorConfig.open;
     }
 
     const startDir = WNES[door.orientation];
     const endDir = hingeConfig[startDir];
-    const endPosition = position.step(opening ? 1 : -1, opening ? startDir : endDir);
+    const endPosition = position.step(
+        opening ? 1 : -1,
+        opening ? startDir : endDir,
+    );
 
     const replacementDoor: LandscapeObject = {
         objectId: replacementDoorId,
@@ -89,7 +99,7 @@ export const action: objectInteractionActionHandler = ({ player, object: door, p
         y: endPosition.y,
         level: position.level,
         type: door.type,
-        orientation: directionData[endDir].rotation
+        orientation: directionData[endDir].rotation,
     };
 
     player.instance.toggleGameObjects(replacementDoor, door, !cacheOriginal);
@@ -102,11 +112,13 @@ export default {
     hooks: [
         {
             type: 'object_interaction',
-            objectIds: [ 1530, 4465, 4467, 3014, 3017, 3018,
-                3019, 1536, 1537, 1533, 1531, 1534, 12348, 11993, 11994, 13001, 13002 ],
-            options: [ 'open', 'close' ],
+            objectIds: [
+                1530, 4465, 4467, 3014, 3017, 3018, 3019, 1536, 1537, 1533,
+                1531, 1534, 12348, 11993, 11994, 13001, 13002,
+            ],
+            options: ['open', 'close'],
             walkTo: true,
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };
