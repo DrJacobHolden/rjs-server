@@ -154,9 +154,6 @@ describe('Task', () => {
             onStopMock = jest.fn();
             executeMock = jest.fn();
             task = new class extends Task {
-                constructor() {
-                    super();
-                }
 
                 public execute(): void {
                     executeMock();

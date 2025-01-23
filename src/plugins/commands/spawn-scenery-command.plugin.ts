@@ -1,7 +1,7 @@
 import { commandActionHandler } from '@engine/action';
 import { objectIds } from '@engine/world/config/object-ids';
 import { dump } from 'js-yaml';
-import { writeFileSync } from 'fs';
+import { writeFileSync } from 'node:fs';
 import { logger } from '@runejs/common';
 import { LandscapeObject } from '@runejs/filestore';
 
@@ -10,14 +10,14 @@ const spawnSceneryAction: commandActionHandler = ({ player, args }) => {
     let locationObjectId: number;
 
     if(locationObjectSearch.match(/^[0-9]+$/)) {
-        locationObjectId = parseInt(locationObjectSearch, 10);
+        locationObjectId = Number.parseInt(locationObjectSearch, 10);
     } else {
         // @TODO nested object ids
         locationObjectId = objectIds[locationObjectSearch];
     }
 
-    if(isNaN(locationObjectId)) {
-        throw new Error(`Location object name not found.`);
+    if(Number.isNaN(locationObjectId)) {
+        throw new Error('Location object name not found.');
     }
 
     const objectType = args.objectType as number;
@@ -55,7 +55,7 @@ const undoSceneryAction: commandActionHandler = (details) => {
     }
 
     player.instance.despawnGameObject(o);
-    delete player.metadata.lastSpawnedScenery;
+    player.metadata.lastSpawnedScenery = undefined;
 
     if(player.metadata.spawnedScenery) {
         player.metadata.spawnedScenery.pop();

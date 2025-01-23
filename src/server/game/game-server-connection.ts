@@ -1,4 +1,4 @@
-import { Socket } from 'net';
+import { Socket } from 'node:net';
 
 import { logger } from '@runejs/common';
 import { ByteBuffer } from '@runejs/common';
@@ -20,11 +20,10 @@ export class GameServerConnection {
     public decodeMessage(buffer?: ByteBuffer): void | Promise<void> {
         if(!this.activeBuffer) {
             if (!buffer) {
-                logger.error(`No buffer provided to decodeMessage.`);
+                logger.error('No buffer provided to decodeMessage.');
                 return;
-            } else {
-                this.activeBuffer = buffer;
             }
+                this.activeBuffer = buffer;
         } else if(buffer) {
             const readable = this.activeBuffer.readable;
             const newBuffer = new ByteBuffer(readable + buffer.length);
@@ -110,7 +109,7 @@ export class GameServerConnection {
     }
 
     public connectionDestroyed(): void {
-        logger.info(`Connection destroyed.`);
+        logger.info('Connection destroyed.');
         this.player?.logout();
     }
 

@@ -10,9 +10,9 @@ const talkToAction : npcInteractionActionHandler = (details) => {
     const { player, npc } = details;
 
     dialogue([player, { npc, key: 'zaff' }], [
-        zaff => [ Emote.GENERIC, `Would you like to buy or sell some staffs?`],
+        zaff => [ Emote.GENERIC, 'Would you like to buy or sell some staffs?'],
         options => [
-            `Yes, please!`, [
+            'Yes, please!', [
                 execute(() => {
                     tradeAction(details);
                 })

@@ -15,9 +15,9 @@ const action: commandActionHandler = (details) => {
         }
     }
 
-    const xCoord: number = typeof x === 'string' ? parseInt(x, 10) : x;
+    const xCoord: number = typeof x === 'string' ? Number.parseInt(x, 10) : x;
 
-    if(isNaN(xCoord)) {
+    if(Number.isNaN(xCoord)) {
         return;
     }
     const y: number = args.y as number;

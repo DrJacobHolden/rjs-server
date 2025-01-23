@@ -14,11 +14,11 @@ export const handler: buttonActionHandler = (details) => {
             activeWorld.chunkManager.getRegionIdForWorldPosition(player.position));
 
         if (!songIdForCurrentRegion) {
-            logger.warn(`No song found for current region`);
+            logger.warn('No song found for current region');
             return;
         }
 
-        if(player.savedMetadata['currentSongIdPlaying'] !== songIdForCurrentRegion) {
+        if(player.savedMetadata.currentSongIdPlaying !== songIdForCurrentRegion) {
             player.playSong(songIdForCurrentRegion);
         }
     } else if(buttonId === MusicTabButtonIds.MANUAL_BUTTON_ID) {
@@ -30,7 +30,7 @@ export const handler: buttonActionHandler = (details) => {
     const musicTrack = findMusicTrackByButtonId(buttonId);
     if(musicTrack === null) {
         return;
-    } else if(player.musicTracks.includes(musicTrack.songId)) {
+    }if(player.musicTracks.includes(musicTrack.songId)) {
         player.playSong(musicTrack.songId);
         player.settings.musicPlayerMode = MusicPlayerMode.MANUAL;
         player.outgoingPackets.updateClientConfig(widgetScripts.musicPlayerAutoManual, 0);

@@ -1,6 +1,6 @@
 import { logger } from '@runejs/common';
 import { getFiles } from '@runejs/common/fs';
-import { join } from 'path';
+import { join } from 'node:path';
 
 import { ActionHook } from '@engine/action/hook';
 import { Quest } from '@engine/world/actor/player/quest';

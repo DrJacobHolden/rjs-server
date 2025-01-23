@@ -10,7 +10,7 @@ const action: commandActionHandler = ({ player, args }) => {
     let npcDetails: NpcDetails | null = null;
 
     if(typeof npcKey === 'string' && npcKey.match(/^[0-9]+$/)) {
-        npcKey = parseInt(npcKey, 10);
+        npcKey = Number.parseInt(npcKey, 10);
     }
 
     if(typeof npcKey === 'string') {

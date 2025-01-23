@@ -49,12 +49,10 @@ export const advancedNumberHookFilter = (expected: number | number[], input: num
     if(options !== undefined && searchOption !== undefined) {
         if(Array.isArray(options)) {
             return options.indexOf(searchOption) !== -1;
-        } else {
-            return options === searchOption;
         }
-    } else {
-        return true;
+            return options === searchOption;
     }
+        return true;
 };
 
 

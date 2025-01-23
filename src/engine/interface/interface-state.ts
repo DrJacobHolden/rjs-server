@@ -221,9 +221,8 @@ export class InterfaceState {
 
         if(widgetId === undefined) {
             return this.getWidget(slot) !== null;
-        } else {
-            return this.getWidget(slot)?.widgetId === widgetId;
         }
+            return this.getWidget(slot)?.widgetId === widgetId;
     }
 
     public getWidget(slot: GameInterfaceSlot): Widget | null {

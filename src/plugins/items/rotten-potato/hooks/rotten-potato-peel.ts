@@ -35,10 +35,10 @@ function openBank(player: Player) {
 }
 
 enum DialogueOption {
-    BANK,
-    TELEPORT_MENU,
-    TELEPORT_TO_RARE_DROP,
-    FORCE_RARE_DROP
+    BANK = 0,
+    TELEPORT_MENU = 1,
+    TELEPORT_TO_RARE_DROP = 2,
+    FORCE_RARE_DROP = 3
 }
 
 const peelPotato: itemInteractionActionHandler = async (details) => {
@@ -47,10 +47,10 @@ const peelPotato: itemInteractionActionHandler = async (details) => {
     // console.log(world.travelLocations.locations)
     await dialogue([details.player], [
         options => [
-            `Bank menu`, [
+            'Bank menu', [
                 execute(() => chosenOption = DialogueOption.BANK)
             ],
-            `Travel Far!`, [
+            'Travel Far!', [
                 execute(() => chosenOption = DialogueOption.TELEPORT_MENU)
             ],
             // `Teleport to RARE!`, [

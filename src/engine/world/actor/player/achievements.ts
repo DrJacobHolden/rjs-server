@@ -36,7 +36,7 @@ export const Achievements: { [key: string]: Achievement } = {
         id: 'bury-bones',
         name: 'Grave Digger',
         description: 'Bury the bones of the dead.',
-        longDescription: `Bury the remains of a deceased enemy.`,
+        longDescription: 'Bury the remains of a deceased enemy.',
         series: AchievementSeries.LUMBRIDGE
     }
 };
@@ -52,8 +52,7 @@ export function giveAchievement(achievement: Achievement, player: Player): boole
 
     player.achievements.push(achievement.id);
     player.playGraphics({ id: gfxIds.levelUpFireworks, delay: 0, height: 125 });
-    player.sendMessage(`<col=ffff00><shad>You've completed an Achievement in the ` +
-        `${ achievementSeries[achievement.series].name } series!</shad></col>`);
+    player.sendMessage(`<col=ffff00><shad>You've completed an Achievement in the ${ achievementSeries[achievement.series].name } series!</shad></col>`);
     player.sendMessage(`<col=255>${ achievement.name }</col> - <i>${ achievement.description }</i>`);
     return true;
 }

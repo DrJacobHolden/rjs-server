@@ -49,7 +49,7 @@ function loadGuide(player: Player, guideId: number, subGuideId: number = 0, refr
 
     const subGuide: SkillSubGuide = guide.sub_guides[subGuideId];
 
-    player.modifyWidget(widgets.skillGuide, { childId: 1, text: (guide.name + ' - ' + subGuide.name) });
+    player.modifyWidget(widgets.skillGuide, { childId: 1, text: (`${guide.name} - ${subGuide.name}`) });
 
     const itemIds: number[] = subGuide.lines.map(g => (g.item?.gameId || 0)).concat(new Array(30 - subGuide.lines.length).fill(null));
     player.outgoingPackets.sendUpdateAllWidgetItemsById({ widgetId: widgets.skillGuide, containerId: 132 }, itemIds);

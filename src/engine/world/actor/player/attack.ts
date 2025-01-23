@@ -10,9 +10,9 @@ export class Attack {
 }
 
 export enum AttackDamageType {
-    Stab,
-    Slash,
-    Crush,
-    Magic,
-    Range
+    Stab = 0,
+    Slash = 1,
+    Crush = 2,
+    Magic = 3,
+    Range = 4
 }

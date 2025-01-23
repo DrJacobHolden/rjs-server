@@ -77,7 +77,7 @@ export const depositItem: itemInteractionActionHandler = (details) => {
             break;
         default:
             // Should never happen
-            throw new Error('Unhandled option in banking plugin: ' + details.option);
+            throw new Error(`Unhandled option in banking plugin: ${details.option}`);
     }
 
     const playerInventory = details.player.inventory;
@@ -159,7 +159,7 @@ export const withdrawItem: itemInteractionActionHandler = (details) => {
             break;
         default:
             // Should never happen
-            throw new Error('Unhandled option in banking plugin: ' + details.option);
+            throw new Error(`Unhandled option in banking plugin: ${details.option}`);
     }
 
     const playerBank = details.player.bank;
@@ -267,7 +267,7 @@ const useBankBoothAction : objectInteractionActionHandler = async (details) => {
     let openBank = false;
     let openPin = false;
     await dialogue([player, { npc: 'rs:generic_banker', key: 'banker' }], [
-        banker => [Emote.HAPPY, `Good day, how can I help you?`],
+        banker => [Emote.HAPPY, 'Good day, how can I help you?'],
         options => [
             `I'd Like to access my bank account, please.`, [
                 execute(() => {
@@ -279,12 +279,12 @@ const useBankBoothAction : objectInteractionActionHandler = async (details) => {
                     openPin = true;
                 })
             ],
-            `What is this place?`, [
-                player => [Emote.WONDERING, `What is this place?`],
-                banker => [Emote.HAPPY, `This is a branch of the Bank of Gielinor. We have branches in many towns.`],
-                player => [Emote.WONDERING, `And what do you do?`],
-                banker => [Emote.GENERIC, `We will look after your items and money for you.`],
-                banker => [Emote.GENERIC, `Leave your valuables with us if you want to keep them safe.`]
+            'What is this place?', [
+                player => [Emote.WONDERING, 'What is this place?'],
+                banker => [Emote.HAPPY, 'This is a branch of the Bank of Gielinor. We have branches in many towns.'],
+                player => [Emote.WONDERING, 'And what do you do?'],
+                banker => [Emote.GENERIC, 'We will look after your items and money for you.'],
+                banker => [Emote.GENERIC, 'Leave your valuables with us if you want to keep them safe.']
             ]
         ]
     ]);

@@ -50,7 +50,7 @@ const itemOnObjectPacket = (player: Player, packet: PacketData) => {
         let morphIndex = -1;
         if(objectConfig.varbitId === -1) {
             if(objectConfig.configId !== -1) {
-                const configValue = player.metadata.configs && player.metadata.configs[objectConfig.configId] ? player.metadata.configs[objectConfig.configId] : 0;
+                const configValue = player.metadata.configs?.[objectConfig.configId] ? player.metadata.configs[objectConfig.configId] : 0;
                 morphIndex = configValue;
 
             }

@@ -29,7 +29,15 @@ export class Isaac {
     }
 
     public seed(s: number[]): void {
-        let a, b, c, d, e, f, g, h, i;
+        let a;
+        let b;
+        let c;
+        let d;
+        let e;
+        let f;
+        let g;
+        let h;
+        let i;
 
         /* seeding the seeds of love */
         a = b = c = d =
@@ -85,7 +93,9 @@ export class Isaac {
     }
 
     public prng(n?: number): void {
-        let i, x, y;
+        let i;
+        let x;
+        let y;
 
         n = (n && typeof(n) === 'number')
             ? Math.abs(Math.floor(n)) : 1;

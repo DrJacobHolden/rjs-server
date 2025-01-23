@@ -3,7 +3,7 @@ import { logger } from '@runejs/common';
 import { ActionPipe, ActionPipeline } from '@engine/action';
 import { getFiles } from '@engine/util';
 import { BUILD_DIR } from '@engine/config';
-import { join } from 'path';
+import { join } from 'node:path';
 
 
 /**
@@ -20,7 +20,7 @@ export async function loadActionFiles(): Promise<void> {
             continue;
         }
 
-        const location = '.' + path.substring(ACTION_DIRECTORY.length).replace('.js', '');
+        const location = `.${path.substring(ACTION_DIRECTORY.length).replace('.js', '')}`;
 
         try {
             const importedAction = (require(location)?.default || null) as ActionPipe | null;

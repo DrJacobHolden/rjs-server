@@ -91,10 +91,9 @@ export class ItemContainer {
 
             if(!hasValueNotNull(index) || index === -1) {
                 return [];
-            } else {
-                return [ index ];
             }
-        } else {
+                return [ index ];
+        }
             const slots: number[] = [];
 
             for(let i = 0; i < this.size; i++) {
@@ -106,7 +105,6 @@ export class ItemContainer {
             }
 
             return slots;
-        }
     }
 
     public findIndex(item: number | Item): number {
@@ -185,7 +183,7 @@ export class ItemContainer {
 
             // Item already in inventory and is stackable
             return { item: newItem, slot: existingItemIndex };
-        } else {
+        }
             const newItemIndex = this.getFirstOpenSlot();
             if (newItemIndex === -1 || item.amount === 0) {
                 // Not enough container space, or the amount of item being added is 0.
@@ -200,7 +198,6 @@ export class ItemContainer {
 
             // Item added to inventory
             return { item, slot: newItemIndex };
-        }
     }
 
     public addStacking(item: number | Item, fireEvent: boolean = true): { item: Item, slot: number } | null {
@@ -226,7 +223,7 @@ export class ItemContainer {
 
             // Item already in inventory and is stackable
             return { item: newItem, slot: existingItemIndex };
-        } else {
+        }
             const newItemIndex = this.getFirstOpenSlot();
             if(newItemIndex === -1) {
                 // Not enough container space
@@ -241,7 +238,6 @@ export class ItemContainer {
 
             // Item added to inventory
             return { item, slot: newItemIndex };
-        }
     }
 
     public amountInStack(slot: number): number {
@@ -345,9 +341,8 @@ export class ItemContainer {
                 return invItem.amount + item.amount <= 2147483647;
             }
             return this.hasSpace();
-        } else {
-            return this.getOpenSlotCount() >= item.amount;
         }
+            return this.getOpenSlotCount() >= item.amount;
     }
 
 

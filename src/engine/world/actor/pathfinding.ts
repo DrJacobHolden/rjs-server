@@ -24,7 +24,7 @@ class Point {
         if(this._cost === point._cost) {
             if(this._parent === null && point._parent !== null) {
                 return false;
-            } else if(this._parent !== null && !this._parent.equals(point._parent)) {
+            }if(this._parent !== null && !this._parent.equals(point._parent)) {
                 return false;
             }
 
@@ -131,7 +131,7 @@ export class Pathfinding {
         const highestY = position.y + searchRadius;
 
         if(destinationX < lowestX || destinationX > highestX || destinationY < lowestY || destinationY > highestY) {
-            throw new Error(`Out of range.`);
+            throw new Error('Out of range.');
         }
 
         const destinationIndexX = destinationX - position.x + searchRadius;
@@ -142,7 +142,7 @@ export class Pathfinding {
         const pointLen = searchRadius * 2;
 
         if(pointLen <= 0) {
-            throw new Error(`Why is your search radius zero?`);
+            throw new Error('Why is your search radius zero?');
         }
 
         this.points = [...Array(pointLen)].map(e => Array(pointLen));
@@ -256,7 +256,7 @@ export class Pathfinding {
             iterations++;
 
             if(iterations > 1000) {
-                throw new Error(`Path iteration overflow, path can not be found.`);
+                throw new Error('Path iteration overflow, path can not be found.');
             }
 
             if(point === null) {
@@ -281,28 +281,28 @@ export class Pathfinding {
         const destinationLocalY: number = destination.y - destinationChunk.collisionMap.insetY;
 
         // West
-        if(destination.x < initialX && destination.y == initialY) {
+        if(destination.x < initialX && destination.y === initialY) {
             if(!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280108)) {
                 return false;
             }
         }
 
         // East
-        if(destination.x > initialX && destination.y == initialY) {
+        if(destination.x > initialX && destination.y === initialY) {
             if(!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280180)) {
                 return false;
             }
         }
 
         // South
-        if(destination.y < initialY && destination.x == initialX) {
+        if(destination.y < initialY && destination.x === initialX) {
             if(!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280102)) {
                 return false;
             }
         }
 
         // North
-        if(destination.y > initialY && destination.x == initialX) {
+        if(destination.y > initialY && destination.x === initialX) {
             if(!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280120)) {
                 return false;
             }

@@ -237,7 +237,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                     appearanceData.put(0);
                 }
 
-                if(torsoItemData && torsoItemData.equipmentData && torsoItemData.equipmentData.equipmentType &&
+                if(torsoItemData?.equipmentData?.equipmentType &&
                     torsoItemData.equipmentData.equipmentType === 'full_top') {
                     appearanceData.put(0);
                 } else {
@@ -253,7 +253,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                 if(headItem) {
                     const headItemData = findItem(headItem.itemId);
 
-                    if(headItemData && headItemData.equipmentData && headItemData.equipmentData.equipmentType) {
+                    if(headItemData?.equipmentData?.equipmentType) {
                         helmetType = headItemData.equipmentData.equipmentType;
 
                         if(helmetType === 'helmet') {

@@ -1,5 +1,5 @@
-import { join } from 'path';
-import { writeFileSync } from 'fs';
+import { join } from 'node:path';
+import { writeFileSync } from 'node:fs';
 import { filestore } from '@server/game/game-server';
 import { logger } from '@runejs/common';
 import { ItemConfig, NpcConfig, ObjectConfig, WidgetBase } from '@runejs/filestore';

@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { JSON_SCHEMA, load } from 'js-yaml';
 import { Position } from '@engine/world/position';
 

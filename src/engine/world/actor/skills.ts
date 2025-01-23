@@ -6,27 +6,27 @@ import { Player } from './player';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
 
 export enum Skill {
-    ATTACK,
-    DEFENCE,
-    STRENGTH,
-    HITPOINTS,
-    RANGED,
-    PRAYER,
-    MAGIC,
-    COOKING,
-    WOODCUTTING,
-    FLETCHING,
-    FISHING,
-    FIREMAKING,
-    CRAFTING,
-    SMITHING,
-    MINING,
-    HERBLORE,
-    AGILITY,
-    THIEVING,
-    SLAYER,
-    FARMING,
-    RUNECRAFTING,
+    ATTACK = 0,
+    DEFENCE = 1,
+    STRENGTH = 2,
+    HITPOINTS = 3,
+    RANGED = 4,
+    PRAYER = 5,
+    MAGIC = 6,
+    COOKING = 7,
+    WOODCUTTING = 8,
+    FLETCHING = 9,
+    FISHING = 10,
+    FIREMAKING = 11,
+    CRAFTING = 12,
+    SMITHING = 13,
+    MINING = 14,
+    HERBLORE = 15,
+    AGILITY = 16,
+    THIEVING = 17,
+    SLAYER = 18,
+    FARMING = 19,
+    RUNECRAFTING = 20,
     CONSTRUCTION = 22
 }
 
@@ -250,7 +250,7 @@ export class Skills extends SkillShortcuts {
                  * tick that the xp drop occurred.
                  */
                 this.actor.enqueueBaseTask(new QueueableTask([], this.actor, () => {
-                    (this.actor as Player).sendMessage(`Congratulations, you just advanced a ` + `${ achievementDetails.name.toLowerCase() } level.`);
+                    (this.actor as Player).sendMessage(`Congratulations, you just advanced a ${ achievementDetails.name.toLowerCase() } level.`);
                     this.showLevelUpDialogue(skill, finalLevel);
                     return {
                         callbackResult: false,
@@ -298,19 +298,17 @@ export class Skills extends SkillShortcuts {
     public getSkillId(skill: number | SkillName): number {
         if(typeof skill === 'number') {
             return skill;
-        } else {
+        }
             const skillName = skill.toString().toUpperCase();
             return Skill[skillName].valueOf();
-        }
     }
 
     public get(skill: number | SkillName): SkillValue {
         if(typeof skill === 'number') {
             return this._values[skill];
-        } else {
+        }
             const skillName = skill.toString().toUpperCase();
             return this._values[Skill[skillName].valueOf()];
-        }
     }
 
     public setExp(skill: number | SkillName, exp: number): void {

@@ -102,7 +102,7 @@ export abstract class Actor {
     public enqueueTask<T1>(taskClass: new (actor: Actor, arg1: T1) => Task, args: [ T1 ]): void;
     public enqueueTask<T>(taskClass: new (actor: Actor, ...args: T[]) => Task, args: T[]): void {
         if (!this.active) {
-            logger.warn(`Attempted to instantiate task for inactive actor`);
+            logger.warn('Attempted to instantiate task for inactive actor');
             return;
         }
 
@@ -126,7 +126,7 @@ export abstract class Actor {
      */
     public enqueueBaseTask(task: Task): void {
         if (!this.active) {
-            logger.warn(`Attempted to enqueue task for  inactive actor`);
+            logger.warn('Attempted to enqueue task for  inactive actor');
             return;
         }
 
@@ -139,7 +139,7 @@ export abstract class Actor {
      */
     public teleport(newPosition: Position): void {
         this.walkingQueue.clear();
-        this.metadata['lastPosition'] = this.position.copy();
+        this.metadata.lastPosition = this.position.copy();
         this.position = newPosition;
         this.metadata.teleporting = true;
     }
@@ -221,7 +221,7 @@ export abstract class Actor {
         ).subscribe(() => {
             subscription.unsubscribe();
             this.face(null);
-            delete this.metadata.following;
+            this.metadata.following = undefined;
         });
     }
 

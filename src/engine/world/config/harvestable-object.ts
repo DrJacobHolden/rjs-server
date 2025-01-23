@@ -111,33 +111,33 @@ const MAGIC_OBJECTS: Map<number, number> = new Map<number, number>([
 ] as [number, number][]);
 
 export enum Ore {
-    CLAY,
-    COPPER,
-    TIN,
-    IRON,
-    COAL,
-    SILVER,
-    GOLD,
-    MITHIL,
-    ADAMANT,
-    RUNITE,
-    RUNE_ESS,
-    GEM
+    CLAY = 0,
+    COPPER = 1,
+    TIN = 2,
+    IRON = 3,
+    COAL = 4,
+    SILVER = 5,
+    GOLD = 6,
+    MITHIL = 7,
+    ADAMANT = 8,
+    RUNITE = 9,
+    RUNE_ESS = 10,
+    GEM = 11
 }
 
 
 export enum Tree {
-    NORMAL,
-    ACHEY,
-    OAK,
-    WILLOW,
-    TEAK,
-    MAPLE,
-    MAHOGANY,
-    YEW,
-    MAGIC,
-    HOLLOW,
-    DRAMEN,
+    NORMAL = 0,
+    ACHEY = 1,
+    OAK = 2,
+    WILLOW = 3,
+    TEAK = 4,
+    MAPLE = 5,
+    MAHOGANY = 6,
+    YEW = 7,
+    MAGIC = 8,
+    HOLLOW = 9,
+    DRAMEN = 10,
 }
 
 

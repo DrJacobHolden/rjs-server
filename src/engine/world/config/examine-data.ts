@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { logger } from '@runejs/common';
 import { JSON_SCHEMA, load } from 'js-yaml';
 
@@ -48,7 +48,7 @@ function parseData(fileName: string): Map<number, Examine> {
             examineMap.set(item.id, item);
         }
     } catch(error) {
-        logger.error('Error parsing examine data: ' + error);
+        logger.error(`Error parsing examine data: ${error}`);
     }
 
     return examineMap;

@@ -27,6 +27,6 @@ export function getVarbitMorphIndex(varbitId, playerConfig) {
     const leastSignificantBit = varbitDefinition.leastSignificantBit;
     // TODO: Unknown
     const i_8_ = varbitMasks[mostSignificantBit - leastSignificantBit];
-    const configValue = playerConfig && playerConfig[configId] ? playerConfig[configId] : 0;
+    const configValue = playerConfig?.[configId] ? playerConfig[configId] : 0;
     return ((configValue) >> leastSignificantBit & i_8_);
 }

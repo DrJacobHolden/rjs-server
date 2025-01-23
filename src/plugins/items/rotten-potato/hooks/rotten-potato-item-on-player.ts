@@ -10,7 +10,7 @@ export const potatoOnPlayer: itemOnPlayerActionHandler = (details) => {
         slot: 'screen',
         fakeWidget: 3100001
     });
-    widget.metadata['player'] = details.otherPlayer;
+    widget.metadata.player = details.otherPlayer;
     details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.bank.depositBoxWidget, details.otherPlayer.inventory);
 
 
@@ -28,7 +28,7 @@ export const potatoManipulatePlayerInventory: itemInteractionActionHandler = (de
     if(!playerWidget) {
         return;
     }
-    const otherPlayer: Player = playerWidget.metadata['player'];
+    const otherPlayer: Player = playerWidget.metadata.player;
 
     if(!otherPlayer) {
         return;
@@ -60,7 +60,7 @@ export const potatoManipulatePlayerInventory: itemInteractionActionHandler = (de
 
         itemAmount += item.amount;
     });
-    if (countToRemove == -1 || countToRemove > itemAmount) {
+    if (countToRemove === -1 || countToRemove > itemAmount) {
         countToRemove = itemAmount;
     }
 

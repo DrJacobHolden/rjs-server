@@ -9,22 +9,22 @@ export interface HarvestTool {
 
 
 export enum Pickaxe {
-    BRONZE,
-    IRON,
-    STEEL,
-    MITHRIL,
-    ADAMANT,
-    RUNE,
+    BRONZE = 0,
+    IRON = 1,
+    STEEL = 2,
+    MITHRIL = 3,
+    ADAMANT = 4,
+    RUNE = 5,
 }
 
 export enum Axe {
-    BRONZE,
-    IRON,
-    STEEL,
-    MITHRIL,
-    ADAMANT,
-    RUNE,
-    DRAGON
+    BRONZE = 0,
+    IRON = 1,
+    STEEL = 2,
+    MITHRIL = 3,
+    ADAMANT = 4,
+    RUNE = 5,
+    DRAGON = 6
 }
 
 

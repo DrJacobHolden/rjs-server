@@ -177,7 +177,6 @@ export class DialogueAction {
 export const dialogueAction = async (player: Player, options?: DialogueOptions): Promise<DialogueAction> => {
     if(options) {
         return new DialogueAction(player).dialogue(options);
-    } else {
-        return Promise.resolve(new DialogueAction(player));
     }
+        return Promise.resolve(new DialogueAction(player));
 };

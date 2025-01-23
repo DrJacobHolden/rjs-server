@@ -25,7 +25,6 @@ export const action: objectInteractionActionHandler = (details) => {
         case 'Flax':
             itemId = itemIds.flax;
             break;
-        case 'Cabbage':
         default:
             itemId = itemIds.cabbage;
             break;

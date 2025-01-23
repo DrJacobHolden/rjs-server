@@ -250,7 +250,7 @@ export async function loadItemConfigurations(path: string): Promise<{
         });
     });
     Object.entries(itemConfigurations).forEach(([key, itemConfig]) => {
-        if (itemConfig.game_id !== undefined && !isNaN(itemConfig.game_id)) {
+        if (itemConfig.game_id !== undefined && !Number.isNaN(itemConfig.game_id)) {
             itemIds[itemConfig.game_id] = key;
             let item = { ...translateItemConfig(key, itemConfig) }
             if (item?.extends) {
@@ -283,7 +283,7 @@ export async function loadItemConfigurations(path: string): Promise<{
                     continue;
                 }
 
-                const subKey = subItem.suffix ? key + ':' + subItem.suffix : key;
+                const subKey = subItem.suffix ? `${key}:${subItem.suffix}` : key;
                 const baseItem = JSON.parse(JSON.stringify({ ...translateItemConfig(key, itemConfig) }));
                 const subBaseItem = JSON.parse(JSON.stringify({ ...translateItemConfig(subKey, subItem) }));
                 itemIds[subItem.game_id] = subKey;

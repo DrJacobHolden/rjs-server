@@ -24,7 +24,7 @@ export const action: itemSwapActionHandler = (details) => {
     const { player, widgetId, containerId, fromSlot, toSlot } = details;
 
     const widgetDetails = swappableWidgets.filter(widgetDetail => widgetDetail[0] === widgetId && widgetDetail[1] === containerId);
-    if(widgetDetails && widgetDetails[0]) {
+    if(widgetDetails?.[0]) {
         const itemContainer: ItemContainer = widgetDetails[0][2](player);
         swapItems(itemContainer, fromSlot, toSlot);
     }

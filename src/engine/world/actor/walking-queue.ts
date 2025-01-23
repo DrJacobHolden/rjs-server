@@ -37,9 +37,8 @@ export class WalkingQueue {
     public getLastPosition(): Position {
         if(this.queue.length === 0) {
             return this.actor.position;
-        } else {
-            return this.queue[this.queue.length - 1];
         }
+            return this.queue[this.queue.length - 1];
     }
 
     public add(x: number, y: number, positionMetadata?: { [key: string]: any }): void {
@@ -119,28 +118,24 @@ export class WalkingQueue {
         if(diffX < 0) {
             if(diffY < 0) {
                 return 5;
-            } else if(diffY > 0) {
+            }if(diffY > 0) {
                 return 0;
-            } else {
-                return 3;
             }
-        } else if(diffX > 0) {
+                return 3;
+        }if(diffX > 0) {
             if(diffY < 0) {
                 return 7;
-            } else if(diffY > 0) {
+            }if(diffY > 0) {
                 return 2;
-            } else {
-                return 4;
             }
-        } else {
+                return 4;
+        }
             if(diffY < 0) {
                 return 6;
-            } else if(diffY > 0) {
+            }if(diffY > 0) {
                 return 1;
-            } else {
-                return -1;
             }
-        }
+                return -1;
     }
 
     public process(): void {
@@ -193,7 +188,7 @@ export class WalkingQueue {
                         const runDiffY = runPosition.y - walkPosition.y;
                         runDir = this.calculateDirection(runDiffX, runDiffY);
 
-                        if(runDir != -1) {
+                        if(runDir !== -1) {
                             this.actor.lastMovementPosition = this.actor.position;
                             this.actor.position = runPosition;
                         }

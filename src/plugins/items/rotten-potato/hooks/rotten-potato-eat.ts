@@ -2,11 +2,11 @@ import { itemInteractionActionHandler } from '@engine/action';
 import { dialogue, execute } from '@engine/world/actor/dialogue';
 
 enum DialogueOption {
-    SET_ALL_STATS,
-    WIPE_INVENTORY,
-    SETUP_POH,
-    TELEPORT_TO_PLAYER,
-    SPAWN_AGGRESSIVE_NPC
+    SET_ALL_STATS = 0,
+    WIPE_INVENTORY = 1,
+    SETUP_POH = 2,
+    TELEPORT_TO_PLAYER = 3,
+    SPAWN_AGGRESSIVE_NPC = 4
 }
 
 const eatPotato: itemInteractionActionHandler = async (details) => {
@@ -15,19 +15,19 @@ const eatPotato: itemInteractionActionHandler = async (details) => {
 
     await dialogue([details.player], [
         options => [
-            `Set all stats`, [
+            'Set all stats', [
                 execute(() => chosenOption = DialogueOption.SET_ALL_STATS)
             ],
-            `Wipe inventory`, [
+            'Wipe inventory', [
                 execute(() => chosenOption = DialogueOption.WIPE_INVENTORY)
             ],
-            `Setup POH`, [
+            'Setup POH', [
                 execute(() => chosenOption = DialogueOption.SETUP_POH)
             ],
-            `Teleport to player`, [
+            'Teleport to player', [
                 execute(() => chosenOption = DialogueOption.TELEPORT_TO_PLAYER)
             ],
-            `Spawn aggressive NPC`, [
+            'Spawn aggressive NPC', [
                 execute(() => chosenOption = DialogueOption.SPAWN_AGGRESSIVE_NPC)
             ],
         ]

@@ -26,7 +26,7 @@ export const action: itemInteractionActionHandler = (details) => {
         player.sendMessage('Cannot handle special foods yet!');
         return;
     }
-    const clock = 'clock_'+itemDetails.metadata.consume_effects.clock;
+    const clock = `clock_${itemDetails.metadata.consume_effects.clock}`;
     // Check if player recently ate
     if(player.metadata[clock]){
         return;

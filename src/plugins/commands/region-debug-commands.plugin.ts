@@ -12,7 +12,7 @@ const debugMapRegion = (player: Player, mapRegionX: number, mapRegionY: number,
     player.sendMessage(`Region ${key} - ${activeWorld.chunkManager.getRegionIdForWorldPosition(player.position)}`);
 
     if(!activeWorld.chunkManager.regionMap.has(key)) {
-        player.sendMessage(`Map region not loaded.`);
+        player.sendMessage('Map region not loaded.');
         return;
     }
 
@@ -23,7 +23,7 @@ const debugMapRegion = (player: Player, mapRegionX: number, mapRegionY: number,
     const region = activeWorld.chunkManager.regionMap.get(key);
 
     if (!region) {
-        player.sendMessage(`Map region not loaded.`);
+        player.sendMessage('Map region not loaded.');
         logger.error(`Map region not loaded. ${key}`)
         return;
     }
@@ -45,7 +45,7 @@ const debugMapRegion = (player: Player, mapRegionX: number, mapRegionY: number,
                 } else if(tileSettings > 9) {
                     line[x] = 'x';
                 } else {
-                    line[x] = tileSettings + '';
+                    line[x] = `${tileSettings}`;
                 }
             }
         }

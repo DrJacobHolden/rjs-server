@@ -139,7 +139,7 @@ const regionChangeActionPipe = (actionData: RegionChangeAction): void => {
 
         if(actionHook.regionType) {
             return regionTypes.indexOf(actionHook.regionType) !== -1;
-        } else if(actionHook.regionTypes && actionHook.regionTypes.length !== 0) {
+        }if(actionHook.regionTypes && actionHook.regionTypes.length !== 0) {
             let valid = false;
             for(const type of actionHook.regionTypes) {
                 if(regionTypes.indexOf(type) !== -1) {
@@ -161,7 +161,7 @@ const regionChangeActionPipe = (actionData: RegionChangeAction): void => {
 
     actionList.forEach(async actionHook =>
         new Promise<void>(resolve => {
-            if (actionHook && actionHook.handler) {
+            if (actionHook?.handler) {
                 actionHook.handler(actionData);
             }
 

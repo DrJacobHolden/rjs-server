@@ -84,7 +84,7 @@ export const canBuildNewRoom = (player: Player): Coords | null => {
     }
 
     if(buildX === currentRoom.x && buildY === currentRoom.y) {
-        player.sendMessage(`You can not build there.`);
+        player.sendMessage('You can not build there.');
         return null;
     }
 

@@ -91,7 +91,7 @@ const objectInteractionPacket = (player: Player, packet: PacketData) => {
         let morphIndex = -1;
         if(objectConfig.varbitId === -1) {
             if(objectConfig.configId !== -1) {
-                morphIndex = player.metadata.configs && player.metadata.configs[objectConfig.configId] ?
+                morphIndex = player.metadata.configs?.[objectConfig.configId] ?
                     player.metadata.configs[objectConfig.configId] : 0;
             }
         } else {
@@ -128,7 +128,7 @@ const objectInteractionPacket = (player: Player, packet: PacketData) => {
 
 
 export default Object.keys(objectInteractionPackets).map(opcode => ({
-    opcode: parseInt(opcode, 10),
+    opcode: Number.parseInt(opcode, 10),
     size: 6,
     handler: objectInteractionPacket
 }));

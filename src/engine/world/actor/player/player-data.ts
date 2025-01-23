@@ -1,6 +1,6 @@
 import { Item } from '@engine/world/items/item';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { logger } from '@runejs/common';
 import { Player } from './player';
 import { SkillValue } from '@engine/world/actor/skills';
@@ -110,7 +110,7 @@ export const validateSettings = (player: Player): void => {
 };
 
 export function savePlayerData(player: Player): boolean {
-    const fileName = player.username.toLowerCase() + '.json';
+    const fileName = `${player.username.toLowerCase()}.json`;
     const filePath = join('data/saves', fileName);
 
     const playerSave: PlayerSave = {
@@ -152,13 +152,13 @@ export function savePlayerData(player: Player): boolean {
 }
 
 export function playerExists(username: string): boolean {
-    const fileName = username.toLowerCase() + '.json';
+    const fileName = `${username.toLowerCase()}.json`;
     const filePath = join('data/saves', fileName);
     return existsSync(filePath);
 }
 
 export function loadPlayerSave(username: string): PlayerSave | null {
-    const fileName = username.toLowerCase() + '.json';
+    const fileName = `${username.toLowerCase()}.json`;
     const filePath = join('data/saves', fileName);
 
     if(!existsSync(filePath)) {

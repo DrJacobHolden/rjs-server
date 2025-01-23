@@ -55,7 +55,7 @@ export const getItemOptions = (itemId: number, widget: { widgetId: number, conta
 export const getItemOption = (itemId: number, optionNumber: number, widget: { widgetId: number, containerId: number }): string => {
     const optionIndex = optionNumber - 1;
     const options = getItemOptions(itemId, widget);
-    let option = 'option-' + optionNumber;
+    let option = `option-${optionNumber}`;
     if(options && options.length >= optionNumber) {
         if(options[optionIndex] !== null && options[optionIndex].toLowerCase() !== 'hidden') {
             option = options[optionIndex].toLowerCase();

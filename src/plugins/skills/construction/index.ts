@@ -12,7 +12,7 @@ export default {
         {
             type: 'button',
             widgetIds: 402,
-            buttonIds: Object.keys(roomBuilderButtonMap).map(key => parseInt(key, 10)),
+            buttonIds: Object.keys(roomBuilderButtonMap).map(key => Number.parseInt(key, 10)),
             handler: roomBuilderWidgetHandler
         },
         {
@@ -31,7 +31,7 @@ export default {
             type: 'player_command',
             commands: [ 'savepoh', 'savehouse' ],
             handler: ({ player }: PlayerCommandAction): void => {
-                player.sendMessage(`Saving house data...`);
+                player.sendMessage('Saving house data...');
                 saveHouse(player);
             }
         },

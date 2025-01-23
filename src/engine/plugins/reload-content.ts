@@ -1,4 +1,4 @@
-import { sep } from 'path';
+import { sep } from 'node:path';
 import { loadGameConfigurations } from '@engine/config';
 import { loadPackets } from '@engine/net';
 import { loadPlugins } from '@engine/plugins/loader';

@@ -94,13 +94,12 @@ const playerCommandActionPipe = (player: Player, command: string, isConsole: boo
                     if(pluginArg.defaultValue === undefined) {
                         player.sendLogMessage(syntaxError, isConsole);
                         return;
-                    } else {
-                        argValue = pluginArg.defaultValue;
                     }
+                        argValue = pluginArg.defaultValue;
                 } else {
                     if(pluginArg.type === 'number') {
-                        argValue = parseInt(argValue);
-                        if(isNaN(argValue)) {
+                        argValue = Number.parseInt(argValue);
+                        if(Number.isNaN(argValue)) {
                             player.sendLogMessage(syntaxError, isConsole);
                             return;
                         }

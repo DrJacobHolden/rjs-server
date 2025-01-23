@@ -17,7 +17,7 @@ const action: commandActionHandler = (details) => {
     let itemId: number | null = null;
 
     if(itemSearch.match(/^[0-9]+$/)) {
-        itemId = parseInt(itemSearch, 10);
+        itemId = Number.parseInt(itemSearch, 10);
     } else {
         if(itemSearch.indexOf(':') !== -1) {
             itemId = findItem(itemSearch)?.gameId || null;
@@ -27,14 +27,14 @@ const action: commandActionHandler = (details) => {
         }
     }
 
-    if(!itemId || isNaN(itemId)) {
-        throw new Error(`Item name not found.`);
+    if(!itemId || Number.isNaN(itemId)) {
+        throw new Error('Item name not found.');
     }
 
     let amount: number = args.amount as number;
 
     if(amount > 2000000000) {
-        throw new Error(`Unable to give more than 2,000,000,000.`);
+        throw new Error('Unable to give more than 2,000,000,000.');
     }
 
     const itemDefinition = findItem(itemId);

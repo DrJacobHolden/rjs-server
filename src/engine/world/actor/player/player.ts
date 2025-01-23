@@ -1,7 +1,7 @@
-import { AddressInfo, Socket } from 'net';
+import { AddressInfo, Socket } from 'node:net';
 import {v4} from 'uuid';
 import { Subject } from 'rxjs';
-import EventEmitter from 'events';
+import EventEmitter from 'node:events';
 
 import { logger } from '@runejs/common';
 
@@ -65,19 +65,19 @@ export const defaultPlayerTabWidgets = () => ([
 ]);
 
 export enum SidebarTab {
-    COMBAT,
-    SKILL,
-    QUEST,
-    INVENTORY,
-    EQUIMENT,
-    PRAYER,
-    MAGIC,
-    FRIENDS,
-    IGNORE,
-    LOGOUT,
-    SETTINGS,
-    EMOTES,
-    MUSIC
+    COMBAT = 0,
+    SKILL = 1,
+    QUEST = 2,
+    INVENTORY = 3,
+    EQUIMENT = 4,
+    PRAYER = 5,
+    MAGIC = 6,
+    FRIENDS = 7,
+    IGNORE = 8,
+    LOGOUT = 9,
+    SETTINGS = 10,
+    EMOTES = 11,
+    MUSIC = 12
 }
 
 export enum Rights {
@@ -209,14 +209,14 @@ export class Player extends Actor {
             } else if(daysSinceLogin === 1) {
                 loginDaysStr = 'yesterday';
             } else {
-                loginDaysStr = daysSinceLogin + ' days ago';
+                loginDaysStr = `${daysSinceLogin} days ago`;
             }
-            this.outgoingPackets.updateWidgetString(widgets.welcomeScreenChildren.question, 1, `Want to help RuneJS improve?\\nSend us a pull request over on Github!`);
+            this.outgoingPackets.updateWidgetString(widgets.welcomeScreenChildren.question, 1, 'Want to help RuneJS improve?\\nSend us a pull request over on Github!');
             this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 13, `You last logged in @red@${loginDaysStr}@bla@ from: @red@${this.lastAddress}`);
-            this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 16, `You have @yel@0 unread messages\\nin your message centre.`);
+            this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 16, 'You have @yel@0 unread messages\\nin your message centre.');
             this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 14, `\\nYou have not yet set any recovery questions.\\nIt is @lre@strongly@yel@ recommended that you do so.\\n\\nIf you don't you will be @lre@unable to recover your\\n@lre@password@yel@ if you forget it, or it is stolen.`);
             this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 22, `To change your recovery questions:\\n1) Logout and return to the frontpage of this website.\\n2) Choose 'Set new recovery questions'.`);
-            this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 17, `\\nYou do not have a Bank PIN.\\nPlease visit a bank if you would like one.`);
+            this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 17, '\\nYou do not have a Bank PIN.\\nPlease visit a bank if you would like one.');
             this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 21, `To start a subscripton:\\n1) Logout and return to the frontpage of this website.\\n2) Choose 'Start a new subscription'`);
             this.outgoingPackets.updateWidgetString(widgets.welcomeScreen, 19, `You are not a member.\\n\\nChoose to subscribe and\\nyou'll get loads of extra\\nbenefits and features.`);
 
@@ -526,7 +526,7 @@ export class Player extends Actor {
             if(questData.onComplete.questCompleteWidget.itemId) {
                 const cacheItemData = filestore.configStore.itemStore.getItem(questData.onComplete.questCompleteWidget.itemId);
 
-                if (cacheItemData && cacheItemData.model2d.widgetModel) {
+                if (cacheItemData?.model2d.widgetModel) {
                     this.outgoingPackets.updateWidgetModel1(widgets.questReward, 3, cacheItemData.model2d.widgetModel);
                 }
 
@@ -602,7 +602,7 @@ export class Player extends Actor {
             text: musicTrack.songName,
             textColor: colors.green
         });
-        this.savedMetadata['currentSongIdPlaying'] = songId;
+        this.savedMetadata.currentSongIdPlaying = songId;
         this.outgoingPackets.playSong(songId);
     }
 
@@ -762,11 +762,11 @@ export class Player extends Actor {
      */
     public settingChanged(buttonId: number): void {
         const settingsMappings = {
-            0: { setting: 'runEnabled', value: !this.settings['runEnabled'] },
-            1: { setting: 'chatEffectsEnabled', value: !this.settings['chatEffectsEnabled'] },
-            2: { setting: 'splitPrivateChatEnabled', value: !this.settings['splitPrivateChatEnabled'] },
-            3: { setting: 'twoMouseButtonsEnabled', value: !this.settings['twoMouseButtonsEnabled'] },
-            4: { setting: 'acceptAidEnabled', value: !this.settings['acceptAidEnabled'] },
+            0: { setting: 'runEnabled', value: !this.settings.runEnabled },
+            1: { setting: 'chatEffectsEnabled', value: !this.settings.chatEffectsEnabled },
+            2: { setting: 'splitPrivateChatEnabled', value: !this.settings.splitPrivateChatEnabled },
+            3: { setting: 'twoMouseButtonsEnabled', value: !this.settings.twoMouseButtonsEnabled },
+            4: { setting: 'acceptAidEnabled', value: !this.settings.acceptAidEnabled },
             // 5 is house options
             // 6 is unknown, might not even exist
             7: { setting: 'screenBrightness', value: 1 },
@@ -929,7 +929,7 @@ export class Player extends Actor {
             return false;
         }
 
-        if(itemDetails && itemDetails.equipmentData) {
+        if(itemDetails?.equipmentData) {
             if(itemDetails.equipmentData.equipmentType === 'two_handed') {
                 shouldUnequipOffHand = true;
             }
@@ -939,7 +939,7 @@ export class Player extends Actor {
             if(slot === 'off_hand' && mainHandEquipped) {
                 const mainHandItemData = findItem(mainHandEquipped.itemId);
 
-                if(mainHandItemData && mainHandItemData.equipmentData && mainHandItemData.equipmentData.equipmentType === 'two_handed') {
+                if(mainHandItemData?.equipmentData && mainHandItemData.equipmentData.equipmentType === 'two_handed') {
                     shouldUnequipMainHand = true;
                 }
             }
@@ -1050,7 +1050,7 @@ export class Player extends Actor {
      */
     public transformInto(npc: Npc | NpcDetails | string | number | null): void {
         if(!npc) {
-            delete this.savedMetadata.npcTransformation;
+            this.savedMetadata.npcTransformation = undefined;
             this.updateFlags.appearanceUpdateRequired = true;
             return;
         }
@@ -1060,7 +1060,7 @@ export class Player extends Actor {
                 if(npc.indexOf(':') !== -1) {
                     npc = npcIdMap[npc];
                 } else {
-                    npc = parseInt(npc, 10);
+                    npc = Number.parseInt(npc, 10);
                 }
             } else if(npc instanceof Npc) {
                 npc = npc.id;
@@ -1070,7 +1070,7 @@ export class Player extends Actor {
         }
 
         if(!npc) {
-            logger.error(`NPC not found.`);
+            logger.error('NPC not found.');
             return;
         }
 
@@ -1091,7 +1091,7 @@ export class Player extends Actor {
         if (originalNpc.varbitId !== -1) {
             morphIndex = getVarbitMorphIndex(originalNpc.varbitId, this.metadata.configs);
         } else if (originalNpc.settingId !== -1) {
-            morphIndex = this.metadata.configs && this.metadata.configs[originalNpc.settingId] ? this.metadata.configs[originalNpc.settingId] : 0;
+            morphIndex = this.metadata.configs?.[originalNpc.settingId] ? this.metadata.configs[originalNpc.settingId] : 0;
         } else {
             logger.warn(`Tried to fetch a child NPC index, but but no varbitId or settingId were found in the NPC details. NPC: ${originalNpc.id}, childrenIDs: ${originalNpc.childrenIds}`);
             return null;
@@ -1117,7 +1117,7 @@ export class Player extends Actor {
             if (event.slot !== undefined && event.item !== undefined) {
                 this.outgoingPackets.sendUpdateSingleWidgetItem(widgets.inventory, event.slot, event.item);
             } else {
-                logger.error(`Inventory update event was missing slot or item.`, event);
+                logger.error('Inventory update event was missing slot or item.', event);
             }
 
         }
@@ -1209,14 +1209,14 @@ export class Player extends Actor {
      * Updates the player's music tab progress.
      */
     private updateMusicTab(): void {
-        if(!this.savedMetadata['currentSongIdPlaying']) {
-            this.savedMetadata['currentSongIdPlaying'] =
+        if(!this.savedMetadata.currentSongIdPlaying) {
+            this.savedMetadata.currentSongIdPlaying =
                 findSongIdByRegionId(activeWorld.chunkManager.getRegionIdForWorldPosition(
                     this.position));
         }
 
         if(this.settings.musicPlayerMode === MusicPlayerMode.MANUAL) {
-            this.playSong(this.savedMetadata['currentSongIdPlaying']);
+            this.playSong(this.savedMetadata.currentSongIdPlaying);
         }
 
         Object.keys(musicRegions).forEach(key => {

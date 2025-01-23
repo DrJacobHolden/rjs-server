@@ -23,7 +23,7 @@ function milkCow(details: { objectConfig: ObjectConfig, player: Player }): void 
         player.sendMessage(`You milk the ${objectConfig.name} and receive some milk.`);
     } else {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const gillieId = findNpc('rs:gillie_groats')!.gameId;
+        const gillieId = findNpc('rs:gillie_groats')?.gameId;
         dialogueAction(player)
             .then(async d => d.npc(gillieId, DialogueEmote.LAUGH_1, [`Tee hee! You've never milked a cow before, have you?`]))
             .then(async d => d.player(DialogueEmote.CALM_TALK_1, ['Erm... No. How could you tell?']))

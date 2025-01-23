@@ -80,118 +80,118 @@ export class CollisionMap {
         x -= this._insetX;
         y -= this._insetY;
 
-        if(type == 0) {
-            if(rotation == 0) {
+        if(type === 0) {
+            if(rotation === 0) {
                 this.set(x, y, 128);
                 this.set(x - 1, y, 8);
             }
-            if(rotation == 1) {
+            if(rotation === 1) {
                 this.set(x, y, 2);
                 this.set(x, y + 1, 32);
             }
-            if(rotation == 2) {
+            if(rotation === 2) {
                 this.set(x, y, 8);
                 this.set(x + 1, y, 128);
             }
-            if(rotation == 3) {
+            if(rotation === 3) {
                 this.set(x, y, 32);
                 this.set(x, y - 1, 2);
             }
         }
-        if(type == 1 || type == 3) {
-            if(rotation == 0) {
+        if(type === 1 || type === 3) {
+            if(rotation === 0) {
                 this.set(x, y, 1);
                 this.set(x - 1, y + 1, 16);
             }
-            if(rotation == 1) {
+            if(rotation === 1) {
                 this.set(x, y, 4);
                 this.set(x + 1, y + 1, 64);
             }
-            if(rotation == 2) {
+            if(rotation === 2) {
                 this.set(x, y, 16);
                 this.set(x + 1, y - 1, 1);
             }
-            if(rotation == 3) {
+            if(rotation === 3) {
                 this.set(x, y, 64);
                 this.set(x - 1, y - 1, 4);
             }
         }
-        if(type == 2) {
-            if(rotation == 0) {
+        if(type === 2) {
+            if(rotation === 0) {
                 this.set(x, y, 130);
                 this.set(x - 1, y, 8);
                 this.set(x, y + 1, 32);
             }
-            if(rotation == 1) {
+            if(rotation === 1) {
                 this.set(x, y, 10);
                 this.set(x, y + 1, 32);
                 this.set(x + 1, y, 128);
             }
-            if(rotation == 2) {
+            if(rotation === 2) {
                 this.set(x, y, 40);
                 this.set(x + 1, y, 128);
                 this.set(x, y - 1, 2);
             }
-            if(rotation == 3) {
+            if(rotation === 3) {
                 this.set(x, y, 160);
                 this.set(x, y - 1, 2);
                 this.set(x - 1, y, 8);
             }
         }
         if(walkable) {
-            if(type == 0) {
-                if(rotation == 0) {
+            if(type === 0) {
+                if(rotation === 0) {
                     this.set(x, y, 0x10000);
                     this.set(x - 1, y, 4096);
                 }
-                if(rotation == 1) {
+                if(rotation === 1) {
                     this.set(x, y, 1024);
                     this.set(x, y + 1, 16384);
                 }
-                if(rotation == 2) {
+                if(rotation === 2) {
                     this.set(x, y, 4096);
                     this.set(x + 1, y, 0x10000);
                 }
-                if(rotation == 3) {
+                if(rotation === 3) {
                     this.set(x, y, 16384);
                     this.set(x, y - 1, 1024);
                 }
             }
-            if(type == 1 || type == 3) {
-                if(rotation == 0) {
+            if(type === 1 || type === 3) {
+                if(rotation === 0) {
                     this.set(x, y, 512);
                     this.set(x - 1, y + 1, 8192);
                 }
-                if(rotation == 1) {
+                if(rotation === 1) {
                     this.set(x, y, 2048);
                     this.set(x + 1, y + 1, 32768);
                 }
-                if(rotation == 2) {
+                if(rotation === 2) {
                     this.set(x, y, 8192);
                     this.set(x + 1, y - 1, 512);
                 }
-                if(rotation == 3) {
+                if(rotation === 3) {
                     this.set(x, y, 32768);
                     this.set(x - 1, y - 1, 2048);
                 }
             }
-            if(type == 2) {
-                if(rotation == 0) {
+            if(type === 2) {
+                if(rotation === 0) {
                     this.set(x, y, 0x10400);
                     this.set(x - 1, y, 4096);
                     this.set(x, y + 1, 16384);
                 }
-                if(rotation == 1) {
+                if(rotation === 1) {
                     this.set(x, y, 5120);
                     this.set(x, y + 1, 16384);
                     this.set(x + 1, y, 0x10000);
                 }
-                if(rotation == 2) {
+                if(rotation === 2) {
                     this.set(x, y, 20480);
                     this.set(x + 1, y, 0x10000);
                     this.set(x, y - 1, 1024);
                 }
-                if(rotation == 3) {
+                if(rotation === 3) {
                     this.set(x, y, 0x14000);
                     this.set(x, y - 1, 1024);
                     this.set(x - 1, y, 4096);
@@ -203,118 +203,118 @@ export class CollisionMap {
     public unmarkWall(x: number, y: number, position: number, rotation: number, impenetrable: boolean): void {
         x -= this._insetX;
         y -= this._insetY;
-        if(position == 0) {
-            if(rotation == 0) {
+        if(position === 0) {
+            if(rotation === 0) {
                 this.unset(x, y, 128);
                 this.unset(x - 1, y, 8);
             }
-            if(rotation == 1) {
+            if(rotation === 1) {
                 this.unset(x, y, 2);
                 this.unset(x, y + 1, 32);
             }
-            if(rotation == 2) {
+            if(rotation === 2) {
                 this.unset(x, y, 8);
                 this.unset(x + 1, y, 128);
             }
-            if(rotation == 3) {
+            if(rotation === 3) {
                 this.unset(x, y, 32);
                 this.unset(x, y - 1, 2);
             }
         }
-        if(position == 1 || position == 3) {
-            if(rotation == 0) {
+        if(position === 1 || position === 3) {
+            if(rotation === 0) {
                 this.unset(x, y, 1);
                 this.unset(x - 1, y + 1, 16);
             }
-            if(rotation == 1) {
+            if(rotation === 1) {
                 this.unset(x, y, 4);
                 this.unset(x + 1, y + 1, 64);
             }
-            if(rotation == 2) {
+            if(rotation === 2) {
                 this.unset(x, y, 16);
                 this.unset(x + 1, y - 1, 1);
             }
-            if(rotation == 3) {
+            if(rotation === 3) {
                 this.unset(x, y, 64);
                 this.unset(x - 1, y - 1, 4);
             }
         }
-        if(position == 2) {
-            if(rotation == 0) {
+        if(position === 2) {
+            if(rotation === 0) {
                 this.unset(x, y, 130);
                 this.unset(x - 1, y, 8);
                 this.unset(x, y + 1, 32);
             }
-            if(rotation == 1) {
+            if(rotation === 1) {
                 this.unset(x, y, 10);
                 this.unset(x, y + 1, 32);
                 this.unset(x + 1, y, 128);
             }
-            if(rotation == 2) {
+            if(rotation === 2) {
                 this.unset(x, y, 40);
                 this.unset(x + 1, y, 128);
                 this.unset(x, y - 1, 2);
             }
-            if(rotation == 3) {
+            if(rotation === 3) {
                 this.unset(x, y, 160);
                 this.unset(x, y - 1, 2);
                 this.unset(x - 1, y, 8);
             }
         }
         if(impenetrable) {
-            if(position == 0) {
-                if(rotation == 0) {
+            if(position === 0) {
+                if(rotation === 0) {
                     this.unset(x, y, 0x10000);
                     this.unset(x - 1, y, 4096);
                 }
-                if(rotation == 1) {
+                if(rotation === 1) {
                     this.unset(x, y, 1024);
                     this.unset(x, y + 1, 16384);
                 }
-                if(rotation == 2) {
+                if(rotation === 2) {
                     this.unset(x, y, 4096);
                     this.unset(x + 1, y, 0x10000);
                 }
-                if(rotation == 3) {
+                if(rotation === 3) {
                     this.unset(x, y, 16384);
                     this.unset(x, y - 1, 1024);
                 }
             }
-            if(position == 1 || position == 3) {
-                if(rotation == 0) {
+            if(position === 1 || position === 3) {
+                if(rotation === 0) {
                     this.unset(x, y, 512);
                     this.unset(x - 1, y + 1, 8192);
                 }
-                if(rotation == 1) {
+                if(rotation === 1) {
                     this.unset(x, y, 2048);
                     this.unset(x + 1, y + 1, 32768);
                 }
-                if(rotation == 2) {
+                if(rotation === 2) {
                     this.unset(x, y, 8192);
                     this.unset(x + 1, y - 1, 512);
                 }
-                if(rotation == 3) {
+                if(rotation === 3) {
                     this.unset(x, y, 32768);
                     this.unset(x - 1, y - 1, 2048);
                 }
             }
-            if(position == 2) {
-                if(rotation == 0) {
+            if(position === 2) {
+                if(rotation === 0) {
                     this.unset(x, y, 0x10400);
                     this.unset(x - 1, y, 4096);
                     this.unset(x, y + 1, 16384);
                 }
-                if(rotation == 1) {
+                if(rotation === 1) {
                     this.unset(x, y, 5120);
                     this.unset(x, y + 1, 16384);
                     this.unset(x + 1, y, 0x10000);
                 }
-                if(rotation == 2) {
+                if(rotation === 2) {
                     this.unset(x, y, 20480);
                     this.unset(x + 1, y, 0x10000);
                     this.unset(x, y - 1, 1024);
                 }
-                if(rotation == 3) {
+                if(rotation === 3) {
                     this.unset(x, y, 0x14000);
                     this.unset(x, y - 1, 1024);
                     this.unset(x - 1, y, 4096);
@@ -390,7 +390,7 @@ export class CollisionMap {
             y = y - 8;
         }
 
-        if(offsetX != 0 || offsetY != 0) {
+        if(offsetX !== 0 || offsetY !== 0) {
             this.getSiblingCollisionMap(offsetX, offsetY)?.set(x, y, flag);
             outOfBounds = true;
         }
@@ -444,7 +444,7 @@ export class CollisionMap {
                 level: this.heightLevel
             });
             return offsetChunk.collisionMap;
-        } else if(this.instance) {
+        }if(this.instance) {
             const instanceChunk = this.instance.getInstancedChunk(this.x + offsetX,
                 this.y + offsetY, this.heightLevel);
             return instanceChunk.collisionMap;

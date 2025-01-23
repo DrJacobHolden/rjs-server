@@ -68,7 +68,7 @@ const action: objectInteractionActionHandler = (details) => {
     }
 
     if(!otherDoorId || (deltaX === 0 && deltaY === 0)) {
-        logger.error('Improperly handled double door at ' + door.x + ',' + door.y + ',' + door.level);
+        logger.error(`Improperly handled double door at ${door.x},${door.y},${door.level}`);
         return;
     }
 

@@ -70,7 +70,7 @@ export class World {
 
     public shutdown(): void {
         this.kickAllPlayers();
-        logger.info(`Shutting down world...`);
+        logger.info('Shutting down world...');
     }
 
     /**
@@ -235,13 +235,13 @@ export class World {
             return;
         }
 
-        logger.info(`Kicking all players...`);
+        logger.info('Kicking all players...');
 
         this.playerList
             .filter(player => player !== null)
             .forEach(player => player.logout());
 
-        logger.info(`Player data save complete, world is now empty.`);
+        logger.info('Player data save complete, world is now empty.');
     }
 
     /**
@@ -252,13 +252,13 @@ export class World {
             return;
         }
 
-        logger.info(`Saving player data...`);
+        logger.info('Saving player data...');
 
         this.playerList
             .filter(player => player !== null)
             .forEach(player => player.save());
 
-        logger.info(`Player data saved.`);
+        logger.info('Player data saved.');
     }
 
     /**
@@ -522,14 +522,13 @@ export class World {
         if(typeof player === 'string') {
             player = player.toLowerCase();
             return this.playerList.findIndex(p => Boolean(p) && p.username.toLowerCase() === player) !== -1;
-        } else {
+        }
             const foundPlayer = this.playerList[player.worldIndex];
             if(!foundPlayer) {
                 return false;
             }
 
             return foundPlayer.equals(player);
-        }
     }
 
     /**

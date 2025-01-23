@@ -107,13 +107,12 @@ export const getTemplateLocalX = (orientation: number, localX: number, localY: n
 
     if(orientation === 0) {
         return localX;
-    } else if(orientation === 1) {
+    }if(orientation === 1) {
         return 7 - (localY + sizeY) + 1;
-    } else if(orientation === 2) {
+    }if(orientation === 2) {
         return 7 - (localX + sizeX) + 1;
-    } else { // 3
-        return localY;
     }
+        return localY;
 };
 
 export const getTemplateLocalY = (orientation: number, localX: number, localY: number,
@@ -126,11 +125,10 @@ export const getTemplateLocalY = (orientation: number, localX: number, localY: n
 
     if(orientation === 0) {
         return localY;
-    } else if(orientation === 1) {
+    }if(orientation === 1) {
         return localX;
-    } else if(orientation === 2) {
+    }if(orientation === 2) {
         return 7 - (localY + sizeY) + 1;
-    } else { // 3
-        return 7 - (localX + sizeX) + 1;
     }
+        return 7 - (localX + sizeX) + 1;
 };

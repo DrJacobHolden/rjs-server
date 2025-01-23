@@ -69,7 +69,7 @@ export type ActionCancelType =
 /**
  * The definition for the actual action pipe handler function.
  */
-export type ActionPipeHandler = (...args: any[]) => RunnableHooks | void;
+export type ActionPipeHandler = (...args: any[]) => RunnableHooks | undefined;
 
 /**
  * Basic definition of a game engine action file (.action.ts exports).

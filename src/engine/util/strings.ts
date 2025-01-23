@@ -14,17 +14,16 @@ export const startsWithVowel = (str: string): boolean => {
 function getFont(font?: number | string) {
     if (font && typeof font === 'number') {
         return filestore.fontStore.getFontById(font);
-    } else if (font && typeof font === 'string') {
+    }if (font && typeof font === 'string') {
         return filestore.fontStore.getFontByName(FontName[font]);
-    } else {
+    }
         // Default font, subject to change
         return filestore.fontStore.getFontByName(FontName.p12_full);
-    }
 }
 
 export enum TextDecoration {
-    Color,
-    Decoration
+    Color = 0,
+    Decoration = 1
 }
 
 function getStylingType(tag: string) {
@@ -35,9 +34,8 @@ function getStylingType(tag: string) {
 
     if (_tag.startsWith('col')) {
         return TextDecoration.Color;
-    } else {
-        return TextDecoration.Decoration;
     }
+        return TextDecoration.Decoration;
 }
 
 
@@ -78,7 +76,7 @@ export function wrapText(text: string, maxWidth: number, font?: number | string)
                 hidden = true;
                 currentTagIndex = currentLine.length + 1;
                 break;
-            case '>':
+            case '>': {
                 hidden = true;
                 // eslint-disable-next-line no-case-declarations
                 const currentTag = currentLine.substring(currentTagIndex, currentLine.length);
@@ -101,6 +99,7 @@ export function wrapText(text: string, maxWidth: number, font?: number | string)
                     }
                 }
                 break;
+            }
             case '@':
                 break;
             case '\n':
@@ -120,7 +119,7 @@ export function wrapText(text: string, maxWidth: number, font?: number | string)
         if (rendered) {
             currentLine += char;
         }
-        if (!hidden && currentTagIndex == -1 && char !== undefined) {
+        if (!hidden && currentTagIndex === -1 && char !== undefined) {
             const charWidth = selectedFont.getCharWidth(char);
             currentWidth += charWidth;
         }
@@ -139,7 +138,7 @@ export function wrapText(text: string, maxWidth: number, font?: number | string)
             }
             let lineToPush = currentLine;
             let remainder = '';
-            if (lastSpace != -1 && char != '\n') {
+            if (lastSpace !== -1 && char !== '\n') {
                 lineToPush = lineToPush.substring(0, lastSpace);
                 remainder = currentLine.substring(lastSpace);
             }
@@ -176,7 +175,7 @@ export function longToString(nameLong: bigint): string {
     while(nameLong !== BigInt(0)) {
         const l1 = nameLong;
         nameLong = BigInt(nameLong) / BigInt(37);
-        ac += VALID_CHARS[parseInt(l1.toString()) - parseInt(nameLong.toString()) * 37];
+        ac += VALID_CHARS[Number.parseInt(l1.toString()) - Number.parseInt(nameLong.toString()) * 37];
     }
 
     return ac.split('').reverse().join('');
@@ -193,7 +192,7 @@ export function stringToLong(s: string): bigint {
         else if (c >= 'a' && c <= 'z') l += BigInt((1 + cc) - 97);
         else if (c >= '0' && c <= '9') l += BigInt((27 + cc) - 48);
     }
-    while (l % BigInt(37) == BigInt(0) && l != BigInt(0)) l /= BigInt(37);
+    while (l % BigInt(37) === BigInt(0) && l !== BigInt(0)) l /= BigInt(37);
     return l;
 }
 

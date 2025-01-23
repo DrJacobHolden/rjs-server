@@ -20,13 +20,13 @@ export const handler: itemInteractionActionHandler = ({ player, itemId, itemSlot
         dialogue([ player ], [
             text => ('Administrators are not allowed to drop items.'),
             options => [
-                `Destroy the item!`, [
+                'Destroy the item!', [
                     execute(() => {
                         inventory.remove(itemSlot);
                         player.outgoingPackets.sendUpdateSingleWidgetItem(widgets.inventory, itemSlot, null);
                     }),
                 ],
-                `Bank the item!`, [
+                'Bank the item!', [
                     execute(() => {
                         inventory.remove(itemSlot);
                         player.bank.add(item);

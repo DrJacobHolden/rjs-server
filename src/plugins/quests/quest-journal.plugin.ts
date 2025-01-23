@@ -27,8 +27,8 @@ export const handler: buttonActionHandler = async ({ player, buttonId }) => {
         const questJournalStages = Object.keys(quest.journalHandler);
         let journalEntry;
         for(const stage of questJournalStages) {
-            const stageNum = parseInt(stage, 10);
-            if(isNaN(stageNum) || playerStage === 'complete') {
+            const stageNum = Number.parseInt(stage, 10);
+            if(Number.isNaN(stageNum) || playerStage === 'complete') {
                 continue;
             }
 
@@ -56,7 +56,7 @@ export const handler: buttonActionHandler = async ({ player, buttonId }) => {
         lines = [ 'Invalid Quest Stage' ];
     }
 
-    player.modifyWidget(widgets.questJournal, { childId: 2, text: '@dre@' + quest.name });
+    player.modifyWidget(widgets.questJournal, { childId: 2, text: `@dre@${quest.name}` });
 
     for(let i = 0; i <= 100; i++) {
         if(i === 0) {

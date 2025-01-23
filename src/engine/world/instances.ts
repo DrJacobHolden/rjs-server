@@ -231,7 +231,7 @@ export class WorldInstance {
         const nearbyPlayers = activeWorld.findNearbyPlayers(worldItem.position, 16, this.instanceId) || [];
 
         nearbyPlayers.forEach(player => {
-            if(excludePlayer && excludePlayer.equals(player)) {
+            if(excludePlayer?.equals(player)) {
                 return;
             }
 

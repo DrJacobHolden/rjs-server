@@ -144,7 +144,7 @@ export class Shop {
     public open(player: Player): void {
         player.metadata.lastOpenedShopKey = this.key;
         player.metadata.shopCloseListener = player.interfaceState.closed.subscribe((whatClosed: WidgetClosedEvent) => {
-            if (whatClosed && whatClosed.widget && whatClosed.widget.widgetId === widgets.shop.widgetId) {
+            if (whatClosed?.widget && whatClosed.widget.widgetId === widgets.shop.widgetId) {
                 this.removePlayerFromShop(player);
             }
         });
@@ -176,7 +176,7 @@ export class Shop {
 
     private removePlayerFromShop(player: Player) {
         if (player.metadata.lastOpenedShopKey === this.key) {
-            delete player.metadata.lastOpenedShopKey;
+            player.metadata.lastOpenedShopKey = undefined;
             player.metadata.shopCloseListener?.unsubscribe();
         }
         this.customers = this.customers.filter((c) => c !== player);

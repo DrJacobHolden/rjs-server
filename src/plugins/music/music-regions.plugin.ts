@@ -29,7 +29,7 @@ const regionChangedHandler = ({ player, currentMapRegionId }): void => {
     // player.sendMessage(`Playing ${songId}:${getByValue(songs, songId)} at region ${currentMapRegionId}`);
     if(!player.musicTracks.includes(songId)) {
         player.musicTracks.push(songId);
-        player.sendMessage('You have unlocked a new music track: <col=ef101f>' + songName + '.</col>');
+        player.sendMessage(`You have unlocked a new music track: <col=ef101f>${songName}.</col>`);
         player.modifyWidget(widgets.musicPlayerTab, { childId:  musicTrack.musicTabButtonId, textColor: colors.green });
     }
     if(player.settings.musicPlayerMode === MusicPlayerMode.AUTO) {

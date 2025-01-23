@@ -1,6 +1,6 @@
 import { logger } from '@runejs/common';
 import { JSON_SCHEMA, load } from 'js-yaml';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { LandscapeObject } from '@runejs/filestore';
 
 export function parseScenerySpawns(): LandscapeObject[] {
@@ -18,7 +18,7 @@ export function parseScenerySpawns(): LandscapeObject[] {
 
         return scenerySpawns;
     } catch(error) {
-        logger.error('Error parsing scenery spawns: ' + error);
+        logger.error(`Error parsing scenery spawns: ${error}`);
         return [];
     }
 }

@@ -129,7 +129,7 @@ export async function loadNpcConfigurations(path: string): Promise<{
                 npcPresets = { ...npcPresets, ...npcConfigs[key] };
             } else {
                 const npcConfig = npcConfigs[key] as NpcServerConfig;
-                if (!isNaN(npcConfig.game_id)) {
+                if (!Number.isNaN(npcConfig.game_id)) {
                     npcIds[npcConfig.game_id] = key;
                     npcs[key] = {
                         ...translateNpcServerConfig(key, npcConfig),
@@ -139,7 +139,7 @@ export async function loadNpcConfigurations(path: string): Promise<{
                 if (npcConfig.variations) {
                     for (const variation of npcConfig.variations) {
                         try {
-                            const subKey = key + ':' + variation.suffix;
+                            const subKey = `${key}:${variation.suffix}`;
                             const baseItem = JSON.parse(JSON.stringify({
                                 ...translateNpcServerConfig(key, npcConfig),
                                 ...filestore.configStore.npcStore.getNpc(npcConfig.game_id)

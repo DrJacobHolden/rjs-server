@@ -66,7 +66,7 @@ export const depositItem: itemInteractionActionHandler = (details) => {
 
         itemAmount += item.amount;
     });
-    if (countToRemove == -1 || countToRemove > itemAmount) {
+    if (countToRemove === -1 || countToRemove > itemAmount) {
         countToRemove = itemAmount;
     }
 

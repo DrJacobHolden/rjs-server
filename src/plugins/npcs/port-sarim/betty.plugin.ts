@@ -10,17 +10,17 @@ const dialogueAction: npcInteractionActionHandler = (details) => {
     const { player, npc } = details;
     let openShop = false;
     dialogue([details.player, { npc: details.npc, key: 'betty' }], [
-        betty => [Emote.HAPPY, `Welcome to the magic emporium.`],
+        betty => [Emote.HAPPY, 'Welcome to the magic emporium.'],
         options => [
-            `Can I see your wares?`, [
-                player => [Emote.HAPPY, `Can I see your wares?`],
+            'Can I see your wares?', [
+                player => [Emote.HAPPY, 'Can I see your wares?'],
                 execute(() => {
                     openShop = true;
                 })
             ],
             `Sorry I'm not into magic.`, [
                 player => [Emote.GENERIC, `Sorry I'm not into magic.`],
-                betty => [Emote.HAPPY, `Well, if you see anyone who is into magic, please send them my way.`]
+                betty => [Emote.HAPPY, 'Well, if you see anyone who is into magic, please send them my way.']
             ]
         ]
     ]);

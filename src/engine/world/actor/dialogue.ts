@@ -603,7 +603,7 @@ async function runDialogueAction(player: Player, dialogueAction: string | Dialog
 
                 const npcDetails = filestore.configStore.npcStore.getNpc(npcId);
 
-                if (npcDetails && npcDetails.name) {
+                if (npcDetails?.name) {
                     player.outgoingPackets.updateWidgetString(widgetId, 1, npcDetails.name);
                 }
             } else {
@@ -749,7 +749,7 @@ export async function itemSelectionDialogue(player: Player, type: 'COOKING' | 'M
             widgetId = 309;
         } else {
             if (items.length > 5) {
-                throw new Error(`Too many items provided to the item selection action!`);
+                throw new Error('Too many items provided to the item selection action!');
             }
 
             widgetId = (301 + items.length);
@@ -770,7 +770,7 @@ export async function itemSelectionDialogue(player: Player, type: 'COOKING' | 'M
 
         player.outgoingPackets.setItemOnWidget(widgetId, childId, itemInfo.itemId, itemInfo.zoom);
         player.outgoingPackets.moveWidgetChild(widgetId, childId, 0, itemInfo.offset);
-        player.outgoingPackets.updateWidgetString(widgetId, itemSelectionDialogues[widgetId].text[index], '\\n\\n\\n\\n' + itemInfo.itemName);
+        player.outgoingPackets.updateWidgetString(widgetId, itemSelectionDialogues[widgetId].text[index], `\\n\\n\\n\\n${itemInfo.itemName}`);
     });
 
     return new Promise((resolve, reject) => {

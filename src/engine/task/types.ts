@@ -7,12 +7,12 @@ export enum TaskStackType {
     /**
      * This task cannot be stacked with other tasks of the same stack group.
      */
-    NEVER,
+    NEVER = 0,
 
     /**
      * This task can be stacked with other tasks of the same stack group.
      */
-    STACK,
+    STACK = 1,
 }
 
 /**
@@ -38,7 +38,7 @@ export enum TaskBreakType {
     /**
      * This task gets stopped when the player moves
      */
-    ON_MOVE,
+    ON_MOVE = 0,
 }
 
 /**

@@ -53,7 +53,7 @@ export class Position {
     public withinInteractionDistance(target: LandscapeObject | Position, minimumDistance: number = 1): boolean {
         if(target instanceof Position) {
             return this.distanceBetween(target) <= minimumDistance;
-        } else {
+        }
             const definition = filestore.configStore.objectStore.getObject(target.objectId);
 
             if (!definition) {
@@ -74,7 +74,7 @@ export class Position {
 
             if(width === 1 && height === 1) {
                 return this.distanceBetween(new Position(occupantX, occupantY, target.level)) <= minimumDistance;
-            } else {
+            }
                 if(target.orientation === 1 || target.orientation === 3) {
                     const off = width;
                     width = height;
@@ -88,8 +88,6 @@ export class Position {
                         }
                     }
                 }
-            }
-        }
 
         return false;
     }

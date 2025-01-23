@@ -178,12 +178,11 @@ export class ChunkManager {
             // using ! here because we know it exists
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this.chunkMap.get(pos.key)!;
-        } else {
+        }
             const chunk = new Chunk(pos);
             this.chunkMap.set(pos.key, chunk);
             chunk.registerMapRegion();
             return chunk;
-        }
     }
 
 }

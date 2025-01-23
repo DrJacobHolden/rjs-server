@@ -25,12 +25,12 @@ export const shopSellValueHandler: itemInteractionActionHandler = (details) => {
 
     if(!shopItem) {
         // The specified item was not found in the specified slot.
-        player.sendMessage(`ERROR item not in shopslot.`);
+        player.sendMessage('ERROR item not in shopslot.');
         return;
     }
 
     if(shopItem.amount <= 0) {
-        player.sendMessage(`The shop has ran out of stock.`);
+        player.sendMessage('The shop has ran out of stock.');
         // Out of stock
         return;
     }

@@ -22,7 +22,7 @@ export interface TaskDetails<T> {
 
 export interface HookTask<T = any> {
     canActivate?: <Q = T>(task: TaskExecutor<Q>, iteration?: number) => boolean | Promise<boolean>;
-    activate: <Q = T>(task: TaskExecutor<Q>, iteration?: number) => void | undefined | boolean | Promise<void | undefined | boolean>;
+    activate: <Q = T>(task: TaskExecutor<Q>, iteration?: number) => undefined | undefined | boolean | Promise<undefined | undefined | boolean>;
     onComplete?: <Q = T>(task: TaskExecutor<Q>, iteration?: number) => void | Promise<void>;
     delay?: number; // # of ticks before execution
     delayMs?: number; // # of milliseconds before execution
@@ -113,7 +113,7 @@ export class TaskExecutor<T> {
             const response = await this.task.activate(this, this.iteration++);
             return typeof response === 'boolean' ? response : true;
         } catch(error) {
-            logger.error(`Error executing action task`);
+            logger.error('Error executing action task');
             logger.error(error);
             return false;
         }
@@ -131,7 +131,7 @@ export class TaskExecutor<T> {
         try {
             return this.task.canActivate(this, this.iteration);
         } catch(error) {
-            logger.error(`Error calling action canActivate`, this.task);
+            logger.error('Error calling action canActivate', this.task);
             logger.error(error);
             return false;
         }

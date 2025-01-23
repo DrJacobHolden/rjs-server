@@ -35,7 +35,7 @@ export function openTravel(player: Player, page: number) {
     // prev page label
     player.modifyWidget(widget.widgetId, {
         childId: 98,
-        text: widget.metadata.page * 2 -1 === 1 ? `` : `Page ${widget.metadata.page * 2 -1} `
+        text: widget.metadata.page * 2 -1 === 1 ? '' : `Page ${widget.metadata.page * 2 -1} `
     })
 
     // next page label
@@ -124,7 +124,7 @@ export const travelMenuInteract: widgetInteractionActionHandler = (details) => {
     if(details.childId >= 131 && details.childId <= 159) {
         selectedIndex = ((details.childId - 129)/2 -1) + 15;
     }
-    if(selectedIndex != undefined) {
+    if(selectedIndex !== undefined) {
         let teleportIndex = selectedIndex + (30 * (playerWidget.metadata.page-1));
         if(!details.player.savedMetadata.lastTravel) {
             details.player.savedMetadata.lastTravel = new Array(10);

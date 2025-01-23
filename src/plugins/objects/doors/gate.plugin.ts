@@ -110,7 +110,7 @@ const action: objectInteractionActionHandler = (details) => {
                 direction = WNES[gate.orientation];
                 position = pos;
             } else {
-                logger.error('Could not find main gate for secondary gate at ' + gate.x + ',' + gate.y + ',' + gate.level);
+                logger.error(`Could not find main gate for secondary gate at ${gate.x},${gate.y},${gate.level}`);
                 player.sendMessage('Oops, something went wrong. Please report this to a developer.');
             }
 
@@ -177,7 +177,7 @@ const action: objectInteractionActionHandler = (details) => {
         };
 
         if(deltaX === 0 && deltaY === 0) {
-            logger.error('Improperly handled gate at ' + gate.x + ',' + gate.y + ',' + gate.level);
+            logger.error(`Improperly handled gate at ${gate.x},${gate.y},${gate.level}`);
             return;
         }
 
@@ -188,7 +188,7 @@ const action: objectInteractionActionHandler = (details) => {
         }
 
         if (!gateSecondPosition) {
-            logger.error('Improperly handled gate at ' + gate.x + ',' + gate.y + ',' + gate.level);
+            logger.error(`Improperly handled gate at ${gate.x},${gate.y},${gate.level}`);
             player.sendMessage('Oops, something went wrong. Please report this to a developer.');
             return;
         }

@@ -1209,10 +1209,6 @@
         "extends": "rs:food",
         "game_id": 389
     },
-    "rs:raw_manta_ray": {
-        "extends": "rs:food",
-        "game_id": 389
-    },
     "rs:raw_leaping_trout": {
         "extends": "rs:food",
         "game_id": 389

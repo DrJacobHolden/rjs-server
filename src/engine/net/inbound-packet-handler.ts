@@ -24,7 +24,7 @@ export async function loadPackets(): Promise<Map<number, InboundPacket>> {
     incomingPackets.clear();
 
     for await(const path of getFiles(PACKET_DIRECTORY, ['.packet.js'], true)) {
-        const location = './inbound-packets' + path.substring(PACKET_DIRECTORY.length).replace('.js', '');
+        const location = `./inbound-packets${path.substring(PACKET_DIRECTORY.length).replace('.js', '')}`;
         const packet = require(location).default;
         if (Array.isArray(packet)) {
             packet.forEach(p => incomingPackets.set(p.opcode, p));

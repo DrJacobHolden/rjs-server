@@ -44,7 +44,7 @@ export async function loadCoreConfigurations(): Promise<void> {
 }
 
 export async function loadGameConfigurations(): Promise<void> {
-    logger.info(`Loading server configurations...`);
+    logger.info('Loading server configurations...');
 
     const { items, itemIds, itemPresets, itemGroups } = await loadItemConfigurations('data/config/items/');
     itemMap = items;
@@ -79,6 +79,7 @@ export async function loadGameConfigurations(): Promise<void> {
 export const findItemTagsInGroups = (groupKeys: string[]): string[] => {
     return Object.keys(groupKeys.reduce<Record<string, boolean>>((all, groupKey)=> {
         const items = itemGroupMap[groupKey] || {};
+        // biome-ignore lint/performance/noAccumulatingSpread: Legacy, should be swapped to return arrays and then flatten.
         return { ...all, ...items };
     }, {}));
 }
@@ -162,10 +163,9 @@ export const findNpc = (npcKey: number | string): NpcDetails | null => {
             const cacheNpc = filestore.configStore.npcStore.getNpc(gameId);
             if(cacheNpc) {
                 return cacheNpc as any;
-            } else {
+            }
                 logger.warn(`NPC ${gameId} is not yet configured on the server and a matching cache NPC was not found.`);
                 return null;
-            }
         }
     }
 
@@ -207,9 +207,8 @@ export const findObject = (objectId: number): ObjectConfig | null => {
 
         objectMap[objectId] = object;
         return object;
-    } else {
-        return objectMap[objectId];
     }
+        return objectMap[objectId];
 };
 
 

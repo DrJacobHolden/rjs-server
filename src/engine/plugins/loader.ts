@@ -45,17 +45,17 @@ export async function loadPlugins(): Promise<void> {
                 }
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                actionHookMap[action.type]!.push(action);
+                actionHookMap[action.type]?.push(action);
             } else {
-                if(!actionHookMap['quest']) {
-                    actionHookMap['quest'] = [];
+                if(!actionHookMap.quest) {
+                    actionHookMap.quest = [];
                 }
 
-                actionHookMap['quest'].push(action);
+                actionHookMap.quest.push(action);
             }
         });
     } else {
-        logger.warn(`No action hooks detected - update plugins.`);
+        logger.warn('No action hooks detected - update plugins.');
     }
 
     for (const plugin of plugins) {

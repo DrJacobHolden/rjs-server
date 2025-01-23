@@ -1,4 +1,4 @@
-import { Socket } from 'net';
+import { Socket } from 'node:net';
 import { LandscapeObject } from '@runejs/filestore';
 import { ByteBuffer, logger } from '@runejs/common';
 
@@ -400,7 +400,7 @@ export class OutboundPacketHandler {
 
             payload.put(bitset, 'BYTE');
 
-            if (bitset == 0) {
+            if (bitset === 0) {
                 continue;
             }
 

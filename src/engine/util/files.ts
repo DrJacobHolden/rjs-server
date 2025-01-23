@@ -1,5 +1,5 @@
-import util from 'util';
-import fs from 'fs';
+import util from 'node:util';
+import fs from 'node:fs';
 import { watch } from 'chokidar';
 import { Observable, Subject } from 'rxjs';
 
@@ -14,7 +14,7 @@ export async function* getFiles(directory: string, list: string[] = [], useWhite
     const files = await readdir(directory);
 
     for(const file of files) {
-        const path = directory + '/' + file;
+        const path = `${directory}/${file}`;
         const statistics = await stat(path);
 
         if(statistics.isDirectory()) {

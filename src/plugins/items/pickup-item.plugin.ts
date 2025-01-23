@@ -17,9 +17,8 @@ export const handler: spawnedItemInteractionHandler = ({ player, worldItem, item
             if(existingItem && (existingItem.amount + worldItem.amount >= 2147483647)) {
                 // @TODO create new item stack
                 return;
-            } else {
-                slot = existingItemIndex;
             }
+                slot = existingItemIndex;
         }
     }
 

@@ -22,15 +22,15 @@ import { activeWorld } from '@engine/world';
 
 
 export const tutorialTabWidgetOrder = [
-    [ tabIndex['settings'], widgets.settingsTab ],
-    [ tabIndex['friends'], widgets.friendsList ],
-    [ tabIndex['ignores'], widgets.ignoreList ],
-    [ tabIndex['emotes'], widgets.emotesTab ],
-    [ tabIndex['music'], widgets.musicPlayerTab ],
-    [ tabIndex['inventory'], widgets.inventory.widgetId ],
-    [ tabIndex['skills'], widgets.skillsTab ],
-    [ tabIndex['equipment'], widgets.equipment.widgetId ],
-    [ tabIndex['combat'], -1 ],
+    [ tabIndex.settings, widgets.settingsTab ],
+    [ tabIndex.friends, widgets.friendsList ],
+    [ tabIndex.ignores, widgets.ignoreList ],
+    [ tabIndex.emotes, widgets.emotesTab ],
+    [ tabIndex.music, widgets.musicPlayerTab ],
+    [ tabIndex.inventory, widgets.inventory.widgetId ],
+    [ tabIndex.skills, widgets.skillsTab ],
+    [ tabIndex.equipment, widgets.equipment.widgetId ],
+    [ tabIndex.combat, -1 ],
     // @TODO prayer, magic,
 ];
 
@@ -53,7 +53,7 @@ export function showTabWidgetHint(player: Player, tabIndex: number, availableTab
     tabClickEvent.event.pipe(take(1)).subscribe(async () => {
         player.setQuestProgress('tyn:goblin_diplomacy', finalProgress);
         tabClickEvent.event.complete();
-        delete player.metadata.tabClickEvent;
+        player.metadata.tabClickEvent = undefined;
         await tutorialHandler(player);
     });
 }
@@ -112,7 +112,7 @@ export const startTutorial = async (player: Player): Promise<void> => {
     player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, player.inventory);
 
     await dialogue([ player ], [
-        titled => [ `Getting Started`, `\nCreate your character!` ]
+        titled => [ 'Getting Started', '\nCreate your character!' ]
     ], {
         permanent: true
     });
@@ -205,7 +205,7 @@ const createCharacterAction: buttonActionHandler = ({ player }): void => {
 
 const journalHandler: QuestJournalHandler = {
 
-    0: `stinkyu hoomsn HAHA\n\n\nf1nglewuRt`
+    0: 'stinkyu hoomsn HAHA\n\n\nf1nglewuRt'
 
 };
 
@@ -215,7 +215,7 @@ const QUEST_ID = 'tyn:goblin_diplomacy';
 const QUEST = new Quest({
     id: QUEST_ID,
     questTabId: 28,
-    name: `Goblin Diplomacy`,
+    name: 'Goblin Diplomacy',
     points: 1,
     journalHandler,
     onComplete: {

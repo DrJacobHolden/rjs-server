@@ -65,7 +65,7 @@ function finishEnterAltar(player: Player, item: Item, altar: RunecraftingAltar):
     }
 
     player.sendMessage(`You hold the ${talisman.name} towards the mysterious ruins.`);
-    player.sendMessage(`You feel a powerful force take hold of you..`);
+    player.sendMessage('You feel a powerful force take hold of you..');
     player.teleport(altar.entrance);
 }
 

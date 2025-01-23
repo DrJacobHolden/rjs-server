@@ -61,7 +61,7 @@ const itemInteractionActionPipe = (player: Player, itemId: number, slot: number,
                                    containerId: number, option: string): RunnableHooks<ItemInteractionAction> | null => {
     const playerWidget = Object.values(player.interfaceState.widgetSlots).find((widget) => widget && widget.widgetId === widgetId);
 
-    if(playerWidget && playerWidget.fakeWidget != undefined) {
+    if(playerWidget && playerWidget.fakeWidget !== undefined) {
         widgetId = playerWidget.fakeWidget;
     }
 
