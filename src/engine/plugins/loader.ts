@@ -6,7 +6,7 @@ import { ActionHook, ActionType, sortActionHooks } from '@engine/action';
 /**
  * A type for describing the plugin action hook map.
  */
-type PluginActionHookMap = {
+type PluginActionHookMap = { quest?: ActionHook[] } & {
     [key in ActionType]?: ActionHook[];
 };
 

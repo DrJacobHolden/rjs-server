@@ -12,8 +12,13 @@ import { ObjectConfig } from '@runejs/filestore';
 
 function milkCow(details: { objectConfig: ObjectConfig, player: Player }): void {
     const { player, objectConfig } = details;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const emptyBucketItem = findItem(itemIds.bucket)!;
+    const emptyBucketItem = findItem(itemIds.bucket);
+    // TODO: `findItem` should probably throw this error internally.
+    if (emptyBucketItem === null) {
+        throw new Error(
+            'Failed to milk cow as no item matching bucket was found.',
+        );
+    }
 
     if (player.hasItemInInventory(itemIds.bucket)) {
         player.playAnimation(animationIds.milkCow);
@@ -22,8 +27,13 @@ function milkCow(details: { objectConfig: ObjectConfig, player: Player }): void 
         player.giveItem(itemIds.bucketOfMilk);
         player.sendMessage(`You milk the ${objectConfig.name} and receive some milk.`);
     } else {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const gillieId = findNpc('rs:gillie_groats')!.gameId;
+        const gilleGroats = findNpc('rs:gillie_groats');
+        // TODO: `findNpc` should probably throw this error internally.
+        if (gilleGroats === null) {
+            throw new Error('Failed to find NPC Gillie Groats.');
+        }
+
+        const gillieId = gilleGroats.gameId;
         dialogueAction(player)
             .then(async d => d.npc(gillieId, DialogueEmote.LAUGH_1, [`Tee hee! You've never milked a cow before, have you?`]))
             .then(async d => d.player(DialogueEmote.CALM_TALK_1, ['Erm... No. How could you tell?']))

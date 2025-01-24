@@ -1,5 +1,5 @@
 import { AddressInfo, Socket } from 'net';
-import {v4} from 'uuid';
+import { v4 } from 'uuid';
 import { Subject } from 'rxjs';
 import EventEmitter from 'events';
 
