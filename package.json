@@ -21,11 +21,14 @@
         "build:watch": "swc ./src -d dist -w --strip-leading-paths",
         "clean": "rimraf coverage && rimraf dist",
         "lint": "biome lint",
+        "lint:fin": "biome lint --write --diagnostic-level=error --reporter=summary",
         "lint:fix": "biome lint --write",
         "format": "biome format",
+        "format:fin": "biome format --write --reporter=summary",
         "format:fix": "biome format --write",
-        "fin": "npm run lint:fix && npm run format:fix",
+        "fin": "npm run typecheck && npm run lint:fin && npm run format:fin && npm run test:fin",
         "test": "jest",
+        "test:fin": "jest --silent --reporters=\"summary\"",
         "typecheck": "tsc -p ./ --noEmit"
     },
     "repository": {

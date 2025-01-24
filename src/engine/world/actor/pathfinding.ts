@@ -544,10 +544,13 @@ export class Pathfinding {
                     ? null
                     : instancedAdjacencyForTile & i;
 
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
+            const globalAdjacencyForTile =
+                globalAdjacency[destinationLocalX][destinationLocalY];
+
             const globalTileFlags =
-                globalAdjacency[destinationLocalX][destinationLocalY] & i;
+                globalAdjacencyForTile === null
+                    ? null
+                    : globalAdjacencyForTile & i;
 
             return instancedTileFlags === null
                 ? globalTileFlags === 0

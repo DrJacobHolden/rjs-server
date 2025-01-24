@@ -36,6 +36,11 @@ export type ActorMetadata = {
     faceActorClearedByWalking: boolean;
 
     /**
+     * The actor's last position before teleporting.
+     */
+    lastPosition: Position;
+
+    /**
      * Set to true if the actor is currently teleporting.
      */
     teleporting: boolean;
