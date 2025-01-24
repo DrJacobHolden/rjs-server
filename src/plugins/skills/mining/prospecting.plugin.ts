@@ -10,7 +10,8 @@ const action: objectInteractionActionHandler = (details) => {
     const ore = getOreFromRock(details.object.objectId);
     details.player.playSound(soundIds.oreEmpty, 7, 0);
 
-    const oreItem = findItem(ore.itemId);
+    const itemConfigId = typeof ore.items === 'string' ? ore.items : ore.items[0].itemConfigId;
+    const oreItem = findItem(itemConfigId);
 
     if (!oreItem) {
         details.player.sendMessage('Sorry, something went wrong. Please report this to a developer.');

@@ -1,9 +1,9 @@
 import { LandscapeObject } from '@runejs/filestore';
-import { findItem } from '@engine/config';
+import { equipmentIndices, findItem } from '@engine/config';
 import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl';
 import { colors, colorText, randomBetween } from '@engine/util';
 import { Player, Skill } from '@engine/world/actor';
-import { HarvestTool, IHarvestable, soundIds } from '@engine/world/config';
+import { HarvestTool, IHarvestable, selectWeightedItem, soundIds } from '@engine/world/config';
 import { checkForGemBoost } from '@engine/world/skill-util/glory-boost';
 import { rollGemType } from '@engine/world/skill-util/harvest-roll';
 import { canMine } from './chance';
@@ -30,16 +30,35 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
      */
     private targetItemName: string;
 
+
     constructor(player: Player, landscapeObject: LandscapeObject, private readonly ore: IHarvestable, private readonly tool: HarvestTool) {
         super(player, landscapeObject);
 
-        const item = findItem(ore.itemId);
+        const itemConfigId = typeof ore.items === 'string' ? ore.items : selectWeightedItem(ore.items);
+        const item = findItem(itemConfigId);
 
         if (!item) {
-            throw new Error(`Could not find item with ID ${ore.itemId}`);
+            throw new Error(`Could not find item with ID ${itemConfigId}`);
         }
 
         this.targetItemName = item.name.toLowerCase().replace(' ore', '')
+    }
+
+    private isGemRock(): boolean {
+        return this.landscapeObject?.objectId === 2111;
+    }
+
+    private hasChargedGlory(): boolean {
+        const neckSlotIndex = equipmentIndices['neck']; // This is 2
+        const neckItem = this.actor.equipment.items[neckSlotIndex];
+        if (!neckItem) {
+            return false;
+        }
+        const itemConfig = findItem(neckItem.itemId);
+        if (!itemConfig) {
+            return false;
+        }
+        return itemConfig.key.startsWith('rs:amulet_of_glory:charged_');
     }
 
     public execute(): void {
@@ -83,7 +102,11 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         }
 
         // roll for success
-        const succeeds = canMine(this.ore, toolLevel, this.actor.skills.mining.level);
+        const succeeds = canMine(
+            { ...this.ore, baseChance: this.getGemMiningChance() },
+            toolLevel,
+            this.actor.skills.mining.level
+        );
         if(!succeeds) {
             return;
         }
@@ -94,8 +117,10 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
             this.actor.giveItem(rollGemType());
         } else {
             this.actor.sendMessage(`You manage to mine some ${this.targetItemName}.`);
-            this.actor.giveItem(this.ore.itemId);
-
+            const itemToGive = typeof this.ore.items === 'string' ?
+                this.ore.items :
+                selectWeightedItem(this.ore.items);
+            this.actor.giveItem(itemToGive);
             // TODO (Jameskmonger) handle Gem rocks and Pure essence rocks
             // if (itemToAdd === 1436 && details.player.skills.hasLevel(Skill.MINING, 30)) {
             //     itemToAdd = 7936;
@@ -131,6 +156,23 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
      */
     private hasMaterials() {
         return this.actor.inventory.has(this.tool.itemId);
+    }
+
+    private getGemMiningChance(): number {
+        if (!this.isGemRock()) {
+            return this.ore.baseChance;
+        }
+
+        // Base chance scaling from 28 to 70 based on level
+        let chance = this.ore.baseChance +
+            (this.actor.skills.mining.level - this.ore.level) * (70 - 28) / (99 - 40);
+
+        // Glory multiplies chance by 3 (from 28-70 to 84-210)
+        if (this.hasChargedGlory()) {
+            chance *= 3;
+        }
+
+        return chance;
     }
 
     /**

@@ -1,9 +1,14 @@
 import { objectIds } from '@engine/world/config/object-ids';
-import { itemIds } from './item-ids';
+import { randomBetween } from '@engine/util';
+
+interface WeightedItem {
+    itemConfigId: string;
+    weight: number;
+}
 
 export interface IHarvestable {
     objects: Map<number, number>;
-    itemId: number;
+    items: string | WeightedItem[];
     level: number;
     experience: number;
     respawnLow: number;
@@ -131,13 +136,29 @@ export enum Tree {
     MAHOGANY,
     YEW,
     MAGIC,
+    HOLLOW,
+    DRAMEN,
 }
 
+
+export function selectWeightedItem(items: WeightedItem[]): string {
+    const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+    let random = randomBetween(1, totalWeight);
+
+    for (const item of items) {
+        random -= item.weight;
+        if (random <= 0) {
+            return item.itemConfigId;
+        }
+    }
+
+    return items[0].itemConfigId; // Fallback to first item
+}
 
 const Ores: IHarvestable[] = [
     {
         objects: CLAY_OBJECTS,
-        itemId: itemIds.ores.clay,
+        items: 'rs:clay',
         level: 1,
         experience: 5.0,
         respawnLow: 5,
@@ -147,7 +168,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: COPPER_OBJECTS,
-        itemId: itemIds.ores.copper,
+        items: 'rs:copper_ore',
         level: 1,
         experience: 17.5,
         respawnLow: 10,
@@ -157,7 +178,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: TIN_OBJECTS,
-        itemId: itemIds.ores.tin,
+        items: 'rs:tin_ore',
         level: 1,
         experience: 17.5,
         respawnLow: 10,
@@ -167,7 +188,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: IRON_OBJECTS,
-        itemId: itemIds.ores.iron,
+        items: 'rs:iron_ore',
         level: 15,
         experience: 35.0,
         respawnLow: 9,
@@ -177,7 +198,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: COAL_OBJECTS,
-        itemId: itemIds.ores.coal,
+        items: 'rs:coal',
         level: 30,
         experience: 50.0,
         respawnLow: 20,
@@ -187,7 +208,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: SILVER_OBJECTS,
-        itemId: itemIds.ores.silver,
+        items: 'rs:silver_ore',
         level: 20,
         experience: 40.0,
         respawnLow: 30,
@@ -197,7 +218,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: GOLD_OBJECTS,
-        itemId: itemIds.ores.gold,
+        items: 'rs:gold_ore',
         level: 40,
         experience: 65.0,
         respawnLow: 50,
@@ -207,7 +228,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: MITHRIL_OBJECTS,
-        itemId: itemIds.ores.mithril,
+        items: 'rs:mithril_ore',
         level: 55,
         experience: 65.0,
         respawnLow: 90,
@@ -217,7 +238,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: ADAMANT_OBJECTS,
-        itemId: itemIds.ores.adamantite,
+        items: 'rs:adamantite_ore',
         level: 70,
         experience: 95.0,
         respawnLow: 200,
@@ -227,7 +248,7 @@ const Ores: IHarvestable[] = [
     },
     {
         objects: RUNITE_OBJECTS,
-        itemId: itemIds.ores.runite,
+        items: 'rs:runite_ore',
         level: 85,
         experience: 125.0,
         respawnLow: 1200,
@@ -236,21 +257,29 @@ const Ores: IHarvestable[] = [
         break: 100
     },
     {
-        objects: new Map<number, number>([[2111, 450]]), // Gem rocks
-        itemId: 1625,
+        objects: new Map<number, number>([[2111, 450]]),
+        items: [
+            { itemConfigId: 'rs:uncut_opal', weight: 60 },      // 60/128
+            { itemConfigId: 'rs:uncut_jade', weight: 30 },      // 30/128
+            { itemConfigId: 'rs:uncut_red_topaz', weight: 15 }, // 15/128
+            { itemConfigId: 'rs:uncut_sapphire', weight: 9 },   // 9/128
+            { itemConfigId: 'rs:uncut_emerald', weight: 5 },    // 5/128
+            { itemConfigId: 'rs:uncut_ruby', weight: 5 },       // 5/128
+            { itemConfigId: 'rs:uncut_diamond', weight: 4 }     // 4/128
+        ],
         level: 40,
         experience: 65.0,
         respawnLow: 200,
         respawnHigh: 400,
-        baseChance: 30,
-        break: 100
+        baseChance: 28, // Base success chance at level 40
+        break: 100      // Always depletes after successful mining
     }
 ];
 
 const Trees: IHarvestable[] = [
     {
         objects: NORMAL_OBJECTS,
-        itemId: itemIds.logs.normal,
+        items: 'rs:logs',
         level: 1,
         experience: 25,
         respawnLow: 59,
@@ -260,7 +289,7 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: ACHEY_OBJECTS,
-        itemId: itemIds.logs.achey,
+        items: 'rs:achey_logs',
         level: 1,
         experience: 25,
         respawnLow: 59,
@@ -270,7 +299,7 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: OAK_OBJECTS,
-        itemId: itemIds.logs.oak,
+        items: 'rs:oak_logs',
         level: 15,
         experience: 37.5,
         respawnLow: 14,
@@ -280,7 +309,7 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: WILLOW_OBJECTS,
-        itemId: itemIds.logs.willow,
+        items: 'rs:willow_logs',
         level: 30,
         experience: 67.5,
         respawnLow: 14,
@@ -290,7 +319,7 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: TEAK_OBJECTS,
-        itemId: itemIds.logs.teak,
+        items: 'rs:teak_logs',
         level: 35,
         experience: 85,
         respawnLow: 15,
@@ -298,10 +327,9 @@ const Trees: IHarvestable[] = [
         baseChance: 0,
         break: 100 / 8
     },
-
     {
         objects: DRAMEN_OBJECTS,
-        itemId: itemIds.logs.dramenbranch,
+        items: 'rs:dramen_branch', // You'll need to add this to logs.json
         level: 36,
         experience: 0,
         respawnLow: 0,
@@ -311,7 +339,7 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: MAPLE_OBJECTS,
-        itemId: itemIds.logs.maple,
+        items: 'rs:maple_logs',
         level: 45,
         experience: 100,
         respawnLow: 59,
@@ -321,7 +349,7 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: HOLLOW_OBJECTS,
-        itemId: itemIds.logs.bark,
+        items: 'rs:bark', // You'll need to add this to logs.json
         level: 45,
         experience: 82.5,
         respawnLow: 43,
@@ -331,7 +359,7 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: MAHOGANY_OBJECTS,
-        itemId: itemIds.logs.mahogany,
+        items: 'rs:mahogany_logs',
         level: 50,
         experience: 125,
         respawnLow: 14,
@@ -341,7 +369,7 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: YEW_OBJECTS,
-        itemId: itemIds.logs.yew,
+        items: 'rs:yew_logs',
         level: 60,
         experience: 175,
         respawnLow: 99,
@@ -351,12 +379,32 @@ const Trees: IHarvestable[] = [
     },
     {
         objects: MAGIC_OBJECTS,
-        itemId: itemIds.logs.magic,
+        items: 'rs:magic_logs',
         level: 75,
         experience: 250,
         respawnLow: 199,
         respawnHigh: 199,
         baseChance: -25,
+        break: 100 / 8
+    },
+    {
+        objects: DRAMEN_OBJECTS,
+        items: 'rs:dramen_branch',
+        level: 36,
+        experience: 0,
+        respawnLow: 0,
+        respawnHigh: 0,
+        baseChance: 100,
+        break: 0
+    },
+    {
+        objects: HOLLOW_OBJECTS,
+        items: 'rs:bark',
+        level: 45,
+        experience: 82.5,
+        respawnLow: 43,
+        respawnHigh: 44,
+        baseChance: 0,
         break: 100 / 8
     },
 ];

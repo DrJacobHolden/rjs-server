@@ -12,12 +12,11 @@ import { logger } from '@runejs/common';
  * @returns a {@link HarvestTool} if the player can harvest the object, or undefined if they cannot.
  */
 export function canInitiateHarvest(player: Player, target: IHarvestable, skill: Skill): undefined | HarvestTool {
-
-
-    const item = findItem(target.itemId);
+    const itemConfigId = typeof target.items === 'string' ? target.items : target.items[0].itemConfigId;
+    const item = findItem(itemConfigId);
 
     if (!item) {
-        logger.error(`Could not find item with id ${target.itemId} for harvestable object.`);
+        logger.error(`Could not find item with config id ${itemConfigId} for harvestable object.`);
         player.sendMessage('Sorry, there was an error. Please contact a developer.');
         return;
     }
@@ -30,8 +29,7 @@ export function canInitiateHarvest(player: Player, target: IHarvestable, skill: 
             break;
     }
 
-
-    // Check player level against the required level
+    // Rest of the function remains the same...
     if (!player.skills.hasLevel(skill, target.level)) {
         switch (skill) {
             case Skill.WOODCUTTING:
@@ -40,13 +38,14 @@ export function canInitiateHarvest(player: Player, target: IHarvestable, skill: 
         }
         return;
     }
-    // Check the players equipment and inventory for a tool
+
     let tool;
     switch (skill) {
         case Skill.WOODCUTTING:
             tool = getBestAxe(player);
             break;
     }
+
     if (tool == null) {
         switch (skill) {
             case Skill.WOODCUTTING:
@@ -55,13 +54,12 @@ export function canInitiateHarvest(player: Player, target: IHarvestable, skill: 
         }
         return;
     }
-    // Check if the players inventory is full, and notify them if its full.
+
     if (!player.inventory.hasSpace()) {
         player.sendMessage(`Your inventory is too full to hold any more ${targetName}.`, true);
         player.playSound(soundIds.inventoryFull);
         return;
     }
+
     return tool;
-
-
 }

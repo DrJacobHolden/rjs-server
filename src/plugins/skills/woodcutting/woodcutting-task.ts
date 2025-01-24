@@ -58,6 +58,26 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
         }
     }
 
+    private getItemToAdd(): string | null {
+        this.actor.sendMessage(`Looking for item ${this.treeInfo.items}`);
+        if (typeof this.treeInfo.items === 'string') {
+            return this.treeInfo.items;
+        }
+
+        // Handle weighted items
+        const totalWeight = this.treeInfo.items.reduce((sum, item) => sum + item.weight, 0);
+        let random = randomBetween(1, totalWeight);
+
+        for (const item of this.treeInfo.items) {
+            random -= item.weight;
+            if (random <= 0) {
+                return item.itemConfigId;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Execute the main woodcutting task loop. This method is called every game tick until the task is completed.
      *
@@ -113,10 +133,17 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
             return;
         }
 
-        const logItem = findObject(this.treeInfo.itemId);
+        const itemConfigId = this.getItemToAdd();
+        if (!itemConfigId) {
+            logger.error('Could not determine item to add from tree');
+            this.actor.sendMessage('Sorry, an error occurred. Please report this to a developer.');
+            this.stop();
+            return;
+        }
 
-        if(!logItem) {
-            logger.error(`Could not find log item with id ${this.treeInfo.itemId}`);
+        const logItem = findItem(itemConfigId);
+        if (!logItem) {
+            logger.error(`Could not find log item with id ${itemConfigId}`);
             this.actor.sendMessage('Sorry, an error occurred. Please report this to a developer.');
             this.stop();
             return;
@@ -132,7 +159,6 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
             return;
         }
 
-        const itemToAdd = this.treeInfo.itemId;
         const roll = randomBetween(1, 256);
         // roll for bird nest chance
         if(roll === 1) {
@@ -141,7 +167,7 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
                 { owner: this.actor || null, expires: 300 });
         } else { // Standard log chopper
             this.actor.sendMessage(`You manage to chop some ${targetName}.`);
-            this.actor.giveItem(itemToAdd);
+            this.actor.giveItem(itemConfigId);
         }
 
         this.actor.skills.woodcutting.addExp(this.treeInfo.experience);
