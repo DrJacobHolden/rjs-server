@@ -1,5 +1,5 @@
 import { objectIds } from '@engine/world/config/object-ids';
-import { randomBetween } from "@engine/util";
+import { randomBetween } from '@engine/util';
 
 interface WeightedItem {
     itemConfigId: string;
