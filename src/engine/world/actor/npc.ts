@@ -119,42 +119,59 @@ export class Npc extends Actor {
     }
 
     //This is useful so that we can tie into things like "spell casts" or events, or traps, etc to finish quests or whatever
-    public async processDeath(assailant: Actor, defender:Actor): Promise<void> {
+    public processDeath(assailant: Actor, defender: Actor) {
+        const deathPosition = defender.position;
 
-        return new Promise<void>(resolve => {
-            const deathPosition = defender.position;
+        let deathAnim: number = animationIds.death;
+        deathAnim =
+            findNpc((defender as Npc).id)?.combatAnimations?.death ||
+            animationIds.death;
 
-            let deathAnim: number = animationIds.death;
-            deathAnim = findNpc((defender as Npc).id)?.combatAnimations?.death || animationIds.death
+        defender.playAnimation(deathAnim);
+        activeWorld.playLocationSound(
+            deathPosition,
+            defender.instance.instanceId,
+            soundIds.npc.human.maleDeath,
+            5,
+        );
+        const npcDetails = findNpc((defender as Npc).id);
 
-            defender.playAnimation(deathAnim);
-            activeWorld.playLocationSound(deathPosition, defender.instance.instanceId, soundIds.npc.human.maleDeath, 5);
-            const npcDetails = findNpc((defender as Npc).id);
+        if (!npcDetails || !npcDetails.dropTable) {
+            return;
+        }
 
-            if(!npcDetails || !npcDetails.dropTable) {
-                return;
-            }
+        if (assailant instanceof Player) {
+            const itemDrops = calculateNpcDrops(assailant, npcDetails);
+            itemDrops.forEach((drop) => {
+                const droppedItem = findItem(drop.itemKey);
 
-            if(assailant instanceof Player) {
-                const itemDrops = calculateNpcDrops(assailant, npcDetails);
-                itemDrops.forEach(drop => {
-                    const droppedItem = findItem(drop.itemKey);
+                if (!droppedItem) {
+                    logger.error(
+                        `Unable to find item with key: ${drop.itemKey}`,
+                    );
 
-                    if (!droppedItem) {
-                        logger.error(`Unable to find item with key: ${drop.itemKey}`);
-                        return;
-                    }
+                    return;
+                }
 
-                    if (!drop.amount) {
-                        logger.error(`Unable to drop item with key: ${drop.itemKey} - no amount specified`);
-                        return;
-                    }
+                if (!drop.amount) {
+                    logger.error(
+                        `Unable to drop item with key: ${drop.itemKey} - no amount specified`,
+                    );
 
-                    activeWorld.globalInstance.spawnWorldItem({ itemId: droppedItem.gameId, amount: drop.amount },
-                        deathPosition, { owner: assailant instanceof Player ? assailant : undefined, expires: 300 });
-                })
-            }
-        });
+                    return;
+                }
+
+                activeWorld.globalInstance.spawnWorldItem(
+                    { itemId: droppedItem.gameId, amount: drop.amount },
+                    deathPosition,
+                    {
+                        owner:
+                            assailant instanceof Player ? assailant : undefined,
+                        expires: 300,
+                    },
+                );
+            });
+        }
     }
 
     public withinBounds(x: number, y: number): boolean {

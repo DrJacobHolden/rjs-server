@@ -1,6 +1,5 @@
 export * from './combat';
 export * from './dialogue';
-export * from './magic';
 export * from './pathfinding';
 export * from './prayer';
 export * from './skills';
