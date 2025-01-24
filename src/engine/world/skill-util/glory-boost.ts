@@ -1,11 +1,20 @@
 import { Player } from '@engine/world/actor/player/player';
 
+import { equipmentIndices, findItem } from '@engine/config';
+
 export function checkForGemBoost(player: Player): number {
-    if (player.isItemEquipped(1706) ||
-        player.isItemEquipped(1708) ||
-        player.isItemEquipped(1710) ||
-        player.isItemEquipped(1712)) {
-        return 86;
+    // Check if any charged glory is equipped
+    const neckSlotIndex = equipmentIndices['neck'];
+    const neckItem = player.equipment.items[neckSlotIndex];
+
+    if (!neckItem) {
+        return 256;
     }
-    return 256;
+
+    const itemConfig = findItem(neckItem.itemId);
+    if (!itemConfig || !itemConfig.key.startsWith('rs:amulet_of_glory:charged_')) {
+        return 256;
+    }
+
+    return 86;
 }
