@@ -50,9 +50,9 @@
     "homepage": "https://github.com/runejs/server#readme",
     "dependencies": {
         "@runejs/common": "2.0.2-beta.3",
-        "@runejs/filestore": "file:../rjs-filestore/lib",
-        "@runejs/login-server": "file:../rjs-login-server/lib",
-        "@runejs/update-server": "file:../rjs-update-server/lib",
+        "@runejs/filestore": "0.17.0",
+        "@runejs/login-server": "2.1.0",
+        "@runejs/update-server": "1.4.0",
         "js-yaml": "^4.1.0",
         "json5": "^2.2.3",
         "lodash": "^4.17.21",
