@@ -242,10 +242,7 @@ const spellsById: Record<number, CombatSpell> = {
     },
 };
 
-export const activate = async (
-    task: TaskExecutor<MagicOnNPCAction>,
-    elapsedTicks: number = 0,
-) => {
+export const activate = async (task: TaskExecutor<MagicOnNPCAction>) => {
     const { npc, player, buttonId: spellId } = task.actionData;
     const spell = spellsById[spellId];
 
@@ -259,19 +256,26 @@ export const activate = async (
         return;
     }
 
-    // TODO: Check we aren't already in combat and that our target isn't in combat either.
-
     if (player.skills.magic.level < spell.level) {
         player.sendMessage(
             'You do not have a high enough magic level to cast this spell.',
         );
         return task.stop();
     }
+
     // TODO: Check runes
     // TODO: Check LOS
 
-    // Start casting the spell.
-    if (task.session.combatTick == null) {
+    // Here we gooooooo! 🚀
+    if (task.session.targetLock == null) {
+        // 3000ms is the attack time for all spells.
+        const targetLock = npc.maybeGetTargetLock(3000);
+        if (!targetLock) {
+            player.sendMessage('Unable to acquire target lock.');
+            return task.stop();
+        }
+
+        task.session.targetLock = targetLock;
         task.session.combatTick = 0;
 
         player.face(npc, true, false, true);
@@ -290,7 +294,7 @@ export const activate = async (
     // Start using the session to track the combat ticks.
     task.session.combatTick++;
 
-    // Fire projectile
+    // Fire the laser! ☄️
     if (task.session.combatTick === 2) {
         const attackerX = player.position.x;
         const attackerY = player.position.y;
@@ -315,49 +319,17 @@ export const activate = async (
         return;
     }
 
+    // TODO: Check attack v defence and maybe splash.
+
     // Calculate damage and apply.
     if (task.session.combatTick === 4) {
-        const currentHitpoints = npc.skills.hitpoints.level;
-        let hit = Math.round(Math.random() * spell.maxHit);
-        if (hit > currentHitpoints) {
-            hit = currentHitpoints;
-        }
-
-        const updatedHitpoints = currentHitpoints - hit;
-
-        if (hit === 0) {
-            npc.updateFlags.addDamage(
-                hit,
-                DamageType.NO_DAMAGE,
-                updatedHitpoints,
-                5, // TODO: Hardcoded to Goblin max health - NPC max health is not available.
-            );
-            // TODO: Not currently working (I think?)
-            npc.playGraphics({ id: SPLASH_GFX, delay: 0, height: 100 });
-        } else {
-            player.skills.magic.addExp(spell.baseExperience);
-
-            npc.skills.setHitpoints(updatedHitpoints);
-            npc.updateFlags.addDamage(
-                hit,
-                DamageType.DAMAGE,
-                updatedHitpoints,
-                5, // TODO: Hardcoded to Goblin max health - NPC max health is not available.
-            );
-            // TODO: Not currently working (I think?)
-            npc.playGraphics({ id: spell.endGfx, delay: 0, height: 100 });
-
-            // Kill.
-            if (updatedHitpoints <= 0) {
-                npc.processDeath(player, npc);
-                // Lazily kill the NPC after death.
-                setTimeout(() => {
-                    npc.kill();
-                }, 1000);
-            }
-        }
-
-        task.stop();
+        const hit = Math.round(Math.random() * spell.maxHit);
+        // Experience is calculated as 2 * hit + a base for casting the spell.
+        player.skills.magic.addExp(spell.baseExperience + hit * 2);
+        // TODO: Playing graphics against NPCs doesn't seem to work :(
+        npc.playGraphics({ id: spell.endGfx, delay: 0, height: 100 });
+        npc.hit(task.session.targetLock, player, hit);
+        return task.stop();
     }
 };
 

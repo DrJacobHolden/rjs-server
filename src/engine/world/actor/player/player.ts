@@ -366,9 +366,6 @@ export class Player extends Actor {
         this.ignoreList.splice(index, 1);
         return true;
     }
-    public onNpcKill(npc: Npc) {
-        console.log('killed npc');
-    }
     /**
      * Should be fired whenever the player's chunk changes. This will fire off chunk updates for all chunks not
      * already tracked by the player - all the new chunks that are coming into view.
