@@ -145,19 +145,16 @@ export class World {
         let tileModifications;
         let personalTileModifications;
 
-        if (actor.isPlayer) {
-            const instance = (actor as Player).instance;
+        if (actor.isPlayer()) {
+            const instance = actor.instance;
 
             if (!instance) {
-                throw new Error(
-                    `Player ${(actor as Player).username} has no instance.`,
-                );
+                throw new Error(`Player ${actor.username} has no instance.`);
             }
 
             tileModifications = instance.getTileModifications(objectPosition);
-            personalTileModifications = (
-                actor as Player
-            ).personalInstance.getTileModifications(objectPosition);
+            personalTileModifications =
+                actor.personalInstance.getTileModifications(objectPosition);
         } else {
             tileModifications =
                 this.globalInstance.getTileModifications(objectPosition);
@@ -169,7 +166,7 @@ export class World {
         if (!landscapeObject) {
             const tileObjects = [...tileModifications.mods.spawnedObjects];
 
-            if (actor.isPlayer) {
+            if (actor.isPlayer()) {
                 tileObjects.push(
                     ...personalTileModifications.mods.spawnedObjects,
                 );
@@ -192,7 +189,7 @@ export class World {
 
         const hiddenTileObjects = [...tileModifications.mods.hiddenObjects];
 
-        if (actor.isPlayer) {
+        if (actor.isPlayer()) {
             hiddenTileObjects.push(
                 ...personalTileModifications.mods.hiddenObjects,
             );

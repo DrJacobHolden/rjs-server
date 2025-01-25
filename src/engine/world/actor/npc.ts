@@ -10,6 +10,7 @@ import {
     activeWorld,
 } from '@engine/world';
 import {
+    DropTable,
     findItem,
     findNpc,
     NpcCombatAnimations,
@@ -22,6 +23,8 @@ import { Actor } from './actor';
 import { Player } from './player';
 import { SkillName } from './skills';
 import { logger } from '@runejs/common';
+import { getTargetLock, TargetLock } from './combat';
+import { DamageType } from './update-flags';
 
 /**
  * Represents a non-player character within the game world.
@@ -43,8 +46,6 @@ export class Npc extends Actor {
         turnRight?: number;
         stand?: number;
     };
-    //ToDo: this should either be calculated by the level or from a config
-    public experienceValue: number = 10;
     public npcEvents: EventEmitter = new EventEmitter();
 
     private _name: string;
@@ -54,6 +55,7 @@ export class Npc extends Actor {
     private _exists: boolean = true;
     private npcSpawn: NpcSpawn;
     private _initialized: boolean = false;
+    private isDying: boolean = false;
 
     public constructor(
         npcDetails: NpcDetails | number,
@@ -140,62 +142,6 @@ export class Npc extends Actor {
         this._initialized = true;
     }
 
-    //This is useful so that we can tie into things like "spell casts" or events, or traps, etc to finish quests or whatever
-    public async processDeath(assailant: Actor, defender: Actor) {
-        const deathPosition = defender.position;
-
-        let deathAnim: number = animationIds.death;
-        deathAnim =
-            findNpc((defender as Npc).id)?.combatAnimations?.death ||
-            animationIds.death;
-
-        defender.playAnimation(deathAnim);
-        activeWorld.playLocationSound(
-            deathPosition,
-            defender.instance.instanceId,
-            soundIds.npc.human.maleDeath,
-            5,
-        );
-        const npcDetails = findNpc((defender as Npc).id);
-
-        if (!npcDetails || !npcDetails.dropTable) {
-            return;
-        }
-
-        if (assailant instanceof Player) {
-            const itemDrops = calculateNpcDrops(assailant, npcDetails);
-            itemDrops.forEach((drop) => {
-                const droppedItem = findItem(drop.itemKey);
-
-                if (!droppedItem) {
-                    logger.error(
-                        `Unable to find item with key: ${drop.itemKey}`,
-                    );
-
-                    return;
-                }
-
-                if (!drop.amount) {
-                    logger.error(
-                        `Unable to drop item with key: ${drop.itemKey} - no amount specified`,
-                    );
-
-                    return;
-                }
-
-                activeWorld.globalInstance.spawnWorldItem(
-                    { itemId: droppedItem.gameId, amount: drop.amount },
-                    deathPosition,
-                    {
-                        owner:
-                            assailant instanceof Player ? assailant : undefined,
-                        expires: 300,
-                    },
-                );
-            });
-        }
-    }
-
     public withinBounds(x: number, y: number): boolean {
         return !(
             x > this.initialPosition.x + this.movementRadius ||
@@ -205,31 +151,24 @@ export class Npc extends Actor {
         );
     }
 
-    public kill(respawn: boolean = true): void {
-        this.destroy();
-
-        activeWorld.chunkManager
-            .getChunkForWorldPosition(this.position)
-            .removeNpc(this);
-        clearInterval(this.randomMovementInterval);
-        activeWorld.deregisterNpc(this);
-
-        if (respawn) {
-            const npcDetails = findNpc(this.id);
-
-            if (!npcDetails) {
-                return;
-            }
-
-            activeWorld.scheduleNpcRespawn(new Npc(npcDetails, this.npcSpawn));
-        }
-    }
-
     public async tick(): Promise<void> {
         super.tick();
 
         return new Promise<void>((resolve) => {
             this.walkingQueue.process();
+
+            // Check if we are dead.
+            if (this.skills.hitpoints.level === 0) {
+                // We separate calls to kill and processDeath by a tick to allow
+                // the death animation to play out.
+                if (this.isDying) {
+                    this.kill();
+                } else {
+                    this.processDeath();
+                    this.isDying = true;
+                }
+            }
+
             resolve();
         });
     }
@@ -353,26 +292,197 @@ export class Npc extends Actor {
     public get instanceId(): string | null {
         return this.instance?.instanceId ?? null;
     }
+
+    // COMBAT STUFF
+    // TODO: Move generic stuff up to Actor or create a new "Combatant" type of Actor or
+    // whatever Object-Oriented thingy people like.
+
+    /**
+     * Set by {@link maybeGetTargetLock} - outside of multi-combat zones a targetLock is needed to execute
+     * any hostile action against this actor.
+     */
+    private targetLock?: TargetLock;
+    /**
+     * Attempts to generate a target lock against the current actor and returns it.
+     *
+     * Will return false if an existing target lock is already in place.
+     *
+     * This might seem over-complicated but we need to validate that both Actors involved in combat
+     * are allowed to participate in the combat before it may begin. For this reason we need to use
+     * a lock to prevent getting into invalid states.
+     *
+     * @param lockTimeout - number - the time in ms in which the lock will expire, set this to the
+     * time it takes for attack to complete.
+     */
+    public maybeGetTargetLock(lockTimeoutMs: number): TargetLock | false {
+        if (this.targetLock?.isValid()) {
+            // Deny if there is an existing, valid target lock.
+            return false;
+        }
+
+        this.targetLock = getTargetLock(lockTimeoutMs);
+        return this.targetLock;
+    }
+
+    /** Stores a record of hit damage and the player to later determine drops. */
+    private playerHits: [username: string, damage: number][] = [];
+    public hit(targetLock: TargetLock, attacker: Actor, damage: number) {
+        if (
+            !this.targetLock ||
+            !targetLock.isValid() ||
+            this.targetLock.lockId !== targetLock.lockId
+        ) {
+            throw new Error(
+                'A targetLock from maybeGetTargetLock must be provided before hitting this actor.',
+            );
+        }
+
+        const currentHitpoints = this.skills.hitpoints.level;
+        let nextHitpoints = currentHitpoints - damage;
+        nextHitpoints = nextHitpoints > 0 ? nextHitpoints : 0;
+        const finalDamage = nextHitpoints > 0 ? damage : currentHitpoints;
+
+        if (finalDamage === 0) {
+            this.updateFlags.addDamage(
+                0,
+                DamageType.NO_DAMAGE,
+                currentHitpoints,
+                5, // TODO: Hardcoded to Goblin max health - NPC max health is not available.
+            );
+        } else {
+            this.skills.setHitpoints(nextHitpoints);
+            this.updateFlags.addDamage(
+                finalDamage,
+                DamageType.DAMAGE,
+                nextHitpoints,
+                5, // TODO: Hardcoded to Goblin max health - NPC max health is not available.
+            );
+
+            if (attacker.isPlayer()) {
+                this.playerHits.push([attacker.username, finalDamage]);
+            }
+        }
+    }
+
+    // TODO: This should be part of the Actor abstraction (players can die too yo!)
+    private processDeath() {
+        // TODO: Why aren't the npcDetails accesible via `this`?
+        const npcDetails = findNpc(this.id);
+        if (npcDetails == null) {
+            throw new Error(
+                `Unable to find details for NPC with ID: ${this.id}`,
+            );
+        }
+
+        // Play the custom death animation if found otherwise use the default.
+        this.playAnimation(
+            npcDetails.combatAnimations?.death || animationIds.death,
+        );
+
+        // Play the sound of death
+        // TODO: Replace with NPC specific death sound.
+        this.playSound(soundIds.npc.human.maleDeath, 5);
+
+        // Drop handling - drops are awarded to the player-type damage source
+        // which contributed the most damage to the NPC.
+
+        if (!npcDetails.dropTable) {
+            // Short circuit if this NPC doesn't drop anything.
+            return;
+        }
+
+        if (this.playerHits.length === 0) {
+            // We were killed by something other than a player(s)... mysterious.
+            return;
+        }
+
+        // Determine which player did the most damage.
+        const countMap: { [username: string]: number } = {};
+        let maxCount = 0;
+        let maxUsername = this.playerHits[0][0];
+
+        this.playerHits.forEach(([username, count]) => {
+            countMap[username] = (countMap[username] || 0) + count;
+            if (countMap[username] > maxCount) {
+                maxCount = countMap[username];
+                maxUsername = username;
+            }
+        });
+
+        const dropOwner = activeWorld.findActivePlayerByUsername(maxUsername);
+
+        if (!dropOwner) {
+            logger.warn('NPC drops skipped as receiving player was not found.');
+            return;
+        }
+
+        const deathPosition = this.position;
+        const itemDrops = calculateNpcDropsForPlayer(
+            npcDetails.dropTable,
+            dropOwner,
+        );
+
+        itemDrops.forEach((drop) => {
+            const droppedItem = findItem(drop.itemKey);
+
+            if (!droppedItem) {
+                logger.error(`Unable to find item with key: ${drop.itemKey}`);
+                return;
+            }
+
+            if (!drop.amount) {
+                logger.error(
+                    `Unable to drop item with key: ${drop.itemKey} - no amount specified`,
+                );
+                return;
+            }
+
+            activeWorld.globalInstance.spawnWorldItem(
+                { itemId: droppedItem.gameId, amount: drop.amount },
+                deathPosition,
+                {
+                    owner: dropOwner,
+                    expires: 300,
+                },
+            );
+        });
+    }
+
+    // TODO: This should be part of the Actor abstraction (players can die too yo!)
+    private kill(respawn: boolean = true): void {
+        this.destroy();
+
+        activeWorld.chunkManager
+            .getChunkForWorldPosition(this.position)
+            .removeNpc(this);
+        clearInterval(this.randomMovementInterval);
+        activeWorld.deregisterNpc(this);
+
+        if (respawn) {
+            const npcDetails = findNpc(this.id);
+
+            if (!npcDetails) {
+                return;
+            }
+
+            activeWorld.scheduleNpcRespawn(new Npc(npcDetails, this.npcSpawn));
+        }
+    }
 }
 
 /**
  * A basic attempt at handling the odds of receiving an item from an NPCs DropTable.
  *
  * This method gets the odds defined in the DropTable, and rolls a random number to see if the odds are met.
- * Also checks whether or not the drop has a quest requirement, and accounts for that.
+ * Also checks whether or not the player has met any quest requirements for the drop.
  *
- * @param player The player receiving the drop.
- * @param npcDetails The NpcDetails of the NPC that contains the DropTable data.
+ * TODO: This isn't _really_ the concern of the NPC, it's dead at this point lol.
  */
-export function calculateNpcDrops(
+export function calculateNpcDropsForPlayer(
+    npcDropTable: DropTable[],
     player: Player,
-    npcDetails: NpcDetails,
 ): { itemKey: string; amount?: number }[] {
     const itemDrops: { itemKey: string; amount?: number }[] = [];
-    const npcDropTable = npcDetails.dropTable;
-    if (!npcDropTable) {
-        return itemDrops;
-    }
 
     npcDropTable.forEach((drop) => {
         let meetsQuestRequirements = true;
@@ -415,7 +525,6 @@ export function calculateNpcDrops(
  * @param max The largest value to generate to.
  * @param min The smallest value to generate from.
  */
-
 function getRandomInt(max, min = 1): number {
     return Math.floor(Math.random() * max) + min;
 }
