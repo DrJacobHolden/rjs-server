@@ -4,7 +4,7 @@ import { equipmentIndices, findItem } from '@engine/config';
 
 export function checkForGemBoost(player: Player): number {
     // Check if any charged glory is equipped
-    const neckSlotIndex = equipmentIndices['neck'];
+    const neckSlotIndex = equipmentIndices.neck;
     const neckItem = player.equipment.items[neckSlotIndex];
 
     if (!neckItem) {

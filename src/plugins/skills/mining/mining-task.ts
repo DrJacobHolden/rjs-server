@@ -61,7 +61,7 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
     }
 
     private hasChargedGlory(): boolean {
-        const neckSlotIndex = equipmentIndices['neck']; // This is 2
+        const neckSlotIndex = equipmentIndices.neck; // This is 2
         const neckItem = this.actor.equipment.items[neckSlotIndex];
         if (!neckItem) {
             return false;
