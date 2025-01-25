@@ -67,19 +67,19 @@ import {
     defaultSettings,
     loadPlayerSave,
     playerExists,
-    PlayerSave,
     PlayerSettings,
     savePlayerData,
 } from './player-data';
 import { Cutscene } from './cutscenes';
 import { InterfaceState } from '@engine/interface';
-import { Quest } from './quest';
 import { SendMessageOptions } from './model';
 import { PlayerSyncTask, NpcSyncTask } from './sync';
 import { dialogue } from '../dialogue';
 import { Npc } from '../npc';
 import { SkillName } from '../skills';
 import { PlayerMetadata } from './metadata';
+import { TargetLock } from '../combat';
+import { DamageType } from '../update-flags';
 
 export const playerOptions: {
     option: string;
@@ -528,6 +528,7 @@ export class Player extends Actor {
         this._nearbyChunks = nearbyChunks;
     }
 
+    private deathTick = 0;
     public async tick(): Promise<void> {
         super.tick();
 
@@ -548,6 +549,27 @@ export class Player extends Actor {
                     }
                 } else {
                     this.outgoingPackets.updateCurrentMapChunk();
+                }
+            }
+
+            // Check if we are dead.
+            if (this.skills.hitpoints.level <= 0) {
+                this.deathTick++;
+
+                if (this.deathTick === 1) {
+                    this.sendMessage('Oh dear, you are dead!');
+                    this.playAnimation(animationIds.death);
+                    this.clearFaceActor();
+                } else if (this.deathTick === 3) {
+                    // Seems we must stop the animations a tick before
+                    // teleporting or the teleport breaks :shrug: doesn't
+                    // look the best but it seems the best we can do for now.
+                    this.stopAnimation();
+                } else if (this.deathTick >= 4) {
+                    // Reset hitpoints and death tick so we are ready to die again.
+                    this.deathTick = 0;
+                    this.skills.setHitpoints(this.skills.hitpoints.levelForExp);
+                    this.teleport(new Position(3224, 3218));
                 }
             }
 
@@ -1761,6 +1783,40 @@ export class Player extends Actor {
 
         this.quadtreeKey = { x: position.x, y: position.y, actor: this };
         activeWorld.playerTree.push(this.quadtreeKey);
+    }
+
+    public hit(targetLock: TargetLock, attacker: Actor, damage: number) {
+        if (
+            !this.targetLock ||
+            !targetLock.isValid() ||
+            this.targetLock.lockId !== targetLock.lockId
+        ) {
+            throw new Error(
+                'A targetLock from maybeGetTargetLock must be provided before hitting this actor.',
+            );
+        }
+
+        const currentHitpoints = this.skills.hitpoints.level;
+        let nextHitpoints = currentHitpoints - damage;
+        nextHitpoints = nextHitpoints > 0 ? nextHitpoints : 0;
+        const finalDamage = nextHitpoints > 0 ? damage : currentHitpoints;
+
+        if (finalDamage === 0) {
+            this.updateFlags.addDamage(
+                0,
+                DamageType.NO_DAMAGE,
+                currentHitpoints,
+                this.skills.hitpoints.levelForExp,
+            );
+        } else {
+            this.skills.setHitpoints(nextHitpoints);
+            this.updateFlags.addDamage(
+                finalDamage,
+                DamageType.DAMAGE,
+                nextHitpoints,
+                this.skills.hitpoints.levelForExp,
+            );
+        }
     }
 
     public get position(): Position {
