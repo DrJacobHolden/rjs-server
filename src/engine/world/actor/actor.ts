@@ -1,8 +1,18 @@
 import { Subject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 
-import { DefensiveBonuses, OffensiveBonuses, SkillBonuses } from '@engine/config';
-import { activeWorld, directionFromIndex, Position, WorldInstance } from '@engine/world';
+import {
+    DefensiveBonuses,
+    findNpc,
+    OffensiveBonuses,
+    SkillBonuses,
+} from '@engine/config';
+import {
+    activeWorld,
+    directionFromIndex,
+    Position,
+    WorldInstance,
+} from '@engine/world';
 import { Item, ItemContainer } from '@engine/world/items';
 import { ActionCancelType, ActionPipeline } from '@engine/action';
 
@@ -13,10 +23,10 @@ import { Pathfinding } from './pathfinding';
 import { ActorMetadata } from './metadata';
 import { Task, TaskScheduler } from '@engine/task';
 import { logger } from '@runejs/common';
-import { ObjectConfig } from '@runejs/filestore';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
 import type { Player } from './player';
 import type { Npc } from './npc';
+import { getTargetLock, TargetLock } from './combat';
 
 
 export type ActorType = 'player' | 'npc';
@@ -74,8 +84,12 @@ export abstract class Actor {
     private _runDirection: number;
     private _faceDirection: number;
     private _bonuses: { offensive: OffensiveBonuses, defensive: DefensiveBonuses, skill: SkillBonuses };
-
     private readonly scheduler = new TaskScheduler();
+    /**
+     * Set by {@link maybeGetTargetLock} - outside of multi-combat zones a targetLock is needed to execute
+     * any hostile action against this actor.
+     */
+    protected targetLock?: TargetLock;
 
     protected constructor(actorType: ActorType) {
         this.type = actorType;
@@ -86,6 +100,12 @@ export abstract class Actor {
     }
 
     public abstract equals(actor: Actor): boolean;
+
+    public abstract hit(
+        targetLock: TargetLock,
+        attacker: Actor,
+        damage: number,
+    ): void;
 
     /**
      * Instantiate a task with the Actor instance and a set of arguments.
@@ -160,8 +180,8 @@ export abstract class Actor {
         };
     }
 
-    public async moveBehind(target: Actor): Promise<boolean> {
-        if(this.position.level !== target.position.level) {
+    public moveBehind(target: Actor): boolean {
+        if (this.position.level !== target.position.level) {
             return false;
         }
 
@@ -178,7 +198,7 @@ export abstract class Actor {
             ignoreDestination = false;
         }
 
-        await this.pathfinding.walkTo(desiredPosition, {
+        this.pathfinding.walkTo(desiredPosition, {
             pathingSearchRadius: distance + 2,
             ignoreDestination
         });
@@ -186,8 +206,8 @@ export abstract class Actor {
         return true;
     }
 
-    public async moveTo(target: Actor): Promise<boolean> {
-        if(this.position.level !== target.position.level) {
+    public moveTo(target: Actor): boolean {
+        if (this.position.level !== target.position.level) {
             return false;
         }
 
@@ -197,7 +217,7 @@ export abstract class Actor {
             return false;
         }
 
-        await this.pathfinding.walkTo(target.position, {
+        this.pathfinding.walkTo(target.position, {
             pathingSearchRadius: distance + 2,
             ignoreDestination: true
         });
@@ -227,10 +247,11 @@ export abstract class Actor {
         });
     }
 
-    public async walkTo(target: Actor): Promise<boolean>;
-    public async walkTo(position: Position): Promise<boolean>;
-    public async walkTo(target: Actor | Position): Promise<boolean> {
-        const desiredPosition = target instanceof Position ? target : target.position;
+    public walkTo(target: Actor): boolean;
+    public walkTo(position: Position): boolean;
+    public walkTo(target: Actor | Position): boolean {
+        const desiredPosition =
+            target instanceof Position ? target : target.position;
 
         const distance = Math.floor(this.position.distanceBetween(desiredPosition));
 
@@ -244,7 +265,7 @@ export abstract class Actor {
             return false;
         }
 
-        await this.pathfinding.walkTo(desiredPosition, {
+        this.pathfinding.walkTo(desiredPosition, {
             pathingSearchRadius: distance + 2,
             ignoreDestination: true
         });
@@ -489,6 +510,55 @@ export abstract class Actor {
         this.scheduler.tick();
     }
 
+
+    public isPlayer(): this is Player {
+        return this.type === 'player';
+    }
+
+    public isNpc(): this is Npc {
+        return this.type === 'npc';
+    }
+
+    /**
+     * Attempts to generate a target lock against the current actor and returns it.
+     *
+     * Will return false if an existing target lock is already in place.
+     *
+     * This might seem over-complicated but we need to validate that both Actors involved in combat
+     * are allowed to participate in the combat before it may begin. For this reason we need to use
+     * a lock to prevent getting into invalid states.
+     *
+     * @param lockTimeout - number - the time in ms in which the lock will expire, set this to the
+     * time it takes for attack to complete.
+     */
+    public maybeGetTargetLock(lockTimeoutMs: number): TargetLock | false {
+        if (this.isNpc()) {
+            const npcDetails = findNpc(this.id);
+            if (!npcDetails) {
+                console.warn('Unable to find NPC details for NPC ID:', this.id);
+                return false;
+            }
+
+            if (!npcDetails.killable) {
+                // Block target locks against non-killable NPCs
+                return false;
+            }
+        }
+
+        if (this.targetLock?.isValid()) {
+            // Deny if there is an existing, valid target lock.
+            return false;
+        }
+
+        if (this.skills.hitpoints.level <= 0) {
+            // Deny if the actor has no hitpoints.
+            return false;
+        }
+
+        this.targetLock = getTargetLock(lockTimeoutMs);
+        return this.targetLock;
+    }
+
     public get position(): Position {
         return this._position;
     }
@@ -555,14 +625,6 @@ export abstract class Actor {
 
     public set instance(value: WorldInstance | null) {
         this._instance = value;
-    }
-
-    public isPlayer(): this is Player {
-        return this.type === 'player';
-    }
-
-    public isNpc(): this is Npc {
-        return this.type === 'npc';
     }
 
     public get bonuses(): { offensive: OffensiveBonuses, defensive: DefensiveBonuses, skill: SkillBonuses } {

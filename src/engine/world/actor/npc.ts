@@ -23,7 +23,7 @@ import { Actor } from './actor';
 import { Player } from './player';
 import { SkillName } from './skills';
 import { logger } from '@runejs/common';
-import { getTargetLock, TargetLock } from './combat';
+import { TargetLock } from './combat';
 import { DamageType } from './update-flags';
 
 /**
@@ -56,15 +56,26 @@ export class Npc extends Actor {
     private _exists: boolean = true;
     private npcSpawn: NpcSpawn;
     private _initialized: boolean = false;
-    private isDying: boolean = false;
     /**
-     * Set by {@link maybeGetTargetLock} - outside of multi-combat zones a targetLock is needed to execute
-     * any hostile action against this actor.
+     * Set when an NPC's health reaches zero - when true - indicates that the NPC will be
+     * destroyed on the next tick.
      */
-    private targetLock?: TargetLock;
+    private isDying: boolean = false;
     /** Stores a record of hit damage and the player to later determine drops. */
     private playerHits: [username: string, damage: number][] = [];
-
+    /**
+     * Tracks the actor, if any, which most recently hit the NPC.
+     *
+     * Each tick, if {@link attackingActor} is not set - we will attempt to path
+     * towards this Actor to attack them when in range.
+     */
+    private underAttackBy?: Actor;
+    /** State for any attack which is in progress. */
+    private attackInProgress?: {
+        combatTick: number;
+        targetLock: TargetLock;
+        victim: Actor;
+    };
     public constructor(npcDetails: NpcDetails | number, npcSpawn: NpcSpawn, instance: WorldInstance | null = null) {
         super('npc');
 
@@ -147,9 +158,7 @@ export class Npc extends Actor {
     public async tick(): Promise<void> {
         super.tick();
 
-        return new Promise<void>(resolve => {
-            this.walkingQueue.process();
-
+        return new Promise<void>((resolve) => {
             // Check if we are dead.
             if (this.skills.hitpoints.level === 0) {
                 // We separate calls to kill and processDeath by a tick to allow
@@ -160,9 +169,75 @@ export class Npc extends Actor {
                     this.processDeath();
                     this.isDying = true;
                 }
+
+                // We are dead and shouldn't bother doing anything else.
+                return resolve();
             }
 
-            resolve();
+            // If we were attacked in the last tick and are not already mid-attack
+            if (this.underAttackBy && !this.attackInProgress) {
+                const victim = this.underAttackBy;
+
+                // TODO: Currently this is hardcoded to the goblin's attack
+                // range and means if you are on a diagonal you can avoid the attack.
+                if (this.position.distanceBetween(victim.position) === 1) {
+                    // TODO: 1600 is hardcoded to the attack speed of the goblin (4 ticks).
+                    const targetLock = victim.maybeGetTargetLock(1600);
+                    // Cleared for lift-off
+                    if (targetLock) {
+                        this.attackInProgress = {
+                            combatTick: 0,
+                            targetLock,
+                            victim,
+                        };
+                    } else {
+                        // We aren't allowed to attack this target so give up.
+                        this.clearFaceActor();
+                        this.underAttackBy = undefined;
+                    }
+                } else if (
+                    this.withinBounds(victim.position.x, victim.position.y)
+                ) {
+                    this.moveTo(victim);
+                } else {
+                    // The target is outside of our movement area and so we
+                    // cannot attack it.
+                    this.clearFaceActor();
+                    this.underAttackBy = undefined;
+                    // TODO: Attempt to run away from the player.
+                }
+            }
+
+            if (this.attackInProgress) {
+                this.attackInProgress.combatTick++;
+                const { combatTick, targetLock, victim } =
+                    this.attackInProgress;
+
+                if (combatTick === 1) {
+                    this.face(victim, true);
+
+                    this.playAnimation({
+                        id: 309, // TODO: Hardcoded to Goblin attack animation.
+                        delay: 20,
+                    });
+                    // TODO: 3 is hardcoded to the attack speed of the goblin (4 ticks).
+                } else if (combatTick === 3) {
+                    victim.hit(
+                        targetLock,
+                        this,
+                        // TODO: Hardcoded to a max hit of 10
+                        Math.round(Math.random() * 10),
+                    );
+                    this.attackInProgress = undefined;
+                    // This is to attempt to ensure we keep attacking
+                    // the same person in multi-combat scenarios.
+                    this.underAttackBy = victim;
+                }
+            }
+
+            this.walkingQueue.process();
+
+            return resolve();
         });
     }
 
@@ -238,28 +313,6 @@ export class Npc extends Actor {
     // TODO: Move generic stuff up to Actor or create a new "Combatant" type of Actor or
     // whatever Object-Oriented thingy people like.
 
-    /**
-     * Attempts to generate a target lock against the current actor and returns it.
-     *
-     * Will return false if an existing target lock is already in place.
-     *
-     * This might seem over-complicated but we need to validate that both Actors involved in combat
-     * are allowed to participate in the combat before it may begin. For this reason we need to use
-     * a lock to prevent getting into invalid states.
-     *
-     * @param lockTimeout - number - the time in ms in which the lock will expire, set this to the
-     * time it takes for attack to complete.
-     */
-    public maybeGetTargetLock(lockTimeoutMs: number): TargetLock | false {
-        if (this.targetLock?.isValid()) {
-            // Deny if there is an existing, valid target lock.
-            return false;
-        }
-
-        this.targetLock = getTargetLock(lockTimeoutMs);
-        return this.targetLock;
-    }
-
     public hit(targetLock: TargetLock, attacker: Actor, damage: number) {
         if (
             !this.targetLock ||
@@ -270,6 +323,8 @@ export class Npc extends Actor {
                 'A targetLock from maybeGetTargetLock must be provided before hitting this actor.',
             );
         }
+
+        this.underAttackBy = attacker;
 
         const currentHitpoints = this.skills.hitpoints.level;
         let nextHitpoints = currentHitpoints - damage;

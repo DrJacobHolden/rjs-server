@@ -53,9 +53,6 @@ const magicOnNpcActionPipe = (
     widgetId: number,
     buttonId: number,
 ): RunnableHooks<MagicOnNPCAction> => {
-    console.info(`pew pew you use magic on ${npc.worldIndex}!`);
-
-    // Find all object action plugins that reference this location object
     const matchingHooks = getActionHooks<MagicOnNPCActionHook>('magic_on_npc');
 
     return {
