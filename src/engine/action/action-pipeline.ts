@@ -1,11 +1,9 @@
 import { Subscription } from 'rxjs';
 
 import { logger } from '@runejs/common';
-import { LandscapeObject } from '@runejs/filestore';
 
 import { Actor, Player } from '@engine/world/actor';
 import { ActionHook, TaskExecutor } from '@engine/action';
-import { Position } from '@engine/world';
 
 /**
  * The priority of an queueable action within the pipeline.
@@ -16,6 +14,7 @@ export type ActionStrength = 'weak' | 'normal' | 'strong';
  * Content action type definitions.
  */
 export type ActionType =
+    | 'attack'
     | 'button'
     | 'widget_interaction'
     | 'npc_init'

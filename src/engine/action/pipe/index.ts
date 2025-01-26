@@ -1,3 +1,4 @@
+export * from './attack.action';
 export * from './button.action';
 export * from './equipment-change.action';
 export * from './item-interaction.action';

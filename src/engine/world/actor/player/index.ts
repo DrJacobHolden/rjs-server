@@ -1,6 +1,5 @@
 export * from './sync';
 export * from './achievements';
-export * from './attack';
 export * from './cutscenes';
 export * from './model';
 export * from './player';
