@@ -322,7 +322,6 @@ export const activate = async (task: TaskExecutor<MagicOnNPCAction>) => {
         const hit = Math.round(Math.random() * spell.maxHit);
         // Experience is calculated as 2 * hit + a base for casting the spell.
         player.skills.magic.addExp(spell.baseExperience + hit * 2);
-        // TODO: Playing graphics against NPCs doesn't seem to work :(
         npc.playGraphics({ id: spell.endGfx, delay: 0, height: 100 });
         npc.hit(task.session.targetLock, player, hit);
         return task.stop();

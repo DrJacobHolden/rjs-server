@@ -76,6 +76,9 @@ export class Npc extends Actor {
         targetLock: TargetLock;
         victim: Actor;
     };
+
+    /** Starts incrementing once the NPC's health reaches 0. */
+    private deathTick = 0;
     public constructor(npcDetails: NpcDetails | number, npcSpawn: NpcSpawn, instance: WorldInstance | null = null) {
         super('npc');
 
@@ -160,16 +163,17 @@ export class Npc extends Actor {
 
         return new Promise<void>((resolve) => {
             // Check if we are dead.
-            if (this.skills.hitpoints.level === 0) {
-                // We separate calls to kill and processDeath by a tick to allow
-                // the death animation to play out.
-                if (this.isDying) {
-                    this.kill();
-                } else {
+            if (this.skills.hitpoints.level <= 0) {
+                // Skip a tick so that the death animation doesn't conflict with the last attack.
+                if (this.deathTick === 1) {
                     this.processDeath();
-                    this.isDying = true;
                 }
 
+                if (this.deathTick >= 3) {
+                    this.kill();
+                }
+
+                this.deathTick++;
                 // We are dead and shouldn't bother doing anything else.
                 return resolve();
             }
