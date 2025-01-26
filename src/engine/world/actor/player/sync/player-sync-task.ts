@@ -116,7 +116,7 @@ export class PlayerSyncTask extends SyncTask<void> {
         if(updateFlags.chatMessages.length !== 0) {
             mask |= 0x8;
         }
-        if(updateFlags.faceActor !== undefined) {
+        if (updateFlags.faceActor !== null) {
             mask |= 0x4;
         }
         if(updateFlags.facePosition) {
@@ -165,13 +165,12 @@ export class PlayerSyncTask extends SyncTask<void> {
             }
         }
 
-        if(updateFlags.faceActor !== undefined) {
-            const actor = updateFlags.faceActor;
-
-            if(actor === null) {
+        if (updateFlags.faceActor !== null) {
+            if (updateFlags.faceActor === 'CLEAR') {
                 // Reset faced actor
                 updateMaskData.put(65535, 'SHORT');
             } else {
+                const actor = updateFlags.faceActor;
                 let worldIndex = actor.worldIndex;
 
                 if(actor instanceof Player) {

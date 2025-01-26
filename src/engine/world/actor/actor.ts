@@ -301,8 +301,8 @@ export abstract class Actor {
     }
 
     public clearFaceActor(): void {
-        if(this.metadata.faceActor) {
-            this.updateFlags.faceActor = null;
+        if (this.metadata.faceActor) {
+            this.updateFlags.faceActor = 'CLEAR';
             this.metadata.faceActor = undefined;
         }
     }
