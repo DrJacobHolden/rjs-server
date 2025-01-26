@@ -1,11 +1,9 @@
 import { Subscription } from 'rxjs';
 
 import { logger } from '@runejs/common';
-import { LandscapeObject } from '@runejs/filestore';
 
 import { Actor, Player } from '@engine/world/actor';
 import { ActionHook, TaskExecutor } from '@engine/action';
-import { Position } from '@engine/world';
 
 
 /**
@@ -18,7 +16,8 @@ export type ActionStrength = 'weak' | 'normal' | 'strong';
  * Content action type definitions.
  */
 export type ActionType =
-    'button'
+    | 'attack'
+    | 'button'
     | 'widget_interaction'
 
     | 'npc_init'

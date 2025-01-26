@@ -67,7 +67,17 @@ const npcInteractionPacket = (player: Player, packet: PacketData) => {
         return;
     }
 
-    player.actionPipeline.call('npc_interaction', player, npc, position, optionName.toLowerCase());
+    if (optionName.toLowerCase() === 'attack') {
+        player.actionPipeline.call('attack', player, npc);
+    } else {
+        player.actionPipeline.call(
+            'npc_interaction',
+            player,
+            npc,
+            position,
+            optionName.toLowerCase(),
+        );
+    }
 };
 
 export default [{
