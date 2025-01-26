@@ -122,13 +122,13 @@ export class NpcSyncTask extends SyncTask<void> {
         if (updateFlags.appearanceUpdateRequired) {
             mask |= 0x80;
         }
-        if (updateFlags.faceActor !== undefined) {
+        if (updateFlags.faceActor !== null) {
             mask |= 0x4;
         }
         if (updateFlags.chatMessages.length !== 0) {
             mask |= 0x40;
         }
-        if (updateFlags.facePosition) {
+        if (updateFlags.facePosition !== null) {
             mask |= 0x8;
         }
         if (updateFlags.animation) {
@@ -156,10 +156,10 @@ export class NpcSyncTask extends SyncTask<void> {
             putWorldIndex();
         }
 
-        if (updateFlags.faceActor !== undefined) {
+        if (updateFlags.faceActor !== null) {
             const actor = updateFlags.faceActor;
 
-            if (actor === null) {
+            if (actor === 'CLEAR') {
                 // Reset faced actor
                 updateMaskData.put(65535, 'SHORT');
             } else {
