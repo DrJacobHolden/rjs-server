@@ -135,6 +135,10 @@ export class NpcSyncTask extends SyncTask<void> {
             mask |= 0x10;
         }
 
+        if (updateFlags.graphics) {
+            mask |= 0x20;
+        }
+
         updateMaskData.put(mask, 'BYTE');
 
         let alreadyPutWorldIndex = false;
@@ -214,6 +218,13 @@ export class NpcSyncTask extends SyncTask<void> {
                 updateMaskData.put(animation.id, 'SHORT');
                 updateMaskData.put(delay);
             }
+            putWorldIndex();
+        }
+
+        if (updateFlags.graphics) {
+            const { id, delay = 0, height } = updateFlags.graphics;
+            updateMaskData.put(id, 'SHORT', 'LITTLE_ENDIAN');
+            updateMaskData.put((height << 16) | (delay & 0xffff), 'INT');
             putWorldIndex();
         }
     }

@@ -155,16 +155,17 @@ export class Npc extends Actor {
 
         return new Promise<void>((resolve) => {
             // Check if we are dead.
-            if (this.skills.hitpoints.level === 0) {
-                // We separate calls to kill and processDeath by a tick to allow
-                // the death animation to play out.
-                if (this.isDying) {
-                    this.kill();
-                } else {
+            if (this.skills.hitpoints.level <= 0) {
+                // Skip a tick so that the death animation doesn't conflict with the last attack.
+                if (this.deathTick === 1) {
                     this.processDeath();
-                    this.isDying = true;
                 }
 
+                if (this.deathTick >= 3) {
+                    this.kill();
+                }
+
+                this.deathTick++;
                 // We are dead and shouldn't bother doing anything else.
                 return resolve();
             }
@@ -360,11 +361,8 @@ export class Npc extends Actor {
     // TODO: Move generic stuff up to Actor or create a new "Combatant" type of Actor or
     // whatever Object-Oriented thingy people like.
 
-    /**
-     * Set when an NPC's health reaches zero - when true - indicates that the NPC will be
-     * destroyed on the next tick.
-     */
-    private isDying: boolean = false;
+    /** Starts incrementing once the NPC's health reaches 0. */
+    private deathTick = 0;
 
     /**
      * Tracks the actor, if any, which most recently hit the NPC.
