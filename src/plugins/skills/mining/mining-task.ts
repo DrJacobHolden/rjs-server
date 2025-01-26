@@ -1,5 +1,5 @@
 import { LandscapeObject } from '@runejs/filestore';
-import { equipmentIndices, findItem } from '@engine/config';
+import { equipmentIndices, findItem, ItemDetails } from '@engine/config';
 import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl';
 import { colors, colorText, randomBetween } from '@engine/util';
 import { Player, Skill } from '@engine/world/actor';
@@ -30,10 +30,14 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
      */
     private elapsedTicks = 0;
 
+    /** The human-readable name of the item that we are mining. */
+    private oreName: string;
+    private oreItem: ItemDetails;
     /**
-     * The name of the item that we are mining.
+     * Something is broke in the task inheritence tree and landscapeObject is
+     * never available to us :(
      */
-    private targetItemName: string;
+    private landscapeObjectProxy: LandscapeObject;
 
     constructor(
         player: Player,
@@ -47,13 +51,15 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
             typeof ore.items === 'string'
                 ? ore.items
                 : selectWeightedItem(ore.items);
-        const item = findItem(itemConfigId);
 
+        const item = findItem(itemConfigId);
         if (!item) {
             throw new Error(`Could not find item with ID ${itemConfigId}`);
         }
 
-        this.targetItemName = item.name.toLowerCase().replace(' ore', '');
+        this.landscapeObjectProxy = landscapeObject;
+        this.oreItem = item;
+        this.oreName = item.name.toLowerCase().replace(' ore', '');
     }
 
     private isGemRock(): boolean {
@@ -77,7 +83,7 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         const taskIteration = this.elapsedTicks++;
 
         // This will be null if the player is not in range of the object.
-        if (!this.landscapeObject) {
+        if (!this.landscapeObjectProxy) {
             return;
         }
 
@@ -86,6 +92,7 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
                 `You need a Mining level of ${this.ore.level} to mine this rock.`,
                 true,
             );
+            this.stop();
             return;
         }
 
@@ -93,16 +100,18 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
             this.actor.sendMessage(
                 'You do not have a pickaxe for which you have the level to use.',
             );
+            this.stop();
             return;
         }
 
         // Check if the players inventory is full, and notify them if its full.
         if (!this.actor.inventory.hasSpace()) {
             this.actor.sendMessage(
-                `Your inventory is too full to hold any more ${this.targetItemName}.`,
+                `Your inventory is too full to hold any more ${this.oreName}.`,
                 true,
             );
             this.actor.playSound(soundIds.inventoryFull);
+            this.stop();
             return;
         }
 
@@ -111,23 +120,17 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
             return;
         }
 
-        this.actor.playSound(soundIds.pickaxeSwing, 7, 0);
-        this.actor.playAnimation(this.tool.animation);
-
-        // Get tool level, and set it to 2 if the tool is an iron hatchet or iron pickaxe
-        // TODO why is this set to 2? Was ported from the old code
-        let toolLevel = this.tool.level - 1;
-        if (this.tool.itemId === 1349 || this.tool.itemId === 1267) {
-            toolLevel = 2;
-        }
-
         // roll for success
         const succeeds = canMine(
             { ...this.ore, baseChance: this.getGemMiningChance() },
-            toolLevel,
+            this.tool.level,
             this.actor.skills.mining.level,
         );
+
         if (!succeeds) {
+            // Play the sound, restart the animation and try again in a few ticks.
+            this.actor.playSound(soundIds.pickaxeSwing, 7, 0);
+            this.actor.playAnimation(this.tool.animation);
             return;
         }
 
@@ -139,21 +142,8 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
             );
             this.actor.giveItem(rollGemType());
         } else {
-            this.actor.sendMessage(
-                `You manage to mine some ${this.targetItemName}.`,
-            );
-            const itemToGive =
-                typeof this.ore.items === 'string'
-                    ? this.ore.items
-                    : selectWeightedItem(this.ore.items);
-            this.actor.giveItem(itemToGive);
-            // TODO (Jameskmonger) handle Gem rocks and Pure essence rocks
-            // if (itemToAdd === 1436 && details.player.skills.hasLevel(Skill.MINING, 30)) {
-            //     itemToAdd = 7936;
-            // }
-            // if (details.object.objectId === 2111 && details.player.skills.hasLevel(Skill.MINING, 30)) {
-            //     itemToAdd = rollGemRockResult().itemId;
-            // }
+            this.actor.sendMessage(`You manage to mine some ${this.oreName}.`);
+            this.actor.giveItem(this.oreItem.gameId);
         }
 
         this.actor.skills.addExp(Skill.MINING, this.ore.experience);
@@ -161,10 +151,10 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         // check if the rock is depleted
         if (randomBetween(0, 100) <= this.ore.break) {
             this.actor.playSound(soundIds.oreDepeleted);
-            this.actor.playAnimation(null);
+            this.actor.stopAnimation();
 
             const replacementObject = this.ore.objects.get(
-                this.landscapeObject.objectId,
+                this.landscapeObjectProxy.objectId,
             );
 
             if (replacementObject) {
@@ -174,7 +164,7 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
                 );
                 this.actor.instance.replaceGameObject(
                     replacementObject,
-                    this.landscapeObject,
+                    this.landscapeObjectProxy,
                     respawnTime,
                 );
             }
@@ -193,6 +183,10 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         return this.actor.inventory.has(this.tool.itemId);
     }
 
+    /**
+     * Returns the chance of successfully mining an ore from a rock,
+     * accomodating the special case of gem rocks.
+     */
     private getGemMiningChance(): number {
         if (!this.isGemRock()) {
             return this.ore.baseChance;
