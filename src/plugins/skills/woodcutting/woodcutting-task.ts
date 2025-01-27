@@ -1,117 +1,94 @@
-import { Skill } from '@engine/world/actor/skills';
-import { canInitiateHarvest } from '@engine/world/skill-util/harvest-skill';
-import {
-    getTreeFromHealthy,
-    IHarvestable,
-} from '@engine/world/config/harvestable-object';
 import { randomBetween } from '@engine/util/num';
 import { colorText } from '@engine/util/strings';
 import { colors } from '@engine/util/colors';
 import { rollBirdsNestType } from '@engine/world/skill-util/harvest-roll';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { findItem, findObject } from '@engine/config/config-handler';
-import { activeWorld } from '@engine/world';
+import { activeWorld, Position } from '@engine/world';
 import { canCut } from './chance';
-import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl';
 import { Player } from '@engine/world/actor';
 import { LandscapeObject } from '@runejs/filestore';
 import { logger } from '@runejs/common';
+import { Task } from '@engine/task';
+import { ObjectInteractionAction } from '@engine/action';
+import { getBestAxe } from '@engine/world/config';
+import { getTreeFromHealthy, Tree } from '@plugins/skills/woodcutting/trees';
 
-class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
-    /**
-     * The tree being cut down.
-     */
-    private treeInfo: IHarvestable;
-
-    /**
-     * The number of ticks that `execute` has been called inside this task.
-     */
+class WoodcuttingTask extends Task {
+    /** The number of ticks that `execute` has been called inside this task. */
     private elapsedTicks = 0;
 
-    /**
-     * Create a new woodcutting task.
-     *
-     * @param player The player that is attempting to cut down the tree.
-     * @param landscapeObject The object that represents the tree.
-     * @param sizeX The size of the tree in x axis.
-     * @param sizeY The size of the tree in y axis.
-     */
     constructor(
-        player: Player,
-        landscapeObject: LandscapeObject,
-        sizeX: number,
-        sizeY: number,
+        /** The player this is attempting to cut down the tree. */
+        private readonly player: Player,
+        /** The object that represents the tree. */
+        private readonly landscapeObject: LandscapeObject,
+        /** The information for the type of tree being chopped */
+        private readonly treeInfo: Tree,
+        /** The width of the tree */
+        private readonly sizeX: number,
+        /** The height of the tree */
+        private readonly sizeY: number,
     ) {
-        super(player, landscapeObject, sizeX, sizeY);
-
-        if (!landscapeObject) {
-            this.stop();
-            return;
-        }
-
-        this.treeInfo = getTreeFromHealthy(landscapeObject.objectId);
-        if (!this.treeInfo) {
-            this.stop();
-            return;
-        }
-    }
-
-    private getItemToAdd(): string | null {
-        this.actor.sendMessage(`Looking for item ${this.treeInfo.items}`);
-        if (typeof this.treeInfo.items === 'string') {
-            return this.treeInfo.items;
-        }
-
-        // Handle weighted items
-        const totalWeight = this.treeInfo.items.reduce(
-            (sum, item) => sum + item.weight,
-            0,
-        );
-        let random = randomBetween(1, totalWeight);
-
-        for (const item of this.treeInfo.items) {
-            random -= item.weight;
-            if (random <= 0) {
-                return item.itemConfigId;
-            }
-        }
-
-        return null;
+        super();
     }
 
     /**
      * Execute the main woodcutting task loop. This method is called every game tick until the task is completed.
-     *
-     * As this task extends {@link ActorLandscapeObjectInteractionTask}, it's important that the
-     * `super.execute` method is called at the start of this method.
-     *
-     * The base `execute` performs a number of checks that allow this task to function healthily.
      */
     public execute(): void {
-        super.execute();
+        if (
+            !isInChoppingRange(
+                this.player.position,
+                this.landscapeObject,
+                this.sizeX,
+                this.sizeY,
+            )
+        ) {
+            // Wait until we arrive at the tree.
+            return;
+        }
 
-        if (!this.isActive || !this.landscapeObject) {
+        if (this.player.skills.woodcutting.level < this.treeInfo.levelToChop) {
+            this.player.sendMessage(
+                `You need a Woodcutting level of ${this.treeInfo.levelToChop} to chop down this tree.`,
+                true,
+            );
+            this.stop();
+            return;
+        }
+
+        const tool = getBestAxe(this.player);
+        if (!tool) {
+            this.player.sendMessage(
+                'You do not have an axe for which you have the level to use.',
+            );
+            this.stop();
+            return;
+        }
+
+        if (!this.player.inventory.hasSpace()) {
+            this.player.sendMessage(
+                'Your inventory is too full to hold any more logs.',
+                true,
+            );
+            this.stop();
             return;
         }
 
         // store the tick count before incrementing so we don't need to keep track of it in all the separate branches
         const taskIteration = this.elapsedTicks++;
 
-        const tool = canInitiateHarvest(
-            this.actor,
-            this.treeInfo,
-            Skill.WOODCUTTING,
-        );
-
-        if (!tool) {
-            this.stop();
-            return;
-        }
-
         if (taskIteration === 0) {
-            this.actor.sendMessage('You swing your axe at the tree.');
-            this.actor.face(this.landscapeObjectPosition);
-            this.actor.playAnimation(tool.animation);
+            this.player.sendMessage('You swing your axe at the tree.');
+            this.player.face(
+                new Position(
+                    this.landscapeObject.x,
+                    this.landscapeObject.y,
+                    this.landscapeObject.level,
+                ),
+            );
+            this.player.playAnimation(tool.animation);
             // First tick / iteration should never proceed beyond this point.
             return;
         }
@@ -121,37 +98,29 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
             const randomSoundIdx = Math.floor(
                 Math.random() * soundIds.axeSwing.length,
             );
-            this.actor.playSound(soundIds.axeSwing[randomSoundIdx], 7, 0);
+            this.player.playSound(soundIds.axeSwing[randomSoundIdx], 7, 0);
         }
 
         // roll for success
         const succeeds = canCut(
             this.treeInfo,
             tool.level,
-            this.actor.skills.woodcutting.level,
+            this.player.skills.woodcutting.level,
         );
 
         if (!succeeds) {
-            this.actor.playAnimation(tool.animation);
+            this.player.playAnimation(tool.animation);
 
             // Keep chopping.
             return;
         }
 
-        const itemConfigId = this.getItemToAdd();
-        if (!itemConfigId) {
-            logger.error('Could not determine item to add from tree');
-            this.actor.sendMessage(
-                'Sorry, an error occurred. Please report this to a developer.',
-            );
-            this.stop();
-            return;
-        }
-
-        const logItem = findItem(itemConfigId);
+        const logItem = findItem(this.treeInfo.logItemName);
         if (!logItem) {
-            logger.error(`Could not find log item with id ${itemConfigId}`);
-            this.actor.sendMessage(
+            logger.error(
+                `Could not find a log matching ${this.treeInfo.logItemName}`,
+            );
+            this.player.sendMessage(
                 'Sorry, an error occurred. Please report this to a developer.',
             );
             this.stop();
@@ -161,12 +130,12 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
         const targetName = (logItem.name || '').toLowerCase();
 
         // if player doesn't have space in inventory, stop the task
-        if (!this.actor.inventory.hasSpace()) {
-            this.actor.sendMessage(
+        if (!this.player.inventory.hasSpace()) {
+            this.player.sendMessage(
                 `Your inventory is too full to hold any more ${targetName}.`,
                 true,
             );
-            this.actor.playSound(soundIds.inventoryFull);
+            this.player.playSound(soundIds.inventoryFull);
             this.stop();
             return;
         }
@@ -174,38 +143,36 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
         const roll = randomBetween(1, 256);
         // roll for bird nest chance
         if (roll === 1) {
-            this.actor.sendMessage(
+            this.player.sendMessage(
                 colorText(`A bird's nest falls out of the tree.`, colors.red),
             );
             activeWorld.globalInstance.spawnWorldItem(
                 rollBirdsNestType(),
-                this.actor.position,
-                { owner: this.actor || null, expires: 300 },
+                this.player.position,
+                { owner: this.player, expires: 300 },
             );
         } else {
             // Standard log chopper
-            this.actor.sendMessage(`You manage to chop some ${targetName}.`);
-            this.actor.giveItem(itemConfigId);
+            this.player.sendMessage(`You manage to chop some ${targetName}.`);
+            this.player.giveItem(this.treeInfo.logItemName);
         }
 
-        this.actor.skills.woodcutting.addExp(this.treeInfo.experience);
+        this.player.skills.woodcutting.addExp(this.treeInfo.expPerChop);
 
         // check if the tree should be broken
-        if (randomBetween(0, 100) <= this.treeInfo.break) {
-            // TODO (Jameskmonger) is this the correct sound?
-            this.actor.playSound(soundIds.oreDepeleted);
+        if (randomBetween(0, 100) <= this.treeInfo.breakChance) {
+            this.player.playSound(soundIds.treeChoppedDown);
 
-            const brokenTreeId = this.treeInfo.objects.get(
-                this.landscapeObject.objectId,
-            );
+            const brokenTreeId =
+                this.treeInfo.stumpIdByTreeId[this.landscapeObject.objectId];
 
             if (brokenTreeId !== undefined) {
-                this.actor.instance.replaceGameObject(
+                this.player.instance.replaceGameObject(
                     brokenTreeId,
                     this.landscapeObject,
                     randomBetween(
-                        this.treeInfo.respawnLow,
-                        this.treeInfo.respawnHigh,
+                        this.treeInfo.minRespawnTicks,
+                        this.treeInfo.maxRespawnTicks,
                     ),
                 );
             } else {
@@ -218,25 +185,42 @@ class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
         }
     }
 
-    /**
-     * This method is called when the task stops.
-     */
+    /** This method is called when the task stops. */
     public onStop(): void {
-        super.onStop();
-
-        this.actor.stopAnimation();
+        this.player.stopAnimation();
     }
 }
 
-export function runWoodcuttingTask(
-    player: Player,
-    landscapeObject: LandscapeObject,
-): void {
-    const objectConfig = findObject(landscapeObject.objectId);
+const isInChoppingRange = (
+    playerPosition: Position,
+    object: LandscapeObject,
+    sizeX: number,
+    sizeY: number,
+) => {
+    return (
+        playerPosition.x >= object.x - 1 &&
+        playerPosition.x <= object.x + sizeX &&
+        playerPosition.y >= object.y - 1 &&
+        playerPosition.y <= object.y + sizeY
+    );
+};
 
+export const runWoodcuttingTask = ({
+    player,
+    object,
+}: ObjectInteractionAction) => {
+    const objectConfig = findObject(object.objectId);
     if (!objectConfig) {
         logger.warn(
-            `Player ${player.username} attempted to run a woodcutting task on an invalid object (id: ${landscapeObject.objectId})`,
+            `Player ${player.username} attempted to run a woodcutting task on an invalid object (id: ${object.objectId})`,
+        );
+        return;
+    }
+
+    const treeInfo = getTreeFromHealthy(object.objectId);
+    if (!treeInfo) {
+        logger.warn(
+            `Player ${player.username} attempted to run a woodcutting task on an invalid tree (id: ${object.objectId})`,
         );
         return;
     }
@@ -244,5 +228,5 @@ export function runWoodcuttingTask(
     const sizeX = objectConfig.rendering.sizeX;
     const sizeY = objectConfig.rendering.sizeY;
 
-    player.enqueueTask(WoodcuttingTask, [landscapeObject, sizeX, sizeY]);
-}
+    player.enqueueTask(WoodcuttingTask, [object, treeInfo, sizeX, sizeY]);
+};
