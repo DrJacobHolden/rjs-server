@@ -15,6 +15,7 @@ import { Task, TaskScheduler } from '@engine/task';
 import { logger } from '@runejs/common';
 import { ObjectConfig } from '@runejs/filestore';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
+import { RequestTickOptions, TickQueue } from "@engine/world/actor/tick-queue";
 
 
 export type ActorType = 'player' | 'npc';
@@ -32,6 +33,7 @@ export abstract class Actor {
     public readonly inventory: ItemContainer = new ItemContainer(28);
     public readonly bank: ItemContainer = new ItemContainer(376);
     public readonly actionPipeline = new ActionPipeline(this);
+    protected readonly tickQueue = new TickQueue(this);
 
     /**
      * The map of available metadata for this actor.
@@ -477,10 +479,25 @@ export abstract class Actor {
         this.active = false;
 
         this.scheduler.clear();
+        this.tickQueue.destroy();
     }
 
     protected tick() {
         this.scheduler.tick();
+        this.tickQueue.tick();
+    }
+
+    /**
+     * Request a tick delay for an action
+     * @param ticks Number of ticks to wait
+     * @param options Additional options for the tick request
+     */
+    public async requestActionTicks(ticks: number, options: Omit<RequestTickOptions, 'ticks'> = {}): Promise<void> {
+        return this.tickQueue.requestTicks({
+            ticks,
+            blocking: options.blocking,
+            replace: options.replace
+        });
     }
 
     public get position(): Position {
