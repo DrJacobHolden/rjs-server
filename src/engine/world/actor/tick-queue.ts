@@ -116,7 +116,7 @@ export class TickQueue {
 
             if (currentRemaining > 0) {
                 remainingTicks = currentRemaining;
-                startTick = currentTask.startTick;
+                startTick = ticks;
             }
 
             currentTask.reject('Task replaced');
