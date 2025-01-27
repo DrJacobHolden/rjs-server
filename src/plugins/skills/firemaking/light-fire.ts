@@ -39,12 +39,12 @@ export const canLightFireAtCurrentPosition = (player: Player): boolean => {
  * @param worldItemLog The world item representing the log.
  * @param burnExp The experience gained for lighting the fire.
  */
-export const lightFire = (player: Player, position: Position, worldItemLog: WorldItem, burnExp: number): void => {
-    if (!canLightFireAtCurrentPosition(player)) {
-        player.sendMessage('You cannot light a fire here.');
-        return;
-    }
-
+export const lightFire = (
+    player: Player,
+    position: Position,
+    worldItemLog: WorldItem,
+    burnExp: number,
+): void => {
     player.instance.despawnWorldItem(worldItemLog);
     const fireObject: LandscapeObject = {
         objectId: objectIds.fire,
@@ -55,7 +55,7 @@ export const lightFire = (player: Player, position: Position, worldItemLog: Worl
         orientation: 0
     };
 
-    player.playAnimation(null);
+    player.stopAnimation();
     player.sendMessage('The fire catches and the logs begin to burn.');
     player.skills.firemaking.addExp(burnExp);
 

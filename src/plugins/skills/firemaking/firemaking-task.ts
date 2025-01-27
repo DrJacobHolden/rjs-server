@@ -2,10 +2,10 @@ import { ActorWorldItemInteractionTask } from '@engine/task/impl';
 import { WorldItem } from '@engine/world';
 import { Player } from '@engine/world/actor';
 import { animationIds, soundIds } from '@engine/world/config';
-import { canLight } from './chance';
 import { FIREMAKING_LOGS } from './data';
 import { lightFire } from './light-fire';
 import { Burnable } from './types';
+import { randomBetween } from '@engine/util';
 
 /**
  * A firemaking task on a {@link WorldItem} log.
@@ -47,7 +47,9 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
     ) {
         super(player, logWorldItem);
 
-        const logInfo = FIREMAKING_LOGS.find(l => l.logItem.gameId === logWorldItem.itemId);
+        const logInfo = FIREMAKING_LOGS.find(
+            (l) => l.logItem?.gameId === logWorldItem.itemId,
+        );
 
         if (!logInfo) {
             throw new Error(`Invalid firemaking log item id: ${logWorldItem.itemId}`);
@@ -96,11 +98,10 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
             this.actor.playAnimation(animationIds.lightingFire);
         }
 
-        // TODO (jameskmonger) reconsider this, is there a minimum tick count?
-        //              OSRS wiki implies that there isn't
-        //              https://oldschool.runescape.wiki/w/Firemaking#Success_chance
-        const passedMinimumThreshold = tickCount > 10;
-        this.canLightFire = passedMinimumThreshold && canLight(this.logInfo.requiredLevel, this.actor.skills.firemaking.level);
+        // Success chance starts at about 25% and increased by about 2% per level.
+        // https://oldschool.runescape.wiki/w/Firemaking#Success_chance
+        this.canLightFire =
+            randomBetween(1, 100) < 25 + this.actor.skills.firemaking.level * 2;
 
         // if we can now light the fire, reset the timer so that on the next tick we can begin lighting the fire
         if (this.canLightFire) {

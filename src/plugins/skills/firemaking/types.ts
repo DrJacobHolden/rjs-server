@@ -7,7 +7,7 @@ export type Burnable = {
     /**
      * The item details for the log.
      */
-    logItem: ItemDetails;
+    logItem: ItemDetails | null;
 
     /**
      * The firemaking level required to light the log.
