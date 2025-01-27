@@ -21,7 +21,7 @@ const action: objectInteractionActionHandler = (details) => {
     setTimeout(() => {
         if (!ore) {
             details.player.sendMessage(
-                'There is current no ore available in this rock.',
+                'There is currently no ore available in this rock.',
             );
             return;
         }

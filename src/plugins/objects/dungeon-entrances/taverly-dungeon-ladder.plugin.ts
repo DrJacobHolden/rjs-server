@@ -7,13 +7,9 @@ export const enterDungeon: objectInteractionActionHandler = (details) => {
     const loc = details.player.position.clone();
     loc.y += 6400;
     details.player.playAnimation(animationIds.climbLadder);
-
-    // this used to use `setInterval` but will need rewriting to be synced with ticks
-    // see https://github.com/runejs/server/issues/417
-    details.player.sendMessage('[debug] see issue #417');
-    // setTimeout(() => {
-    //     details.player.teleport(loc);
-    // }, World.TICK_LENGTH);
+    setTimeout(() => {
+        details.player.teleport(loc);
+    }, World.TICK_LENGTH);
 };
 
 
@@ -21,13 +17,9 @@ export const exitDungeon: objectInteractionActionHandler = (details) => {
     const loc = details.player.position.clone();
     loc.y -= 6400;
     details.player.playAnimation(animationIds.climbLadder);
-
-    // this used to use `setInterval` but will need rewriting to be synced with ticks
-    // see https://github.com/runejs/server/issues/417
-    details.player.sendMessage('[debug] see issue #417');
-    // setTimeout(() => {
-    //     details.player.teleport(loc);
-    // }, World.TICK_LENGTH);
+    setTimeout(() => {
+        details.player.teleport(loc);
+    }, World.TICK_LENGTH);
 };
 
 
