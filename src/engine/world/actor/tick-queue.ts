@@ -1,4 +1,4 @@
-import { Actor } from "@engine/world/actor/actor";
+import { Actor } from '@engine/world/actor/actor';
 
 
 

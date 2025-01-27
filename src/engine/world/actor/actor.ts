@@ -13,9 +13,8 @@ import { Pathfinding } from './pathfinding';
 import { ActorMetadata } from './metadata';
 import { Task, TaskScheduler } from '@engine/task';
 import { logger } from '@runejs/common';
-import { ObjectConfig } from '@runejs/filestore';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
-import { RequestTickOptions, TickQueue } from "@engine/world/actor/tick-queue";
+import { RequestTickOptions, TickQueue } from '@engine/world/actor/tick-queue';
 
 
 export type ActorType = 'player' | 'npc';
