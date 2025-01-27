@@ -67,9 +67,7 @@ export const objectIds = {
             { default: 5903, stump: 1351 },
             { default: 5904, stump: 1351 },
         ],
-        archey: [
-            { default: 2023, stump: 3371 }
-        ],
+        achey: [{ default: 2023, stump: 3371 }],
         oak: [
             { default: 1281, stump: 1356 },
             // { default: 3037, stump: 1342 }, // Sigex: dark Oak tutorial island no stump

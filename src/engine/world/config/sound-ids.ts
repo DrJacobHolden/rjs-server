@@ -22,6 +22,7 @@ export const soundIds = {
     spinWool: 2590,
     inventoryFull: 2277,
     buryBones: 2738,
+    treeChoppedDown: 3600,
     oreDepeleted: 3600,
     pickaxeSwing: 3220,
     axeSwing: [88, 89, 90],

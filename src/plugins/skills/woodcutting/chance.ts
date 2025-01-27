@@ -1,5 +1,5 @@
 import { randomBetween } from '@engine/util';
-import { IHarvestable } from '@engine/world/config';
+import { Tree } from './trees';
 
 /**
  * Roll a random number between 0 and 255 and compare it to the percent needed to cut the tree.
@@ -11,13 +11,12 @@ import { IHarvestable } from '@engine/world/config';
  * @returns True if the tree was successfully cut, false otherwise
  */
 export const canCut = (
-    tree: IHarvestable,
+    tree: Tree,
     toolLevel: number,
     woodcuttingLevel: number
 ): boolean => {
     const successChance = randomBetween(0, 255);
 
-    const percentNeeded =
-        tree.baseChance + toolLevel + woodcuttingLevel;
+    const percentNeeded = tree.baseChopChance + toolLevel + woodcuttingLevel;
     return successChance <= percentNeeded;
 };
