@@ -27,7 +27,9 @@
                 "defend": 312,
                 "death": 313
             },
-            "drop_table": [{ "itemKey": "rs:bones", "frequency": "always", "amount": 1 }]
+            "drop_table": [
+                { "itemKey": "rs:bones", "frequency": "always", "amount": 1 }
+            ]
         }
     },
 

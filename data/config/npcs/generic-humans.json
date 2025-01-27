@@ -23,7 +23,11 @@
             },
             "drop_table": [
                 { "itemKey": "rs:bones", "frequency": "always", "amount": 1 },
-                { "itemKey": "rs:bronze_dagger", "frequency": "1/128", "amount": 1 }
+                {
+                    "itemKey": "rs:bronze_dagger",
+                    "frequency": "1/128",
+                    "amount": 1
+                }
             ]
         }
     },
