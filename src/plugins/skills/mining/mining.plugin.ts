@@ -1,11 +1,8 @@
 import { objectInteractionActionHandler } from '@engine/action';
-import {
-    getAllOreIds,
-    getOreFromRock,
-} from '@engine/world/config/harvestable-object';
 import { getBestPickaxe, soundIds } from '@engine/world/config';
-import { MiningTask } from '@plugins/skills/mining/mining-task';
+import { MiningTask } from './mining-task';
 import { Skill } from '@engine/world/actor';
+import { getOreFromRock, getOreIds } from './ores';
 
 const action: objectInteractionActionHandler = ({
     object,
@@ -20,9 +17,9 @@ const action: objectInteractionActionHandler = ({
         return;
     }
 
-    if (!player.skills.hasLevel(Skill.MINING, ore.level)) {
+    if (!player.skills.hasLevel(Skill.MINING, ore.levelToMine)) {
         player.sendMessage(
-            `You need a Mining level of ${ore.level} to mine this rock.`,
+            `You need a Mining level of ${ore.levelToMine} to mine this rock.`,
             true,
         );
         return;
@@ -42,21 +39,19 @@ const action: objectInteractionActionHandler = ({
         return;
     }
 
-    player.sendMessage('You swing your pick at the rock.');
-    player.face(position);
-    player.playAnimation(tool.animation);
-
     player.enqueueTask(MiningTask, [object, ore, tool]);
 };
 
 
 export default {
     pluginId: 'rs:mining',
-    hooks: [ {
-        type: 'object_interaction',
-        options: [ 'mine' ],
-        objectIds: getAllOreIds(),
-        walkTo: true,
-        handler: action
-    } ]
+    hooks: [
+        {
+            type: 'object_interaction',
+            options: ['mine'],
+            objectIds: getOreIds(),
+            walkTo: false,
+            handler: action,
+        },
+    ],
 };

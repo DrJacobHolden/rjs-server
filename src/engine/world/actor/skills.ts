@@ -249,14 +249,24 @@ export class Skills extends SkillShortcuts {
                  * dialogue being shown after other events get processed on the
                  * tick that the xp drop occurred.
                  */
-                this.actor.enqueueBaseTask(new QueueableTask([], this.actor, () => {
-                    (this.actor as Player).sendMessage(`Congratulations, you just advanced a ` + `${ achievementDetails.name.toLowerCase() } level.`);
-                    this.showLevelUpDialogue(skill, finalLevel);
-                    return {
-                        callbackResult: false,
-                        shouldContinueLooping: false,
-                    }
-                } , null, null))
+                this.actor.enqueueBaseTask(
+                    new QueueableTask(
+                        [],
+                        this.actor,
+                        () => {
+                            (this.actor as Player).sendMessage(
+                                `Congratulations, you just advanced a ${achievementDetails.name.toLowerCase()} level.`,
+                            );
+                            // this.showLevelUpDialogue(skill, finalLevel);
+                            return {
+                                callbackResult: false,
+                                shouldContinueLooping: false,
+                            };
+                        },
+                        null,
+                        null,
+                    ),
+                );
             }
         }
     }

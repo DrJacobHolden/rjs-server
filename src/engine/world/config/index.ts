@@ -2,7 +2,6 @@ export * from './animation-ids';
 export * from './examine-data';
 export * from './gfx-ids';
 export * from './harvest-tool';
-export * from './harvestable-object';
 export * from './item-ids';
 export * from './object-ids';
 export * from './scenery-spawns';

@@ -134,5 +134,12 @@
         "tradable": true,
         "weight": 0.453,
         "equippable": true
+    },
+    "rs:dragon_dagger_p++": {
+        "game_id": 5680,
+        "examine": "A powerful dagger.",
+        "tradable": true,
+        "weight": 0.453,
+        "equippable": true
     }
 }

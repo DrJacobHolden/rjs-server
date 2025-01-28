@@ -29,7 +29,7 @@ const getStumpsByTree = (
     }, {});
 };
 
-const Trees: Tree[] = [
+const trees: Tree[] = [
     {
         stumpIdByTreeId: getStumpsByTree('normal'),
         logItemName: 'rs:logs',
@@ -144,11 +144,11 @@ const Trees: Tree[] = [
 ];
 
 export const getTreeFromHealthy = (objectId: number): Tree | undefined => {
-    return Trees.find((tree) => tree.stumpIdByTreeId[objectId] !== undefined);
+    return trees.find((tree) => tree.stumpIdByTreeId[objectId] !== undefined);
 };
 
 export const getTreeIds = (): number[] => {
-    return Trees.flatMap((tree) =>
+    return trees.flatMap((tree) =>
         Object.keys(tree.stumpIdByTreeId).map(Number),
     );
 };

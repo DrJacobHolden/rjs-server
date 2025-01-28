@@ -12,11 +12,14 @@ import { logger } from '@runejs/common';
 import { Task } from '@engine/task';
 import { ObjectInteractionAction } from '@engine/action';
 import { getBestAxe } from '@engine/world/config';
-import { getTreeFromHealthy, Tree } from '@plugins/skills/woodcutting/trees';
+import { getTreeFromHealthy, Tree } from './trees';
 
 class WoodcuttingTask extends Task {
     /** The number of ticks that `execute` has been called inside this task. */
     private elapsedTicks = 0;
+
+    /** Set to true the first time the proximity check succeeds. */
+    private hasChopped = false;
 
     constructor(
         /** The player this is attempting to cut down the tree. */
@@ -45,8 +48,15 @@ class WoodcuttingTask extends Task {
                 this.sizeY,
             )
         ) {
+            if (this.hasChopped) {
+                // We walked away from the tree.
+                this.stop();
+            }
             // Wait until we arrive at the tree.
             return;
+        }
+        if (!this.hasChopped) {
+            this.hasChopped = true;
         }
 
         if (this.player.skills.woodcutting.level < this.treeInfo.levelToChop) {
@@ -76,10 +86,9 @@ class WoodcuttingTask extends Task {
             return;
         }
 
-        // store the tick count before incrementing so we don't need to keep track of it in all the separate branches
-        const taskIteration = this.elapsedTicks++;
-
-        if (taskIteration === 0) {
+        // Start counting ticks as all checks have passed.
+        this.elapsedTicks++;
+        if (this.elapsedTicks === 1) {
             this.player.sendMessage('You swing your axe at the tree.');
             this.player.face(
                 new Position(
@@ -94,11 +103,12 @@ class WoodcuttingTask extends Task {
         }
 
         // play a random axe sound at the correct time
-        if (taskIteration % 3 !== 0) {
+        if (this.elapsedTicks % 3 === 0) {
             const randomSoundIdx = Math.floor(
                 Math.random() * soundIds.axeSwing.length,
             );
             this.player.playSound(soundIds.axeSwing[randomSoundIdx], 7, 0);
+            this.player.playAnimation(tool.animation);
         }
 
         // roll for success
@@ -109,8 +119,6 @@ class WoodcuttingTask extends Task {
         );
 
         if (!succeeds) {
-            this.player.playAnimation(tool.animation);
-
             // Keep chopping.
             return;
         }
