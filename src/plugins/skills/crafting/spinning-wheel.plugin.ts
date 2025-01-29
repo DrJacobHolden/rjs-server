@@ -9,6 +9,8 @@ import { findItem, widgets } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
 import { Player } from '@engine/world/actor';
 import { take } from 'rxjs/operators';
+import { ContentPlugin } from '@engine/plugins/plugin.types';
+import { QueueType } from '@engine/world/actor/tick-queue';
 
 interface Spinnable {
     input: number | number[];
@@ -90,12 +92,8 @@ export const openSpinningInterface: objectInteractionActionHandler = (details) =
         slot: 'screen',
     });
 };
-async function spinProduct(player: Player, spinnable: Spinnable, count: number, animate: boolean = true): Promise<void> {
-    // Early exit if count is 0
-    if (count <= 0) {
-        return;
-    }
 
+function processSpin(player: Player, spinnable: Spinnable): boolean {
     let currentItem: number;
     let currentItemIndex = 0;
 
@@ -114,34 +112,47 @@ async function spinProduct(player: Player, spinnable: Spinnable, count: number, 
         } else {
             const itemName = findItem(currentItem)?.name || '';
             player.sendMessage(`You don't have any ${itemName.toLowerCase()}.`);
-            return;
+            return false;
         }
     }
 
-    // Always do the first action instantly
+    // Process the spinning action
     player.removeFirstItem(currentItem);
     player.giveItem(spinnable.output);
     player.skills.addExp(Skill.CRAFTING, spinnable.experience);
 
-    // Only play animation on first call
-    if (animate) {
-        player.playAnimation(animationIds.spinSpinningWheel);
-        player.playSound(soundIds.spinWool, 5);
+    return true;
+}
+async function spinProduct(player: Player, spinnable: Spinnable, count: number): Promise<void> {
+    // Early exit if count is 0
+    if (count <= 0) {
+        return;
     }
 
-    // If there are more items to spin, continue with the async process
-    if (count > 1) {
-        try {
-            // Wait for 3 ticks
-            await player.requestActionTicks(3, { replace: true });
+    try {
+        for (let i = 0; i < count; i++) {
+            // Queue as WEAK task
+            await player.tickQueue.requestTicks({
+                ticks: i === 0 ? 0 : 3, // First action immediate, then 3 tick spacing
+                type: QueueType.WEAK
+            });
 
-            await spinProduct(player, spinnable, count - 1, !animate);
-        } catch (error) {
-            player.sendMessage(error);
-            return;
+            // Play animation and sound each time
+            player.playAnimation(animationIds.spinSpinningWheel);
+            player.playSound(soundIds.spinWool, 5);
+
+            // Process the spin
+            if (!processSpin(player, spinnable)) {
+                break;
+            }
         }
+    } catch (error) {
+        // Queue was interrupted (movement/combat/etc)
+        player.sendMessage(`Spinning interrupted: ${error}`);
     }
 }
+
+
 
 export const buttonClicked: buttonActionHandler = async (details) => {
     // Check if player might be spawning widget clientside
@@ -169,7 +180,7 @@ export const buttonClicked: buttonActionHandler = async (details) => {
     }
 
     if (!product.shouldTakeInput) {
-        // Start spinning with predefined count
+        // Start spinning with predefined count using WEAK queue
         await spinProduct(details.player, product.spinnable, product.count);
     } else {
         // Handle "Make X" option
@@ -191,20 +202,20 @@ export const buttonClicked: buttonActionHandler = async (details) => {
             await spinProduct(details.player, product.spinnable, amount);
         } catch (error) {
             // Handle cancellation
-            details.player.sendMessage(error)
+            details.player.sendMessage(error);
         }
     }
 };
 
-export default {
+export default <ContentPlugin>{
     pluginId: 'rs:spinning_wheel',
     hooks: [
         {
             type: 'object_interaction',
             objectIds: objectIds.spinningWheel,
             options: ['spin'],
-            walkTo: true,
             handler: openSpinningInterface,
+            walkTo: true,
         },
         {
             type: 'button',

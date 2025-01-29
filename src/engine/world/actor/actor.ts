@@ -15,6 +15,7 @@ import { Task, TaskScheduler } from '@engine/task';
 import { logger } from '@runejs/common';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
 import { RequestTickOptions, TickQueue } from '@engine/world/actor/tick-queue';
+import { DelayManager } from '@engine/world/actor/delay-manager';
 
 
 export type ActorType = 'player' | 'npc';
@@ -32,7 +33,8 @@ export abstract class Actor {
     public readonly inventory: ItemContainer = new ItemContainer(28);
     public readonly bank: ItemContainer = new ItemContainer(376);
     public readonly actionPipeline = new ActionPipeline(this);
-    protected readonly tickQueue = new TickQueue(this);
+    public readonly delayManager = new DelayManager(this);
+    public readonly tickQueue: TickQueue = new TickQueue(this);
 
     /**
      * The map of available metadata for this actor.
@@ -95,12 +97,12 @@ export abstract class Actor {
      * If the task has a stack type of `NEVER`, other tasks in the same {@link TaskStackGroup} will be cancelled.
      */
     public enqueueTask(taskClass: new (actor: Actor) => Task, ...args: never[]): void;
-    public enqueueTask<T1, T2, T3, T4, T5, T6>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => Task, args: [ T1, T2, T3, T4, T5, T6 ]): void;
-    public enqueueTask<T1, T2, T3, T4, T5>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => Task, args: [ T1, T2, T3, T4, T5 ]): void;
-    public enqueueTask<T1, T2, T3, T4>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4) => Task, args: [ T1, T2, T3, T4 ]): void;
-    public enqueueTask<T1, T2, T3>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3) => Task, args: [ T1, T2, T3 ]): void;
-    public enqueueTask<T1, T2>(taskClass: new (actor: Actor, arg1: T1, arg2: T2) => Task, args: [ T1, T2 ]): void;
-    public enqueueTask<T1>(taskClass: new (actor: Actor, arg1: T1) => Task, args: [ T1 ]): void;
+    public enqueueTask<T1, T2, T3, T4, T5, T6>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => Task, args: [T1, T2, T3, T4, T5, T6]): void;
+    public enqueueTask<T1, T2, T3, T4, T5>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => Task, args: [T1, T2, T3, T4, T5]): void;
+    public enqueueTask<T1, T2, T3, T4>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4) => Task, args: [T1, T2, T3, T4]): void;
+    public enqueueTask<T1, T2, T3>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3) => Task, args: [T1, T2, T3]): void;
+    public enqueueTask<T1, T2>(taskClass: new (actor: Actor, arg1: T1, arg2: T2) => Task, args: [T1, T2]): void;
+    public enqueueTask<T1>(taskClass: new (actor: Actor, arg1: T1) => Task, args: [T1]): void;
     public enqueueTask<T>(taskClass: new (actor: Actor, ...args: T[]) => Task, args: T[]): void {
         if (!this.active) {
             logger.warn(`Attempted to instantiate task for inactive actor`);
@@ -160,19 +162,19 @@ export abstract class Actor {
     }
 
     public async moveBehind(target: Actor): Promise<boolean> {
-        if(this.position.level !== target.position.level) {
+        if (this.position.level !== target.position.level) {
             return false;
         }
 
         const distance = Math.floor(this.position.distanceBetween(target.position));
-        if(distance > 16) {
+        if (distance > 16) {
             this.clearFaceActor();
             return false;
         }
 
         let ignoreDestination = true;
         let desiredPosition = target.position;
-        if(target.lastMovementPosition) {
+        if (target.lastMovementPosition) {
             desiredPosition = target.lastMovementPosition;
             ignoreDestination = false;
         }
@@ -186,12 +188,12 @@ export abstract class Actor {
     }
 
     public async moveTo(target: Actor): Promise<boolean> {
-        if(this.position.level !== target.position.level) {
+        if (this.position.level !== target.position.level) {
             return false;
         }
 
         const distance = Math.floor(this.position.distanceBetween(target.position));
-        if(distance > 16) {
+        if (distance > 16) {
             this.clearFaceActor();
             return false;
         }
@@ -210,7 +212,7 @@ export abstract class Actor {
 
         this.moveBehind(target);
         const subscription = target.walkingQueue.movementEvent.subscribe(() => {
-            if(!this.moveBehind(target)) {
+            if (!this.moveBehind(target)) {
                 // (Jameskmonger) actionsCancelled is deprecated, casting this to satisfy the typecheck for now
                 this.actionsCancelled.next(null as unknown as ActionCancelType);
             }
@@ -233,11 +235,11 @@ export abstract class Actor {
 
         const distance = Math.floor(this.position.distanceBetween(desiredPosition));
 
-        if(distance <= 1) {
+        if (distance <= 1) {
             return false;
         }
 
-        if(distance > 16) {
+        if (distance > 16) {
             this.clearFaceActor();
             this.metadata.faceActorClearedByWalking = true;
             return false;
@@ -252,41 +254,41 @@ export abstract class Actor {
     }
 
     public face(face: Position | Actor | null, clearWalkingQueue: boolean = true, autoClear: boolean = true, clearedByWalking: boolean = true): void {
-        if(face === null) {
+        if (face === null) {
             this.clearFaceActor();
             this.updateFlags.facePosition = null;
             return;
         }
 
-        if(face instanceof Position) {
+        if (face instanceof Position) {
             this.updateFlags.facePosition = face;
-        } else if(face instanceof Actor) {
+        } else if (face instanceof Actor) {
             this.updateFlags.faceActor = face;
             this.metadata.faceActor = face;
             this.metadata.faceActorClearedByWalking = clearedByWalking;
 
-            if(autoClear) {
+            if (autoClear) {
                 setTimeout(() => {
                     this.clearFaceActor();
                 }, 20000);
             }
         }
 
-        if(clearWalkingQueue) {
+        if (clearWalkingQueue) {
             this.walkingQueue.clear();
             this.walkingQueue.valid = false;
         }
     }
 
     public clearFaceActor(): void {
-        if(this.metadata.faceActor) {
+        if (this.metadata.faceActor) {
             this.updateFlags.faceActor = null;
             this.metadata.faceActor = undefined;
         }
     }
 
     public playAnimation(animation: number | Animation | null): void {
-        if(typeof animation === 'number') {
+        if (typeof animation === 'number') {
             animation = { id: animation, delay: 0 };
         }
 
@@ -298,7 +300,7 @@ export abstract class Actor {
     }
 
     public playGraphics(graphics: number | Graphic): void {
-        if(typeof graphics === 'number') {
+        if (typeof graphics === 'number') {
             graphics = { id: graphics, delay: 0, height: 120 };
         }
 
@@ -320,6 +322,7 @@ export abstract class Actor {
     public giveItem(item: number | Item): boolean {
         return this.inventory.add(item) !== null;
     }
+
     public giveBankItem(item: number | Item): boolean {
         return this.bank.add(item) !== null;
     }
@@ -327,6 +330,7 @@ export abstract class Actor {
     public hasItemInInventory(item: number | Item): boolean {
         return this.inventory.has(item);
     }
+
     public hasItemInBank(item: number | Item): boolean {
         return this.bank.has(item);
     }
@@ -336,6 +340,9 @@ export abstract class Actor {
     }
 
     public canMove(): boolean {
+        if (this.delayManager.isDelayed()) {
+            return false;
+        }
         // In the future, there will undoubtedly be various reasons for the
         // actor to not be able to move, but for now we are returning true.
         return true;
@@ -352,13 +359,13 @@ export abstract class Actor {
     }
 
     public moveSomewhere(): void {
-        if(!this.canMove()) {
+        if (!this.canMove()) {
             return;
         }
 
-        if(this.isNpc) {
+        if (this.isNpc) {
             const nearbyPlayers = activeWorld.findNearbyPlayers(this.position, 24, this.instance?.instanceId);
-            if(nearbyPlayers.length === 0) {
+            if (nearbyPlayers.length === 0) {
                 // No need for this actor to move if there are no players nearby to witness it, save some memory. :)
                 return;
             }
@@ -366,7 +373,7 @@ export abstract class Actor {
 
         const movementChance = Math.floor(Math.random() * 10);
 
-        if(movementChance < 7) {
+        if (movementChance < 7) {
             return;
         }
 
@@ -374,17 +381,17 @@ export abstract class Actor {
         let py = this.position.y;
         let movementAllowed = false;
 
-        while(!movementAllowed) {
+        while (!movementAllowed) {
             px = this.position.x;
             py = this.position.y;
 
             const moveXChance = Math.floor(Math.random() * 10);
 
-            if(moveXChance > 6) {
+            if (moveXChance > 6) {
                 const moveXAmount = Math.floor(Math.random() * 5);
                 const moveXMod = Math.floor(Math.random() * 2);
 
-                if(moveXMod === 0) {
+                if (moveXMod === 0) {
                     px -= moveXAmount;
                 } else {
                     px += moveXAmount;
@@ -393,11 +400,11 @@ export abstract class Actor {
 
             const moveYChance = Math.floor(Math.random() * 10);
 
-            if(moveYChance > 6) {
+            if (moveYChance > 6) {
                 const moveYAmount = Math.floor(Math.random() * 5);
                 const moveYMod = Math.floor(Math.random() * 2);
 
-                if(moveYMod === 0) {
+                if (moveYMod === 0) {
                     py -= moveYAmount;
                 } else {
                     py += moveYAmount;
@@ -406,14 +413,14 @@ export abstract class Actor {
 
             let valid = true;
 
-            if(!this.withinBounds(px, py)) {
+            if (!this.withinBounds(px, py)) {
                 valid = false;
             }
 
             movementAllowed = valid;
         }
 
-        if(px !== this.position.x || py !== this.position.y) {
+        if (px !== this.position.x || py !== this.position.y) {
             this.walkingQueue.clear();
             this.walkingQueue.valid = true;
             this.walkingQueue.add(px, py);
@@ -421,7 +428,7 @@ export abstract class Actor {
     }
 
     public forceMovement(direction: number, steps: number): void {
-        if(!this.canMove()) {
+        if (!this.canMove()) {
             return;
         }
 
@@ -429,20 +436,20 @@ export abstract class Actor {
         let py = this.position.y;
         let movementAllowed = false;
 
-        while(!movementAllowed) {
+        while (!movementAllowed) {
             px = this.position.x;
             py = this.position.y;
 
             const movementDirection = directionFromIndex(direction);
-            if(!movementDirection) {
+            if (!movementDirection) {
                 return;
             }
             let valid = true;
-            for(let step = 0; step < steps; step++) {
+            for (let step = 0; step < steps; step++) {
                 px += movementDirection.deltaX;
                 py += movementDirection.deltaY;
 
-                if(!this.withinBounds(px, py)) {
+                if (!this.withinBounds(px, py)) {
                     valid = false;
                 }
 
@@ -451,7 +458,7 @@ export abstract class Actor {
             movementAllowed = valid;
         }
 
-        if(px !== this.position.x || py !== this.position.y) {
+        if (px !== this.position.x || py !== this.position.y) {
             this.walkingQueue.clear();
             this.walkingQueue.valid = true;
             this.walkingQueue.add(px, py);
@@ -482,8 +489,15 @@ export abstract class Actor {
     }
 
     protected tick() {
-        this.scheduler.tick();
+        // Process delays first
+        this.delayManager.tick();
+
+        // Only process queue if not delayed
         this.tickQueue.tick();
+
+
+        // Always process scheduler since it may have soft tasks
+        this.scheduler.tick();
     }
 
     /**
@@ -491,11 +505,10 @@ export abstract class Actor {
      * @param ticks Number of ticks to wait
      * @param options Additional options for the tick request
      */
-    public async requestActionTicks(ticks: number, options: Omit<RequestTickOptions, 'ticks'> = {}): Promise<void> {
+    public async requestTickDelay(ticks: number, options: Omit<RequestTickOptions, 'ticks'> = {}): Promise<void> {
         return this.tickQueue.requestTicks({
             ticks,
-            blocking: options.blocking,
-            replace: options.replace
+            inheritCooldown: options.inheritCooldown
         });
     }
 
@@ -504,7 +517,7 @@ export abstract class Actor {
     }
 
     public set position(value: Position) {
-        if(!this._position) {
+        if (!this._position) {
             this._lastMapRegionUpdatePosition = value;
         }
 

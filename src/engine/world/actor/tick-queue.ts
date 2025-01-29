@@ -1,84 +1,131 @@
 import { Actor } from '@engine/world/actor/actor';
+import { Player } from '@engine/world/actor/player';
+
+/**
+ * Represents different queue types for tick tasks.
+ *
+ * @see {@link https://osrs-docs.com/docs/mechanics/queues/#queue-types}
+ */
+export enum QueueType {
+    /**
+     * Weak tasks are removed by any interruption (movement, combat, interfaces, etc)
+     * and are cleared if any Strong tasks exist in the queue
+     */
+    WEAK = 'weak',
+
+    /**
+     * Normal tasks are processed normally but skipped if a modal interface is open
+     */
+    NORMAL = 'normal',
+
+    /**
+     * Strong tasks remove all Weak tasks from the queue and force close modal interfaces
+     */
+    STRONG = 'strong',
+
+    /**
+     * Soft tasks cannot be interrupted and always execute when their time comes,
+     * even during delays. Also forces modal interfaces closed.
+     */
+    SOFT = 'soft'
+}
+
+/**
+ * Configuration options for requesting a tick task
+ */
+export interface RequestTickOptions {
+    /**
+     * Number of game ticks to wait before executing
+     */
+    ticks: number;
+
+    /**
+     * The type of task - determines how it behaves regarding interruptions
+     * @default QueueType.NORMAL
+     */
+    type?: QueueType;
+
+}
 
 
 
 /**
- * Represents different processing lanes for tick tasks
+ * Represents a queued tick task
  */
-export enum TickLane {
-    /**
-     * Default lane for world interaction like skilling and combat
-     */
-    WORLD_INTERACTION = 'world_interaction',
-}
-
-
-export interface RequestTickOptions {
-    /**
-     * Number of game ticks to wait
-     */
-    ticks: number;
-
-    /**
-     * If true, prevents other tick requests from being processed while this one is active
-     * @default false
-     */
-    blocking?: boolean;
-
-    /**
-     * If true, replaces the current task but maintains its remaining ticks.
-     * If no current task exists, starts with the full tick count.
-     * @default false
-     */
-    replace?: boolean;
-
-    /**
-     * The lane this task should run in
-     * @default TickLane.WORLD_INTERACTION
-     */
-    lane?: TickLane;
-}
-
-
 export interface TickTask {
+    /** Number of ticks to wait */
     ticks: number;
+    /** Promise that resolves when task completes */
     promise: Promise<void>;
+    /** Function to resolve the promise */
     resolve: () => void;
+    /** Function to reject the promise */
     reject: (reason?: any) => void;
-    blocking: boolean;
+    /** Type of task */
+    type: QueueType;
+    /** Tick number when task was started */
     startTick: number;
-    lane: TickLane;
 }
+
 
 /**
  * Manages tick-based timing and scheduling for an Actor.
  *
- * The TickQueue allows actors to schedule actions that should occur after a specific number of game ticks.
- * It automatically handles movement cancellation and supports blocking/replacing existing tasks.
+ * Implements OSRS-style task queuing with different task types:
+ * - WEAK tasks are removed by interruptions or presence of STRONG tasks
+ * - NORMAL tasks are processed normally but skip if modal interface is open
+ * - STRONG tasks clear WEAK tasks and force close modal interfaces
+ * - SOFT tasks cannot be interrupted and always execute
+ *
+ * Tasks are processed in order and can be delayed by game ticks. Delayed actors
+ * cannot process most tasks except for SOFT tasks.
  *
  * Each tick represents 600ms in the game world.
+ *
+ * @see {@link https://osrs-docs.com/docs/mechanics/queues/} - OSRS Queue Documentation
+ * @see {@link https://osrs-docs.com/docs/mechanics/delays/} - OSRS Delay System
+ * TODO: @see {@link https://oldschool.runescape.wiki/w/Tick_manipulation}
  */
+
 export class TickQueue {
-    private tasksByLane: Map<TickLane, TickTask[]> = new Map();
-    private currentTick: number = 0;
-    private movementSubscription: any;
+    /** Current game tick counter */
+    public currentTick: number = 0;
+    /** List of queued tasks */
+    private tasks: TickTask[] = [];
 
     /**
      * Creates a new TickQueue for the given actor
      * @param actor The actor this queue belongs to
      */
     constructor(private actor: Actor) {
-        Object.values(TickLane).forEach(lane => {
-            this.tasksByLane.set(lane, []);
+        // Subscribe to movement events to clear weak tasks
+        this.actor.walkingQueue.movementEvent.subscribe(() => {
+            this.clearWeakTasks('Movement interrupted action');
         });
-        // Automatically cancel tasks when actor moves
-        this.movementSubscription = this.actor.walkingQueue.movementEvent.subscribe(() => {
-            this.rejectAllTasks('Movement interrupted action');
+    }
+
+    /**
+     * Removes all WEAK tasks from the queue
+     * @param reason The reason for clearing tasks, passed to reject()
+     */
+    private clearWeakTasks(reason: string): void {
+        this.tasks = this.tasks.filter(task => {
+            if (task.type === QueueType.WEAK) {
+                task.reject(reason);
+                return false;
+            }
+            return true;
         });
     }
 
     /**
      * Request to wait for a specific number of ticks
+     *
+     * Tasks are queued based on their type:
+     * - WEAK tasks can be interrupted by movement/actions
+     * - NORMAL tasks skip if modal interface is open
+     * - STRONG tasks clear WEAK tasks and close modals
+     * - SOFT tasks cannot be interrupted
      *
      * @param options Configuration options for the tick request
      * @returns Promise that resolves when the ticks have elapsed or rejects if interrupted
@@ -86,12 +133,13 @@ export class TickQueue {
      *
      * @example
      * ```typescript
+     * // Wait 3 ticks with WEAK type (interruptible)
      * try {
-     *   // Wait 3 ticks with blocking
-     *   await actor.tickQueue.requestTicks({ ticks: 3, blocking: true });
-     *
-     *   // Action after 3 ticks
-     *   actor.doSomething();
+     *   await actor.tickQueue.requestTicks({
+     *     ticks: 3,
+     *     type: QueueType.WEAK
+     *   });
+     *   // Action after 3 ticks if not interrupted
      * } catch (error) {
      *   // Handle interruption
      * }
@@ -100,29 +148,24 @@ export class TickQueue {
     public async requestTicks(options: RequestTickOptions): Promise<void> {
         const {
             ticks,
-            blocking = false,
-            replace = false,
-            lane = TickLane.WORLD_INTERACTION
+            type = QueueType.NORMAL
         } = options;
 
-        const laneTasks = this.tasksByLane.get(lane)!;
-        let startTick = this.currentTick;
-        let remainingTicks = ticks;
+        // Handle STRONG tasks entering queue
+        if (type === QueueType.STRONG) {
+            // Clear weak tasks first
+            this.clearWeakTasks('Strong task present');
 
-        if (replace && laneTasks.length > 0) {
-            const currentTask = laneTasks[laneTasks.length - 1];
-            const elapsedTicks = this.currentTick - currentTask.startTick;
-            const currentRemaining = currentTask.ticks - elapsedTicks;
-
-            if (currentRemaining > 0) {
-                remainingTicks = currentRemaining;
-                startTick = ticks;
+            // Force close modal interfaces immediately
+            if (this.actor instanceof Player) {
+                this.actor.interfaceState.closeAllSlots();
             }
+        }
 
-            currentTask.reject('Task replaced');
-            laneTasks.pop();
-        } else if (this.isLaneBlocked(lane)) {
-            throw new Error(`Lane ${lane} is blocked by an existing task`);
+        // Handle SOFT tasks entering queue
+        if (type === QueueType.SOFT && this.actor instanceof Player) {
+            // Force close modal interfaces immediately
+            this.actor.interfaceState.closeAllSlots();
         }
 
         let resolveFunc: () => void;
@@ -134,99 +177,122 @@ export class TickQueue {
         });
 
         const task: TickTask = {
-            ticks: remainingTicks,
+            ticks,
             promise,
             resolve: resolveFunc!,
             reject: rejectFunc!,
-            blocking,
-            startTick,
-            lane
+            type,
+            startTick: this.currentTick
         };
 
-        laneTasks.push(task);
+        this.tasks.push(task);
         return promise;
     }
 
     /**
-     * Advances the tick counter and resolves any completed tasks.
-     * Called automatically by the actor's tick system.
+     * Processes queued tasks on each game tick.
+     *
+     * Processing rules:
+     * - Skips if actor is delayed (except SOFT tasks)
+     * - NORMAL tasks skip if modal interface open
+     * - STRONG/SOFT tasks force close modal interfaces
+     * - Continues processing until no tasks were processed in a loop
      */
     public tick(): void {
         this.currentTick++;
 
-        for (const [lane, tasks] of this.tasksByLane.entries()) {
-            for (let i = tasks.length - 1; i >= 0; i--) {
-                const task = tasks[i];
-                if (this.currentTick >= task.startTick + task.ticks) {
-                    task.resolve();
-                    tasks.splice(i, 1);
+
+        // Check if actor is delayed
+        const isDelayed = this.actor.delayManager.isDelayed();
+
+        let processedTasks = 0;
+        do {
+            processedTasks = 0;
+
+            for (let i = this.tasks.length - 1; i >= 0; i--) {
+                const task = this.tasks[i];
+
+                // Only process task if:
+                // 1. It's a SOFT task (these ignore delays)
+                // 2. OR actor is not delayed and task can be processed
+                if (task.type === QueueType.SOFT || (!isDelayed && this.canProcessTask(task))) {
+                    if (this.currentTick >= task.startTick + task.ticks) {
+                        // Handle modal interfaces for STRONG/SOFT tasks
+                        if (this.actor instanceof Player &&
+                            (task.type === QueueType.STRONG || task.type === QueueType.SOFT)) {
+                            this.actor.interfaceState.closeAllSlots();
+                        }
+
+                        task.resolve();
+                        this.tasks.splice(i, 1);
+                        processedTasks++;
+                    }
                 }
             }
+        } while (processedTasks > 0 && this.tasks.length > 0);
+    }
+
+    /**
+     * Checks if a task can be processed based on its type and current conditions
+     * @param task The task to check
+     * @returns True if task can be processed, false otherwise
+     */
+
+    private canProcessTask(task: TickTask): boolean {
+        // Check if task should execute in future
+        if (this.currentTick < task.startTick + task.ticks) {
+            return false;
         }
+
+        // For players, handle modal interfaces
+        if (this.actor instanceof Player) {
+            // NORMAL tasks skip if modal interface is open
+            if (task.type === QueueType.NORMAL
+            // && this.actor.interfaceState.hasModalOpen() // TODO: implement in player
+            ) {
+                return false;
+            }
+
+            // STRONG/SOFT tasks force close interfaces before processing
+            if (task.type === QueueType.STRONG || task.type === QueueType.SOFT) {
+                this.actor.interfaceState.closeAllSlots();
+            }
+        }
+
+        // Weak tasks interrupted by strong tasks
+        if (task.type === QueueType.WEAK && this.hasStrongTask()) {
+            task.reject('Strong task present');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if queue contains any strong tasks
+     */
+    private hasStrongTask(): boolean {
+        return this.tasks.some(task => task.type === QueueType.STRONG);
     }
 
     /**
      * Cleans up the tick queue when the actor is destroyed.
-     * Cancels all pending tasks and unsubscribes from movement events.
+     * Rejects all pending tasks.
      */
     public destroy(): void {
-        if (this.movementSubscription) {
-            this.movementSubscription.unsubscribe();
-            this.movementSubscription = null;
-        }
-
-        // Reject all tasks in all lanes
         this.rejectAllTasks('Actor destroyed');
     }
 
-    private isLaneBlocked(lane: TickLane): boolean {
-        const tasks = this.tasksByLane.get(lane);
-        return tasks?.some(task => task.blocking) ?? false;
-    }
-
     /**
-     * Resets all tasks in all lanes to start from the current tick.
-     * Does not cancel or reject tasks, just resets their start time.
-     */
-    public resetAllTicks(): void {
-        for (const lane of this.tasksByLane.keys()) {
-            this.resetLaneTicks(lane);
-        }
-    }
-
-    /**
-     * Rejects all tasks in all lanes
+     * Rejects all tasks in the queue
      * @param reason The reason for rejection
      */
-    public rejectAllTasks(reason: string = 'Tasks cancelled'): void {
-        for (const lane of this.tasksByLane.keys()) {
-            this.rejectLaneTasks(lane, reason);
-        }
-    }
-
-    /**
-     * Resets the ticks for tasks in a specific lane
-     * @param lane The lane to reset
-     */
-    public resetLaneTicks(lane: TickLane): void {
-        const tasks = this.tasksByLane.get(lane);
-        if (tasks) {
-            tasks.forEach(task => {
-                task.startTick = this.currentTick;
-            });
-        }
-    }
-
-    /**
-     * Rejects all tasks in a specific lane
-     * @param lane The lane to reject tasks from
-     * @param reason The reason for rejection
-     */
-    private rejectLaneTasks(lane: TickLane, reason: string = 'Task cancelled'): void {
-        const tasks = this.tasksByLane.get(lane);
-        if (tasks) {
-            tasks.forEach(task => task.reject(reason));
-            tasks.length = 0;
+    private rejectAllTasks(reason: string = 'Tasks cancelled'): void {
+        while (this.tasks.length > 0) {
+            const task = this.tasks.pop();
+            if (task) {
+                task.reject(reason);
+            }
         }
     }
 }

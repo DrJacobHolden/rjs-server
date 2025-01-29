@@ -48,25 +48,18 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
         this.data = data;
     }
 
-    /**
-     * Executed every tick to check if the player has arrived yet and calls the plugins if so.
-     */
-    public execute(): void {
-        // call super to manage waiting for the movement to complete
-        super.execute();
 
-        // check if the player has arrived yet
+    protected onObjectReached(): void {
         const landscapeObject = this.landscapeObject;
         const landscapeObjectPosition = this.landscapeObjectPosition;
+
         if (!landscapeObject || !landscapeObjectPosition) {
+            this.stop();
             return;
         }
 
-        // call the relevant plugins
         this.plugins.forEach(plugin => {
-            if (!plugin || !plugin.handler) {
-                return;
-            }
+            if (!plugin?.handler) return;
 
             const action = {
                 player: this.actor,
@@ -78,7 +71,6 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
             plugin.handler(action);
         });
 
-        // this task only executes once, on arrival
         this.stop();
     }
 }

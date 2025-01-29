@@ -1,19 +1,8 @@
 import { logger } from '@runejs/common';
 import { getFiles } from '@runejs/common/fs';
 import { join } from 'path';
+import { ContentPlugin } from '@engine/plugins/plugin.types';
 
-import { ActionHook } from '@engine/action/hook';
-import { Quest } from '@engine/world/actor/player/quest';
-
-
-/**
- * The definition of a single content plugin.
- */
-export class ContentPlugin {
-    public pluginId: string;
-    public hooks?: ActionHook[];
-    public quests?: Quest[];
-}
 
 
 /**
