@@ -1,5 +1,6 @@
 import { Actor } from '@engine/world/actor/actor';
 import { Player } from '@engine/world/actor/player';
+import { ActionTimer } from "@engine/world/actor/timing/action-timer";
 
 /**
  * Represents different queue types for tick tasks.
@@ -45,6 +46,11 @@ export interface RequestTickOptions {
      */
     type?: QueueType;
 
+    /**
+     * Whether to use the global action timer that can be manipulated
+     * @default false
+     */
+    useGlobalTimer?: boolean;
 }
 
 
@@ -65,6 +71,8 @@ export interface TickTask {
     type: QueueType;
     /** Tick number when task was started */
     startTick: number;
+
+    useGlobalTimer?: boolean;
 }
 
 
@@ -92,7 +100,7 @@ export class TickQueue {
     public currentTick: number = 0;
     /** List of queued tasks */
     private tasks: TickTask[] = [];
-
+    private actionTimer = new ActionTimer();
     /**
      * Creates a new TickQueue for the given actor
      * @param actor The actor this queue belongs to
@@ -148,7 +156,8 @@ export class TickQueue {
     public async requestTicks(options: RequestTickOptions): Promise<void> {
         const {
             ticks,
-            type = QueueType.NORMAL
+            type = QueueType.NORMAL,
+            useGlobalTimer = false
         } = options;
 
         // Handle STRONG tasks entering queue
@@ -168,6 +177,10 @@ export class TickQueue {
             this.actor.interfaceState.closeAllSlots();
         }
 
+        if (useGlobalTimer) {
+            this.actionTimer.setTimer(ticks);
+        }
+
         let resolveFunc: () => void;
         let rejectFunc: (reason?: any) => void;
 
@@ -182,7 +195,8 @@ export class TickQueue {
             resolve: resolveFunc!,
             reject: rejectFunc!,
             type,
-            startTick: this.currentTick
+            startTick: this.currentTick,
+            useGlobalTimer
         };
 
         this.tasks.push(task);
@@ -201,7 +215,7 @@ export class TickQueue {
     public tick(): void {
         this.currentTick++;
 
-
+        this.actionTimer.tick();
         // Check if actor is delayed
         const isDelayed = this.actor.delayManager.isDelayed();
 
@@ -216,7 +230,7 @@ export class TickQueue {
                 // 1. It's a SOFT task (these ignore delays)
                 // 2. OR actor is not delayed and task can be processed
                 if (task.type === QueueType.SOFT || (!isDelayed && this.canProcessTask(task))) {
-                    if (this.currentTick >= task.startTick + task.ticks) {
+                    if (this.shouldCompleteTask(task)) {
                         // Handle modal interfaces for STRONG/SOFT tasks
                         if (this.actor instanceof Player &&
                             (task.type === QueueType.STRONG || task.type === QueueType.SOFT)) {
@@ -230,6 +244,19 @@ export class TickQueue {
                 }
             }
         } while (processedTasks > 0 && this.tasks.length > 0);
+    }
+
+    private shouldCompleteTask(task: TickTask): boolean {
+        const elapsed = this.currentTick - task.startTick;
+        if (elapsed < task.ticks) {
+            return false;
+        }
+
+        if (task.useGlobalTimer) {
+            return !this.actionTimer.isActive();
+        }
+
+        return true;
     }
 
     /**

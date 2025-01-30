@@ -1,4 +1,4 @@
-import { ActionHook, ActionType } from '@engine/action';
+import { ActionType, ObjectInteractionAction } from '@engine/action';
 import { Quest } from '@engine/world/actor/player/quest';
 
 // Base hook type that all hook types must extend
@@ -13,6 +13,7 @@ export interface ObjectInteractionHook extends BaseHook {
     objectIds: number[];
     options?: string[];
     walkTo?: boolean;
+    handler: (details: ObjectInteractionAction) => any;
 }
 
 // Button interaction hook type

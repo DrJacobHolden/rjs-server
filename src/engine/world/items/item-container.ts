@@ -281,6 +281,10 @@ export class ItemContainer {
         return this.getFirstOpenSlot() !== -1;
     }
 
+    public isFull(): boolean {
+        return !this.hasSpace();
+    }
+
     public getOpenSlotCount(): number {
         let count = 0;
         for(let i = 0; i < this._size; i++) {
