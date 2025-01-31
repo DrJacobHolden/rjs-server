@@ -159,11 +159,11 @@ export default<ContentPlugin> {
             handler: async (details) => startWoodcutting(details),
             walkTo: true
         },
-        // {
-        //     type: 'item_on_object',
-        //     objectIds: [...getTreeIds()],
-        //     itemIds: [...AXES.keys()],
-        //     handler: async ({ player, object }) => startWoodcutting(player, object)
-        // }
+        {
+            type: 'item_on_object',
+            objectIds: getTreeIds(),
+            itemIds: [...AXES.keys()],
+            handler: async (details) => startWoodcutting(details)
+        }
     ]
 };
