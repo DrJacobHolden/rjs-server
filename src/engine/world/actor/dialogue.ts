@@ -666,7 +666,7 @@ async function runParsedDialogue(player: Player, dialogueTree: ParsedDialogueTre
 
 export async function dialogue(participants: (Player | NpcParticipant)[], dialogueTree: DialogueTree,
     additionalOptions?: AdditionalOptions): Promise<boolean> {
-    const player = participants.find(p => p instanceof Player) as Player;
+    const player: Player | undefined = participants.find(p => p instanceof Player);
 
     if (!player) {
         throw new Error('Player instance not provided to dialogue action.');

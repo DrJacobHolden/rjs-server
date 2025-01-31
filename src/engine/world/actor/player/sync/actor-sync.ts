@@ -86,8 +86,8 @@ export function syncTrackedActors(packet: Packet, playerPosition: Position, appe
         const trackedActor: Actor = trackedActors[i];
         let exists = true;
 
-        if(trackedActor instanceof Player) {
-            if(!activeWorld.playerOnline(trackedActor as Player)) {
+        if(trackedActor.isPlayer()) {
+            if(!activeWorld.playerOnline(trackedActor)) {
                 exists = false;
             }
         } else {
