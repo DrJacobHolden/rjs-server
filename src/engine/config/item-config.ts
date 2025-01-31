@@ -236,7 +236,7 @@ export async function loadItemConfigurations(path: string): Promise<{
     const itemGroups: Record<string, Record<string, boolean>> = {} // Record where key is group id, and value is an array of all itemstags in group
     let itemPresets: ItemPresetConfiguration = {};
 
-    const files = await loadConfigurationFiles(path);
+    const files = await loadConfigurationFiles<ItemConfiguration>(path);
     const itemConfigurations: Record<string, ItemConfiguration> = {};
 
     files.forEach(itemConfigs => {

@@ -1,6 +1,6 @@
 import { commandActionHandler } from '@engine/action';
 import { objectIds } from '@engine/world/config/object-ids';
-import { safeDump } from 'js-yaml';
+import { dump } from 'js-yaml';
 import { writeFileSync } from 'fs';
 import { logger } from '@runejs/common';
 import { LandscapeObject } from '@runejs/filestore';
@@ -66,7 +66,7 @@ const dumpSceneryAction: commandActionHandler = (details) => {
     const { player } = details;
 
     const path = `data/dump/scene-${ new Date().getTime() }.yml`;
-    writeFileSync(path, safeDump(player.metadata.spawnedScenery));
+    writeFileSync(path, dump(player.metadata.spawnedScenery));
     logger.info(path);
     player.metadata.spawnedScenery = [];
 };
