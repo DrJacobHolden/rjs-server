@@ -1,12 +1,12 @@
 {
-    "$schema": "https://json.schemastore.org/swcrc",
+    "$schema": "https://swc.rs/schema.json",
     "exclude": "node_modules/",
     "sourceMaps": true,
     "module": {
         "type": "commonjs"
     },
     "jsc": {
-        "target": "es2016",
+        "target": "esnext",
         "baseUrl": "./src",
         "paths": {
             "@engine/*": ["./engine/*"],
