@@ -161,7 +161,7 @@ export abstract class Actor {
         };
     }
 
-    public async moveBehind(target: Actor): Promise<boolean> {
+    public moveBehind(target: Actor): boolean {
         if (this.position.level !== target.position.level) {
             return false;
         }
@@ -179,7 +179,7 @@ export abstract class Actor {
             ignoreDestination = false;
         }
 
-        await this.pathfinding.walkTo(desiredPosition, {
+        this.pathfinding.walkTo(desiredPosition, {
             pathingSearchRadius: distance + 2,
             ignoreDestination
         });
@@ -187,7 +187,7 @@ export abstract class Actor {
         return true;
     }
 
-    public async moveTo(target: Actor): Promise<boolean> {
+    public moveTo(target: Actor): boolean {
         if (this.position.level !== target.position.level) {
             return false;
         }
@@ -198,7 +198,7 @@ export abstract class Actor {
             return false;
         }
 
-        await this.pathfinding.walkTo(target.position, {
+        this.pathfinding.walkTo(target.position, {
             pathingSearchRadius: distance + 2,
             ignoreDestination: true
         });
@@ -228,9 +228,9 @@ export abstract class Actor {
         });
     }
 
-    public async walkTo(target: Actor): Promise<boolean>;
-    public async walkTo(position: Position): Promise<boolean>;
-    public async walkTo(target: Actor | Position): Promise<boolean> {
+    public walkTo(target: Actor): boolean;
+    public walkTo(position: Position): boolean;
+    public walkTo(target: Actor | Position): boolean {
         const desiredPosition = target instanceof Position ? target : target.position;
 
         const distance = Math.floor(this.position.distanceBetween(desiredPosition));
@@ -245,7 +245,7 @@ export abstract class Actor {
             return false;
         }
 
-        await this.pathfinding.walkTo(desiredPosition, {
+        this.pathfinding.walkTo(desiredPosition, {
             pathingSearchRadius: distance + 2,
             ignoreDestination: true
         });
@@ -507,8 +507,8 @@ export abstract class Actor {
      */
     public async requestTickDelay(ticks: number, options: Omit<RequestTickOptions, 'ticks'> = {}): Promise<void> {
         return this.tickQueue.requestTicks({
+            ...options,
             ticks,
-            inheritCooldown: options.inheritCooldown
         });
     }
 

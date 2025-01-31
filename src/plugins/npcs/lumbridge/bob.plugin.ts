@@ -1,4 +1,3 @@
-import { ContentPlugin } from '@engine/plugins';
 import { NpcInteractionActionHook } from '@engine/action';
 import { findShop } from '@engine/config';
 
@@ -11,7 +10,7 @@ const bobHook: NpcInteractionActionHook = {
     handler: ({ player }) => findShop('rs:lumbridge_bobs_axes')?.open(player)
 };
 
-const bobPlugin: ContentPlugin = {
+const bobPlugin = {
     pluginId: 'rs:bob',
     hooks: [ bobHook ]
 }
