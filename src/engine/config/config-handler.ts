@@ -149,9 +149,9 @@ export const findItem = (itemKey: number | string): ItemDetails | null => {
 };
 
 
-export const findNpc = (npcKey: number | string): NpcDetails | null => {
+export const findNpc = (npcKey: number | string): NpcDetails => {
     if(!npcKey) {
-        return null;
+        throw new Error('NPC key is required');
     }
 
     if(typeof npcKey === 'number') {
@@ -164,7 +164,7 @@ export const findNpc = (npcKey: number | string): NpcDetails | null => {
                 return cacheNpc as any;
             } else {
                 logger.warn(`NPC ${gameId} is not yet configured on the server and a matching cache NPC was not found.`);
-                return null;
+                throw new Error(`NPC ${gameId} is not yet configured on the server and a matching cache NPC was not found.`);
             }
         }
     }
@@ -177,7 +177,8 @@ export const findNpc = (npcKey: number | string): NpcDetails | null => {
 
     if(!npc) {
         logger.warn(`NPC ${npcKey} is not yet configured on the server and a matching cache NPC was not provided.`);
-        return null;
+        throw new Error(`NPC ${npcKey} is not yet configured on the server and a matching cache NPC was not provided.`);
+
     }
 
     if(npc.extends) {

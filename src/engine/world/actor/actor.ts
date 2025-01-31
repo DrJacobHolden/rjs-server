@@ -16,6 +16,7 @@ import { logger } from '@runejs/common';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
 import { RequestTickOptions, TickQueue } from '@engine/world/actor/tick-queue';
 import { DelayManager } from '@engine/world/actor/delay-manager';
+import { Player } from '@engine/world/actor/player';
 
 
 export type ActorType = 'player' | 'npc';
@@ -512,6 +513,10 @@ export abstract class Actor {
         });
     }
 
+    public isPlayer(): this is Player {
+        return this.type === 'player';
+    }
+
     public get position(): Position {
         return this._position;
     }
@@ -578,10 +583,6 @@ export abstract class Actor {
 
     public set instance(value: WorldInstance | null) {
         this._instance = value;
-    }
-
-    public get isPlayer(): boolean {
-        return this.type === 'player';
     }
 
     public get isNpc(): boolean {

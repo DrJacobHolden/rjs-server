@@ -113,7 +113,7 @@ export class World {
         let tileModifications;
         let personalTileModifications;
 
-        if(actor.isPlayer) {
+        if(actor.isPlayer()) {
             const instance = (actor as Player).instance;
 
             if (!instance) {
@@ -130,7 +130,7 @@ export class World {
         if(!landscapeObject) {
             const tileObjects = [ ...tileModifications.mods.spawnedObjects ];
 
-            if(actor.isPlayer) {
+            if(actor.isPlayer()) {
                 tileObjects.push(...personalTileModifications.mods.spawnedObjects);
             }
 
@@ -146,7 +146,7 @@ export class World {
 
         const hiddenTileObjects = [ ...tileModifications.mods.hiddenObjects ];
 
-        if(actor.isPlayer) {
+        if(actor.isPlayer()) {
             hiddenTileObjects.push(...personalTileModifications.mods.hiddenObjects);
         }
 

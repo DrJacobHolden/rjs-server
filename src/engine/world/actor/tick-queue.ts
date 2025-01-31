@@ -100,7 +100,7 @@ export class TickQueue {
     public currentTick: number = 0;
     /** List of queued tasks */
     private tasks: TickTask[] = [];
-    private actionTimer = new ActionTimer();
+    public globalTimer = new ActionTimer();
     /**
      * Creates a new TickQueue for the given actor
      * @param actor The actor this queue belongs to
@@ -178,7 +178,7 @@ export class TickQueue {
         }
 
         if (useGlobalTimer) {
-            this.actionTimer.setTimer(ticks);
+            this.globalTimer.setTimer(ticks);
         }
 
         let resolveFunc: () => void;
@@ -217,7 +217,7 @@ export class TickQueue {
     public tick(): void {
         this.currentTick++;
 
-        this.actionTimer.tick();
+        this.globalTimer.tick();
         // Check if actor is delayed
         const isDelayed = this.actor.delayManager.isDelayed();
 
@@ -255,7 +255,7 @@ export class TickQueue {
         }
 
         if (task.useGlobalTimer) {
-            return !this.actionTimer.isActive();
+            return !this.globalTimer.isActive();
         }
 
         return true;

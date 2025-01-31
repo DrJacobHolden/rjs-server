@@ -149,7 +149,7 @@ export class TaskExecutor<T> {
     public getDetails(): TaskDetails<T> {
         return {
             actor: this.actor,
-            player: this.actor.isPlayer ? this.actor as Player : undefined,
+            player: this.actor.isPlayer() ? this.actor as Player : undefined,
             npc: this.actor.isNpc ? this.actor as Npc : undefined,
             actionData: this.actionData,
             session: this.session

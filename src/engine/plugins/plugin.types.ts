@@ -1,4 +1,4 @@
-import { ActionType, ObjectInteractionAction } from '@engine/action';
+import { ActionType, MagicOnNPCAction, ObjectInteractionAction } from '@engine/action';
 import { Quest } from '@engine/world/actor/player/quest';
 
 // Base hook type that all hook types must extend
@@ -158,8 +158,11 @@ export interface MagicOnPlayerHook extends BaseHook {
 // Magic on NPC hook type
 export interface MagicOnNpcHook extends BaseHook {
     type: 'magic_on_npc';
-    npcs?: string | string[];
-    spellIds?: number | number[];
+    widgetIds?: number[];
+    buttonIds?: number | number[];
+    handler: (details: MagicOnNPCAction) => any;
+    // npcs?: string | string[];
+    // spellIds?: number | number[];
 }
 
 // Prayer hook type
@@ -200,7 +203,7 @@ export interface ContentPlugin {
     pluginId: string;
 
     // Array of hooks this plugin provides
-    hooks?: PluginHook[];
+    hooks?: PluginHook | PluginHook[];
 
     // Optional quests defined by this plugin
     quests?: Quest[];

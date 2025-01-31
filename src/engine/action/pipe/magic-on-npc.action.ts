@@ -5,7 +5,7 @@ import { ActionHook, getActionHooks, ActionPipe, RunnableHooks } from '@engine/a
 /**
  * Defines a button action hook.
  */
-export interface MagicOnNPCActionHook extends ActionHook<MagicOnNPCAction, magiconnpcActionHandler> {
+export interface MagicOnNPCActionHook extends ActionHook<MagicOnNPCAction, MagicOnNPCActionHandler> {
     // The npc world id that was clicked on after choosing the spell
     npcworldId?: number;
     // The IDs of the UI widgets that the buttons are on.
@@ -20,7 +20,7 @@ export interface MagicOnNPCActionHook extends ActionHook<MagicOnNPCAction, magic
 /**
  * The button action hook handler function to be called when the hook's conditions are met.
  */
-export type magiconnpcActionHandler = (buttonAction: MagicOnNPCAction) => void | Promise<void>;
+export type MagicOnNPCActionHandler = (buttonAction: MagicOnNPCAction) => void | Promise<void>;
 
 
 /**

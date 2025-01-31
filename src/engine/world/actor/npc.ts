@@ -10,6 +10,7 @@ import { Actor } from './actor';
 import { Player } from './player';
 import { SkillName } from './skills';
 import { logger } from '@runejs/common';
+import { DamageType } from '@engine/world/actor/update-flags';
 
 /**
  * Represents a non-player character within the game world.
@@ -23,6 +24,8 @@ export class Npc extends Actor {
     public readonly varbitId: number = -1;
     public readonly settingId: number = -1;
     public readonly childrenIds?: number[];
+
+    public readonly cacheDetails: NpcDetails;
     public parent?: Npc;
     public id: number;
     public animations: NpcCombatAnimations & {
@@ -66,12 +69,14 @@ export class Npc extends Actor {
         }
 
         if(typeof npcDetails === 'number') {
-            this.id = npcDetails;
+            this.id = npcDetails
+            this.cacheDetails = findNpc(npcDetails);
         } else {
             this.id = npcDetails.gameId;
             this._combatLevel = npcDetails.combatLevel;
             this.animations = npcDetails.combatAnimations || {};
             this.options = npcDetails.options || [];
+            this.cacheDetails = npcDetails;
 
             if(npcDetails.skills) {
                 const skillNames = Object.keys(npcDetails.skills);
@@ -116,6 +121,34 @@ export class Npc extends Actor {
         await this.actionPipeline.call('npc_init', { npc: this });
 
         this._initialized = true;
+    }
+
+    public hit(attacker: Actor, damage: number) {
+        const currentHitpoints = this.skills.hitpoints.level;
+        let nextHitpoints = currentHitpoints - damage;
+        nextHitpoints = nextHitpoints > 0 ? nextHitpoints : 0;
+        const finalDamage = nextHitpoints > 0 ? damage : currentHitpoints;
+
+        if (finalDamage === 0) {
+            this.updateFlags.addDamage(
+                0,
+                DamageType.NO_DAMAGE,
+                currentHitpoints,
+                this.cacheDetails.skills?.hitpoints || 5, // TODO: Hardcoded to Goblin max health - NPC max health is not available.
+            );
+        } else {
+            this.skills.setHitpoints(nextHitpoints);
+            this.updateFlags.addDamage(
+                finalDamage,
+                DamageType.DAMAGE,
+                nextHitpoints,
+                this.cacheDetails.skills?.hitpoints || 5, // TODO: Hardcoded to Goblin max health - NPC max health is not available.
+            );
+
+            // if (attacker.isPlayer()) {
+            //     this.playerHits.push([attacker.username, finalDamage]);
+            // }
+        }
     }
 
     //This is useful so that we can tie into things like "spell casts" or events, or traps, etc to finish quests or whatever
