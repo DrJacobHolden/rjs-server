@@ -15,6 +15,8 @@ import { Task, TaskScheduler } from '@engine/task';
 import { logger } from '@runejs/common';
 import { ObjectConfig } from '@runejs/filestore';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
+import { Npc } from '@engine/world/actor/npc';
+import { Player } from '@engine/world/actor/player';
 
 
 export type ActorType = 'player' | 'npc';
@@ -355,8 +357,8 @@ export abstract class Actor {
             return;
         }
 
-        if(this.isNpc) {
-            const nearbyPlayers = activeWorld.findNearbyPlayers(this.position, 24, this.instance?.instanceId);
+        if(this.isNpc()) {
+            const nearbyPlayers = activeWorld.findNearbyPlayers(this.position, 24, this.instance.instanceId);
             if(nearbyPlayers.length === 0) {
                 // No need for this actor to move if there are no players nearby to witness it, save some memory. :)
                 return;
@@ -483,6 +485,14 @@ export abstract class Actor {
         this.scheduler.tick();
     }
 
+    public isPlayer(): this is Player {
+        return this.type === 'player';
+    }
+
+    public isNpc(): this is Npc {
+        return this.type === 'npc';
+    }
+
     public get position(): Position {
         return this._position;
     }
@@ -549,14 +559,6 @@ export abstract class Actor {
 
     public set instance(value: WorldInstance | null) {
         this._instance = value;
-    }
-
-    public get isPlayer(): boolean {
-        return this.type === 'player';
-    }
-
-    public get isNpc(): boolean {
-        return this.type === 'npc';
     }
 
     public get bonuses(): { offensive: OffensiveBonuses, defensive: DefensiveBonuses, skill: SkillBonuses } {

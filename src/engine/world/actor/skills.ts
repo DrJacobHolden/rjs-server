@@ -226,14 +226,14 @@ export class Skills extends SkillShortcuts {
 
         this.setExp(skill, finalExp);
 
-        if(this.actor instanceof Player) {
+        if(this.actor.isPlayer()) {
             this.actor.outgoingPackets.updateSkill(this.getSkillId(skill), finalLevel, finalExp);
         }
 
         if(currentLevel !== finalLevel) {
             this.setLevel(skill, finalLevel);
 
-            if(this.actor instanceof Player) {
+            if(this.actor.isPlayer()) {
                 const achievementDetails = skillDetails[this.getSkillId(skill)];
                 if(!achievementDetails) {
                     return;
@@ -262,11 +262,11 @@ export class Skills extends SkillShortcuts {
     }
 
     public showLevelUpDialogue(skill: number | SkillName, level: number): void {
-        if(!(this.actor instanceof Player)) {
+        if(!(this.actor.isPlayer())) {
             return;
         }
 
-        const player = this.actor as Player;
+        const player = this.actor;
         const achievementDetails = skillDetails[this.getSkillId(skill)];
         const widgetId = achievementDetails.advancementWidgetId;
 
