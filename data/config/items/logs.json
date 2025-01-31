@@ -73,5 +73,12 @@
     "rs:magic_pyre_logs": {
         "extends": "rs:log",
         "game_id": 1513
+    },
+    "rs:bark": {
+    "game_id": 3239,
+    "examine": "Bark from a hollow tree.",
+    "tradable": true,
+    "weight": 1,
+    "equippable": false
     }
 }

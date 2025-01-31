@@ -1,59 +1,55 @@
 // Note if adding hunter, Strung rabbit foot makes this out of 94 instead of 99
 import { randomBetween } from '@engine/util/num';
 import { Item } from '@engine/world/items/item';
+import { findItem } from '@engine/config';
 
 export function rollBirdsNestType(): Item {
     const roll = randomBetween(0, 99);
-    let itemId;
+    let itemConfigId;
+
     if (roll > 3) {
         // Bird egg
         if (roll === 0) {
-            itemId = 5070; // Red egg
+            itemConfigId = 'rs:birds_egg_red';
         } else if (roll === 1) {
-            itemId = 5071; // Green egg
+            itemConfigId = 'rs:birds_egg_green';
         } else {
-            itemId = 5072; // blue egg
+            itemConfigId = 'rs:birds_egg_blue';
         }
     } else if (roll > 34) {
-        itemId = 5074; // Ring
+        itemConfigId = 'rs:birds_nest_ring';
     } else {
-        itemId = 5073; // Seeds
+        itemConfigId = 'rs:birds_nest_seed';
     }
-    return { itemId: itemId, amount: 1 };
+
+    const item = findItem(itemConfigId);
+    if (!item) {
+        throw new Error(`Could not find item config for ${itemConfigId}`);
+    }
+
+    return { itemId: item.gameId, amount: 1 };
 }
+
 
 export function rollGemType(): Item {
     const roll = randomBetween(0, 3);
-    let itemId;
+    let itemConfigId;
+
     if (roll === 0) {
-        itemId = 1617; // Uncut Diamond
+        itemConfigId = 'rs:uncut_diamond';
     } else if (roll === 1) {
-        itemId = 1619; // Uncut ruby
+        itemConfigId = 'rs:uncut_ruby';
     } else if (roll === 2) {
-        itemId = 1621; // uncut emerald
+        itemConfigId = 'rs:uncut_emerald';
     } else {
-        itemId = 1623; // uncut sapphire
+        itemConfigId = 'rs:uncut_sapphire';
     }
-    return { itemId: itemId, amount: 1 };
+
+    const item = findItem(itemConfigId);
+    if (!item) {
+        throw new Error(`Could not find item config for ${itemConfigId}`);
+    }
+
+    return { itemId: item.gameId, amount: 1 };
 }
 
-export function rollGemRockResult(): Item  {
-    const roll = randomBetween(0, 127);
-    let itemId;
-    if (roll < 60) {
-        itemId = 1625; // Uncut Opal
-    } else if (roll < 90) {
-        itemId = 1627; // Uncut Jade
-    } else if (roll < 105) {
-        itemId = 1629; // uncut topaz
-    } else if (roll < 114) {
-        itemId = 1623; // uncut sapphire
-    } else if (roll < 119) {
-        itemId = 1621; // uncut emerald
-    } else if (roll < 124) {
-        itemId = 1619; // uncut ruby
-    } else {
-        itemId = 1617; // uncut diamond
-    }
-    return { itemId: itemId, amount: 1 };
-}
