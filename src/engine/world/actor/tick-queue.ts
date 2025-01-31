@@ -1,6 +1,6 @@
 import { Actor } from '@engine/world/actor/actor';
 import { Player } from '@engine/world/actor/player';
-import { ActionTimer } from "@engine/world/actor/timing/action-timer";
+import { ActionTimer } from '@engine/world/actor/timing/action-timer';
 
 /**
  * Represents different queue types for tick tasks.
@@ -192,7 +192,9 @@ export class TickQueue {
         const task: TickTask = {
             ticks,
             promise,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             resolve: resolveFunc!,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             reject: rejectFunc!,
             type,
             startTick: this.currentTick,

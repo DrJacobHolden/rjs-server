@@ -3,9 +3,9 @@ import { LandscapeObject } from '@runejs/filestore';
 import { findItem } from '@engine/config';
 import { QueueType } from '@engine/world/actor/tick-queue';
 import {
-    AXES,
+    AXES, getPrimaryItem,
     getTreeFromHealthy,
-    getTreeIds,
+    getTreeIds, selectWeightedItem,
     WOODCUTTING_SOUNDS
 } from '@plugins/skills/woodcutting/woodcutting.constants';
 import { randomBetween } from '@engine/util';
@@ -99,7 +99,7 @@ const startWoodcutting = async (details: ObjectInteractionAction): Promise<void>
     const chopTree = async (): Promise<void> => {
         // Check if we can still chop
         if (player.inventory.isFull()) {
-            player.sendMessage(`Your inventory is too full to hold any more ${findItem(treeData.itemId)?.name.toLowerCase()}.`);
+            player.sendMessage(`Your inventory is too full to hold any more ${findItem(getPrimaryItem(treeData.items))?.name.toLowerCase()}.`);
             return;
         }
 
@@ -122,10 +122,11 @@ const startWoodcutting = async (details: ObjectInteractionAction): Promise<void>
 
             // Check for success
             if (calculateSuccess(player, tree, axe)) {
+                const loot = selectWeightedItem(treeData.items);
                 // Give logs and xp
-                if (player.giveItem(treeData.itemId)) {
+                if (player.giveItem(loot)) {
                     player.skills.addExp('woodcutting', treeData.experience);
-                    player.sendMessage(`You get some ${findItem(treeData.itemId)?.name.toLowerCase()}.`);
+                    player.sendMessage(`You get some ${findItem(loot)?.name.toLowerCase()}.`);
                 }
 
                 // Check for depletion
