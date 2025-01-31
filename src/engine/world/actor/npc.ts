@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4';
+import { v4 } from 'uuid';
 import EventEmitter from 'events';
 
 import { filestore } from '@server/game/game-server';
@@ -48,7 +48,7 @@ export class Npc extends Actor {
         super('npc');
 
         this.key = npcSpawn.npcKey;
-        this.uuid = uuidv4();
+        this.uuid = v4();
         this.position = npcSpawn.spawnPosition.clone();
         this.initialPosition = this.position.clone();
         this.npcSpawn = npcSpawn;
@@ -75,8 +75,7 @@ export class Npc extends Actor {
 
             if(npcDetails.skills) {
                 const skillNames = Object.keys(npcDetails.skills);
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                skillNames.forEach(skillName => this.skills.setLevel(skillName as SkillName, npcDetails.skills![skillName]));
+                skillNames.forEach((skillName) => this.skills.setLevel(skillName as SkillName, npcDetails.skills?.[skillName] ?? 1));
             }
         }
 

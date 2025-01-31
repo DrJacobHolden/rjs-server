@@ -200,7 +200,7 @@ export function shopFactory(key: string, config: ShopConfiguration): Shop {
 export async function loadShopConfigurations(path: string): Promise<{ [key: string]: Shop }> {
     const shops: { [key: string]: Shop } = {};
 
-    const files = await loadConfigurationFiles(path);
+    const files = await loadConfigurationFiles<{ [key: string]: ShopConfiguration }>(path);
     files.forEach(shopConfigs => {
         const shopKeys = Object.keys(shopConfigs);
         shopKeys.forEach(key => {

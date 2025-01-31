@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4';
+import { v4 } from 'uuid';
 import { lastValueFrom, Subscription, timer } from 'rxjs';
 
 import { logger } from '@runejs/common';
@@ -34,7 +34,7 @@ export interface HookTask<T = any> {
 // T = current action info (ButtonAction, MoveItemAction, etc)
 export class TaskExecutor<T> {
 
-    public readonly taskId = uuidv4();
+    public readonly taskId = v4();
     public readonly strength: ActionStrength;
     public running: boolean = false;
     public session: TaskSessionData = {}; // a session store to use for the lifetime of the task

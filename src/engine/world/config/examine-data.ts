@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { logger } from '@runejs/common';
-import { JSON_SCHEMA, safeLoad } from 'js-yaml';
+import { JSON_SCHEMA, load } from 'js-yaml';
 
 interface Examine {
     id: number;
@@ -38,7 +38,7 @@ export class ExamineCache {
 function parseData(fileName: string): Map<number, Examine> {
     const examineMap: Map<number, Examine> = new Map<number, Examine>();
     try {
-        const examineItems = safeLoad(readFileSync(fileName, 'utf8'), { schema: JSON_SCHEMA }) as Examine[];
+        const examineItems = load(readFileSync(fileName, 'utf8'), { schema: JSON_SCHEMA }) as Examine[];
 
         if(!examineItems || examineItems.length === 0) {
             throw new Error('Unable to read examine data.');
