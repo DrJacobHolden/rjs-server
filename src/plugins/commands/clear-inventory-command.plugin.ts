@@ -1,11 +1,12 @@
-import { PlayerCommandAction } from '@engine/action';
+import type { PlayerCommandAction } from '@engine/action/pipe/player-command.action';
 
 export default {
     pluginId: 'rs:clear_inventory_command',
-    hooks: [ {
-        type: 'player_command',
-        commands: [ 'clear' ],
-        handler: (details: PlayerCommandAction): void => details.player.inventory.clear()
-    }
-    ]
+    hooks: [
+        {
+            type: 'player_command',
+            commands: ['clear'],
+            handler: (details: PlayerCommandAction): void => details.player.inventory.clear(),
+        },
+    ],
 };

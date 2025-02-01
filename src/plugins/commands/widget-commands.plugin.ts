@@ -1,23 +1,23 @@
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
-const action: commandActionHandler = (details) => {
+const action: commandActionHandler = details => {
     const { player, args } = details;
 
     const widgetId: number = args.widgetId as number;
     const secondaryWidgetId: number = args.secondaryWidgetId as number;
 
-    if(secondaryWidgetId === 1) {
+    if (secondaryWidgetId === 1) {
         player.interfaceState.openWidget(widgetId, {
-            slot: 'screen'
+            slot: 'screen',
         });
     } else {
         player.interfaceState.openWidget(widgetId, {
             slot: 'screen',
-            multi: true
+            multi: true,
         });
         player.interfaceState.openWidget(secondaryWidgetId, {
             slot: 'tabarea',
-            multi: true
+            multi: true,
         });
     }
 };
@@ -27,19 +27,19 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'widget' ],
+            commands: ['widget'],
             args: [
                 {
                     name: 'widgetId',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'secondaryWidgetId',
                     type: 'number',
-                    defaultValue: 1
-                }
+                    defaultValue: 1,
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

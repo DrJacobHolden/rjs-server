@@ -1,17 +1,16 @@
 import { ByteBuffer } from '@runejs/common';
 
 import { Packet, PacketType } from '@engine/net/packet';
-import { Npc } from '@engine/world/actor/npc';
-import { registerNewActors, SyncTask, syncTrackedActors } from './actor-sync';
-import { Player } from '../player';
 import { activeWorld } from '@engine/world';
-
+import type { Npc } from '@engine/world/actor/npc';
+import { isPlayer } from '@engine/world/actor/util';
+import type { Player } from '../player';
+import { SyncTask, registerNewActors, syncTrackedActors } from './actor-sync';
 
 /**
  * Handles the chonky npc synchronization packet for a specific player.
  */
 export class NpcSyncTask extends SyncTask<void> {
-
     private readonly player: Player;
 
     public constructor(player: Player) {
@@ -26,18 +25,25 @@ export class NpcSyncTask extends SyncTask<void> {
 
             const updateMaskData = new ByteBuffer(5000);
 
-            const nearbyNpcs = activeWorld.npcTree.colliding({
-                x: this.player.position.x - 15,
-                y: this.player.position.y - 15,
-                width: 32,
-                height: 32
-            }).filter(collision => {
-                const npc = collision?.actor as Npc || null;
-                return npc && npc.initialized && npc.instanceId === this.player.instance.instanceId;
-            });
+            const nearbyNpcs = activeWorld.npcTree
+                .colliding({
+                    x: this.player.position.x - 15,
+                    y: this.player.position.y - 15,
+                    width: 32,
+                    height: 32,
+                })
+                .filter(collision => {
+                    const npc = (collision?.actor as Npc) || null;
+                    return npc && npc.initialized && npc.instanceId === this.player.instance.instanceId;
+                });
 
-            this.player.trackedNpcs = syncTrackedActors(npcUpdatePacket, this.player.position,
-                actor => this.appendUpdateMaskData(actor as Npc, updateMaskData), this.player.trackedNpcs, nearbyNpcs) as Npc[];
+            this.player.trackedNpcs = syncTrackedActors(
+                npcUpdatePacket,
+                this.player.position,
+                actor => this.appendUpdateMaskData(actor as Npc, updateMaskData),
+                this.player.trackedNpcs,
+                nearbyNpcs,
+            ) as Npc[];
 
             registerNewActors(npcUpdatePacket, this.player, this.player.trackedNpcs, nearbyNpcs, actor => {
                 const newNpc = actor as Npc;
@@ -59,7 +65,7 @@ export class NpcSyncTask extends SyncTask<void> {
                 this.appendUpdateMaskData(newNpc, updateMaskData);
             });
 
-            if(updateMaskData.writerIndex !== 0) {
+            if (updateMaskData.writerIndex !== 0) {
                 npcUpdatePacket.putBits(15, 32767);
                 npcUpdatePacket.closeBitBuffer();
 
@@ -87,29 +93,33 @@ export class NpcSyncTask extends SyncTask<void> {
      */
     private appendUpdateMaskData(npc: Npc, updateMaskData: ByteBuffer): void {
         const updateFlags = npc.updateFlags;
-        if(!updateFlags.updateBlockRequired) {
+        if (!updateFlags.updateBlockRequired) {
             return;
         }
 
         let mask = 0;
 
-        if(updateFlags.damage !== null) {
+        if (updateFlags.damage !== null) {
             mask |= 0x1;
         }
-        if(updateFlags.appearanceUpdateRequired) {
+        if (updateFlags.appearanceUpdateRequired) {
             mask |= 0x80;
         }
-        if(updateFlags.faceActor !== undefined) {
+        if (updateFlags.faceActor !== null) {
             mask |= 0x4;
         }
-        if(updateFlags.chatMessages.length !== 0) {
+        if (updateFlags.chatMessages.length !== 0) {
             mask |= 0x40;
         }
-        if(updateFlags.facePosition) {
+        if (updateFlags.facePosition !== null) {
             mask |= 0x8;
         }
-        if(updateFlags.animation) {
+        if (updateFlags.animation) {
             mask |= 0x10;
+        }
+
+        if (updateFlags.graphics) {
+            mask |= 0x20;
         }
 
         updateMaskData.put(mask, 'BYTE');
@@ -121,9 +131,9 @@ export class NpcSyncTask extends SyncTask<void> {
             }
             updateMaskData.put(npc.worldIndex, 'SHORT');
             alreadyPutWorldIndex = true;
-        }
+        };
 
-        if(updateFlags.damage !== null) {
+        if (updateFlags.damage !== null) {
             const damage = updateFlags.damage;
             updateMaskData.put(damage.damageDealt);
             updateMaskData.put(damage.damageType.valueOf());
@@ -133,16 +143,16 @@ export class NpcSyncTask extends SyncTask<void> {
             putWorldIndex();
         }
 
-        if(updateFlags.faceActor !== undefined) {
+        if (updateFlags.faceActor !== null) {
             const actor = updateFlags.faceActor;
 
-            if(actor === null) {
+            if (actor === 'CLEAR') {
                 // Reset faced actor
                 updateMaskData.put(65535, 'SHORT');
             } else {
                 let worldIndex = actor.worldIndex;
 
-                if(actor instanceof Player) {
+                if (isPlayer(actor)) {
                     // Client checks if index is less than 32768.
                     // If it is, it looks for an NPC.
                     // If it isn't, it looks for a player (subtracting 32768 to find the index).
@@ -155,10 +165,10 @@ export class NpcSyncTask extends SyncTask<void> {
             putWorldIndex();
         }
 
-        if(updateFlags.chatMessages.length !== 0) {
+        if (updateFlags.chatMessages.length !== 0) {
             const message = updateFlags.chatMessages[0];
 
-            if(message.message) {
+            if (message.message) {
                 updateMaskData.putString(message.message);
             } else {
                 updateMaskData.putString('Undefined Message');
@@ -167,22 +177,22 @@ export class NpcSyncTask extends SyncTask<void> {
             putWorldIndex();
         }
 
-        if(updateFlags.appearanceUpdateRequired) {
+        if (updateFlags.appearanceUpdateRequired) {
             updateMaskData.put(npc.id, 'SHORT');
             putWorldIndex();
         }
 
-        if(updateFlags.facePosition) {
+        if (updateFlags.facePosition) {
             const position = updateFlags.facePosition;
             updateMaskData.put(position.x * 2 + 1, 'SHORT');
             updateMaskData.put(position.y * 2 + 1, 'SHORT', 'LITTLE_ENDIAN');
             putWorldIndex();
         }
 
-        if(updateFlags.animation) {
+        if (updateFlags.animation) {
             const animation = updateFlags.animation;
 
-            if(animation === null || animation.id === -1) {
+            if (animation === null || animation.id === -1) {
                 // Reset animation
                 updateMaskData.put(65535, 'SHORT');
                 updateMaskData.put(0);
@@ -193,6 +203,12 @@ export class NpcSyncTask extends SyncTask<void> {
             }
             putWorldIndex();
         }
-    }
 
+        if (updateFlags.graphics) {
+            const { id, delay = 0, height } = updateFlags.graphics;
+            updateMaskData.put(id, 'SHORT', 'LITTLE_ENDIAN');
+            updateMaskData.put((height << 16) | (delay & 0xffff), 'INT');
+            putWorldIndex();
+        }
+    }
 }

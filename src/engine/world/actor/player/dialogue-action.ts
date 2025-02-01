@@ -1,25 +1,24 @@
-import { Player } from '@engine/world/actor/player/player';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player } from '@engine/world/actor/player/player';
 import { filestore } from '@server/game/game-server';
-import { Npc } from '@engine/world/actor/npc';
-import { logger } from '@runejs/common';
 
 export const dialogueWidgetIds = {
-    PLAYER: [ 64, 65, 66, 67 ],
-    NPC: [ 241, 242, 243, 244 ],
-    OPTIONS: [ 228, 230, 232, 234 ],
-    TEXT: [ 210, 211, 212, 213, 214 ]
+    PLAYER: [64, 65, 66, 67],
+    NPC: [241, 242, 243, 244],
+    OPTIONS: [228, 230, 232, 234],
+    TEXT: [210, 211, 212, 213, 214],
 };
 
-type LineConstraint = [ number, number ];
+type LineConstraint = [number, number];
 
 /**
  * Min -> max lines for a specific dialogue type.
  */
 const lineConstraints: { [key: string]: LineConstraint } = {
-    PLAYER: [ 1, 4 ],
-    NPC: [ 1, 4 ],
-    OPTIONS: [ 2, 5 ],
-    TEXT: [ 1, 5 ]
+    PLAYER: [1, 4],
+    NPC: [1, 4],
+    OPTIONS: [2, 5],
+    TEXT: [1, 5],
 };
 
 export enum DialogueEmote {
@@ -52,7 +51,7 @@ export enum DialogueEmote {
     ANGRY_1 = 614,
     ANGRY_2 = 615,
     ANGRY_3 = 616,
-    ANGRY_4 = 617
+    ANGRY_4 = 617,
 }
 
 export type DialogueType = 'PLAYER' | 'NPC' | 'OPTIONS' | 'TEXT';
@@ -68,11 +67,9 @@ export interface DialogueOptions {
 
 // @DEPRECATED
 export class DialogueAction {
-
     private _action: number | null = null;
 
-    public constructor(private readonly p: Player) {
-    }
+    public constructor(private readonly p: Player) {}
 
     public async player(emote: DialogueEmote, lines: string[]): Promise<DialogueAction> {
         return this.dialogue({ emote, lines, type: 'PLAYER' });
@@ -87,35 +84,35 @@ export class DialogueAction {
     }
 
     public async dialogue(options: DialogueOptions): Promise<DialogueAction> {
-        if(options.lines.length < lineConstraints[options.type][0] || options.lines.length > lineConstraints[options.type][1]) {
+        if (options.lines.length < lineConstraints[options.type][0] || options.lines.length > lineConstraints[options.type][1]) {
             throw new Error('Invalid line length.');
         }
 
-        if(options.type === 'NPC' && options.npc === undefined) {
+        if (options.type === 'NPC' && options.npc === undefined) {
             throw new Error('NPC not supplied.');
         }
 
         this._action = null;
 
         let widgetIndex = options.lines.length - 1;
-        if(options.type === 'OPTIONS') {
+        if (options.type === 'OPTIONS') {
             widgetIndex--;
         }
 
         const widgetId = dialogueWidgetIds[options.type][widgetIndex];
 
-        if(widgetId === undefined || widgetId === null || widgetId === -1) {
+        if (widgetId === undefined || widgetId === null || widgetId === -1) {
             return Promise.resolve(this);
         }
 
         let textOffset = 0;
 
-        if(options.type === 'PLAYER' || options.type === 'NPC') {
-            if(!options.emote) {
+        if (options.type === 'PLAYER' || options.type === 'NPC') {
+            if (!options.emote) {
                 options.emote = DialogueEmote.DEFAULT;
             }
 
-            if(options.type === 'NPC') {
+            if (options.type === 'NPC') {
                 const npc = options.npc;
 
                 if (npc === undefined) {
@@ -131,28 +128,28 @@ export class DialogueAction {
 
                 this.p.outgoingPackets.setWidgetNpcHead(widgetId, 0, npc);
                 this.p.outgoingPackets.updateWidgetString(widgetId, 1, cacheNpc.name || 'Unknown');
-            } else if(options.type === 'PLAYER') {
+            } else if (options.type === 'PLAYER') {
                 this.p.outgoingPackets.setWidgetPlayerHead(widgetId, 0);
                 this.p.outgoingPackets.updateWidgetString(widgetId, 1, this.p.username);
             }
 
             this.p.outgoingPackets.playWidgetAnimation(widgetId, 0, options.emote);
             textOffset = 2;
-        } else if(options.type === 'OPTIONS') {
+        } else if (options.type === 'OPTIONS') {
             this.p.outgoingPackets.updateWidgetString(widgetId, 0, options.title || 'No Title');
             textOffset = 1;
-        } else if(options.type === 'TEXT') {
+        } else if (options.type === 'TEXT') {
             textOffset = 0;
         }
 
-        for(let i = 0; i < options.lines.length; i++) {
+        for (let i = 0; i < options.lines.length; i++) {
             this.p.outgoingPackets.updateWidgetString(widgetId, textOffset + i, options.lines[i]);
         }
 
         return new Promise<DialogueAction>((resolve, reject) => {
             this.p.interfaceState.openWidget(widgetId, {
-                slot: 'chatbox'
-            })
+                slot: 'chatbox',
+            });
             const sub = this.p.interfaceState.closed.subscribe(action => {
                 sub.unsubscribe();
                 this._action = action?.data ?? null;
@@ -175,7 +172,7 @@ export class DialogueAction {
 }
 
 export const dialogueAction = async (player: Player, options?: DialogueOptions): Promise<DialogueAction> => {
-    if(options) {
+    if (options) {
         return new DialogueAction(player).dialogue(options);
     } else {
         return Promise.resolve(new DialogueAction(player));

@@ -1,6 +1,6 @@
-import { ConstructedRegion } from '../map';
-import { Position } from '../position';
-import { Actor } from './actor';
+import type { ConstructedRegion } from '@engine/world/map/region';
+import type { Position } from '../position';
+import type { Actor } from './actor';
 
 /**
  * The definition of the metadata available on an {@link Actor}.

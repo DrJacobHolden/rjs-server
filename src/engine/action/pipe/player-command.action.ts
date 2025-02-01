@@ -1,8 +1,9 @@
-import { Player } from '@engine/world/actor';
-import { ActionHook, getActionHooks, ActionPipe, RunnableHooks } from '@engine/action';
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
 import { reloadContent, reloadContentCommands } from '@engine/plugins/reload-content';
+import type { Player } from '@engine/world/actor/player/player';
 import { logger } from '@runejs/common';
-
 
 /**
  * Defines a player command action hook.
@@ -18,12 +19,10 @@ export interface PlayerCommandActionHook extends ActionHook<PlayerCommandAction,
     }[];
 }
 
-
 /**
  * The player command action hook handler function to be called when the hook's conditions are met.
  */
 export type commandActionHandler = (playerCommandAction: PlayerCommandAction) => void;
-
 
 /**
  * Details about a player command action being performed.
@@ -39,7 +38,6 @@ export interface PlayerCommandAction {
     args: { [key: string]: number | string };
 }
 
-
 /**
  * The pipe that the game engine hands player command actions off to.
  * @param player
@@ -47,8 +45,12 @@ export interface PlayerCommandAction {
  * @param isConsole
  * @param inputArgs
  */
-const playerCommandActionPipe = (player: Player, command: string, isConsole: boolean,
-                                 inputArgs: string[]): RunnableHooks<PlayerCommandAction> | null => {
+const playerCommandActionPipe = (
+    player: Player,
+    command: string,
+    isConsole: boolean,
+    inputArgs: string[],
+): RunnableHooks<PlayerCommandAction> | null => {
     command = command.toLowerCase();
 
     // Reload game content
@@ -61,17 +63,17 @@ const playerCommandActionPipe = (player: Player, command: string, isConsole: boo
 
     const plugins = getActionHooks<PlayerCommandActionHook>('player_command').filter(actionHook => {
         let valid: boolean;
-        if(Array.isArray(actionHook.commands)) {
+        if (Array.isArray(actionHook.commands)) {
             valid = actionHook.commands.indexOf(command) !== -1;
         } else {
             valid = actionHook.commands === command;
         }
 
-        if(!valid) {
+        if (!valid) {
             return false;
         }
 
-        if(actionHook.args) {
+        if (actionHook.args) {
             const args = actionHook.args;
             let syntaxError = `Syntax error. Try ::${command}`;
 
@@ -80,32 +82,31 @@ const playerCommandActionPipe = (player: Player, command: string, isConsole: boo
             });
 
             const requiredArgLength = actionHook.args.filter(arg => arg.defaultValue === undefined).length;
-            if(requiredArgLength > inputArgs.length) {
+            if (requiredArgLength > inputArgs.length) {
                 player.sendLogMessage(syntaxError, isConsole);
                 return;
             }
 
-
-            for(let i = 0; i < actionHook.args.length; i++) {
+            for (let i = 0; i < actionHook.args.length; i++) {
                 let argValue: string | number | null = inputArgs[i] || null;
                 const pluginArg = actionHook.args[i];
 
-                if(argValue === null || argValue === undefined) {
-                    if(pluginArg.defaultValue === undefined) {
+                if (argValue === null || argValue === undefined) {
+                    if (pluginArg.defaultValue === undefined) {
                         player.sendLogMessage(syntaxError, isConsole);
                         return;
                     } else {
                         argValue = pluginArg.defaultValue;
                     }
                 } else {
-                    if(pluginArg.type === 'number') {
+                    if (pluginArg.type === 'number') {
                         argValue = parseInt(argValue);
-                        if(isNaN(argValue)) {
+                        if (isNaN(argValue)) {
                             player.sendLogMessage(syntaxError, isConsole);
                             return;
                         }
-                    } else if(pluginArg.type === 'string') {
-                        if(!argValue || argValue.trim() === '') {
+                    } else if (pluginArg.type === 'string') {
+                        if (!argValue || argValue.trim() === '') {
                             player.sendLogMessage(syntaxError, isConsole);
                             return;
                         }
@@ -119,8 +120,8 @@ const playerCommandActionPipe = (player: Player, command: string, isConsole: boo
         return true;
     });
 
-    if(plugins.length === 0) {
-        player.sendLogMessage(`Unhandled command: ${ command }`, isConsole);
+    if (plugins.length === 0) {
+        player.sendLogMessage(`Unhandled command: ${command}`, isConsole);
         return null;
     }
 
@@ -130,13 +131,12 @@ const playerCommandActionPipe = (player: Player, command: string, isConsole: boo
             player,
             command,
             isConsole,
-            args: actionArgs
-        }
-    }
+            args: actionArgs,
+        },
+    };
 };
-
 
 /**
  * Player command action pipe definition.
  */
-export default [ 'player_command',  playerCommandActionPipe ] as ActionPipe;
+export default ['player_command', playerCommandActionPipe] as ActionPipe;

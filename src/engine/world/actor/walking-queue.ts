@@ -1,17 +1,14 @@
-import { Actor } from './actor';
-import { Position } from '../position';
-import { Player } from './player/player';
-import { Npc } from './npc';
-import { regionChangeActionFactory } from '@engine/action';
-import { Subject } from 'rxjs';
+import { regionChangeActionFactory } from '@engine/action/pipe/region-change.action';
 import { activeWorld, Chunk } from '@engine/world';
-
+import { isNpc, isPlayer } from '@engine/world/actor/util';
+import { Subject } from 'rxjs';
+import { Position } from '../position';
+import type { Actor } from './actor';
 
 /**
  * Controls an actor's movement.
  */
 export class WalkingQueue {
-
     public readonly movementQueued = new Subject<Position>();
     public readonly movementEvent = new Subject<Position>();
     public readonly movementQueued$ = this.movementQueued.asObservable();
@@ -34,7 +31,7 @@ export class WalkingQueue {
     }
 
     public getLastPosition(): Position {
-        if(this.queue.length === 0) {
+        if (this.queue.length === 0) {
             return this.actor.position;
         } else {
             return this.queue[this.queue.length - 1];
@@ -51,12 +48,12 @@ export class WalkingQueue {
 
         const stepsBetween = Math.max(Math.abs(diffX), Math.abs(diffY));
 
-        for(let i = 0; i < stepsBetween; i++) {
-            if(diffX !== 0) {
+        for (let i = 0; i < stepsBetween; i++) {
+            if (diffX !== 0) {
                 diffX += diffX < 0 ? 1 : -1;
             }
 
-            if(diffY !== 0) {
+            if (diffY !== 0) {
                 diffY += diffY < 0 ? 1 : -1;
             }
 
@@ -65,11 +62,11 @@ export class WalkingQueue {
 
             const newPosition = new Position(lastX, lastY, this.actor.position.level);
 
-            if(this.actor.pathfinding.canMoveTo(lastPosition, newPosition)) {
+            if (this.actor.pathfinding.canMoveTo(lastPosition, newPosition)) {
                 lastPosition = newPosition;
                 newPosition.metadata = {
                     ...newPosition.metadata,
-                    ...positionMetadata
+                    ...positionMetadata,
                 };
                 this.queue.push(newPosition);
                 this.movementQueued.next(newPosition);
@@ -79,13 +76,13 @@ export class WalkingQueue {
             }
         }
 
-        if(lastX !== x || lastY !== y && this.valid) {
+        if (lastX !== x || (lastY !== y && this.valid)) {
             const newPosition = new Position(x, y, this.actor.position.level);
 
-            if(this.actor.pathfinding.canMoveTo(lastPosition, newPosition)) {
+            if (this.actor.pathfinding.canMoveTo(lastPosition, newPosition)) {
                 newPosition.metadata = {
                     ...newPosition.metadata,
-                    ...positionMetadata
+                    ...positionMetadata,
                 };
                 this.queue.push(newPosition);
                 this.movementQueued.next(newPosition);
@@ -99,7 +96,7 @@ export class WalkingQueue {
         const position = this.actor.position;
         const newPosition = new Position(position.x + xDiff, position.y + yDiff, position.level);
 
-        if(this.actor.pathfinding.canMoveTo(position, newPosition)) {
+        if (this.actor.pathfinding.canMoveTo(position, newPosition)) {
             this.clear();
             this.valid = true;
             this.add(newPosition.x, newPosition.y, { ignoreWidgets: true });
@@ -115,26 +112,26 @@ export class WalkingQueue {
     }
 
     public calculateDirection(diffX: number, diffY: number): number {
-        if(diffX < 0) {
-            if(diffY < 0) {
+        if (diffX < 0) {
+            if (diffY < 0) {
                 return 5;
-            } else if(diffY > 0) {
+            } else if (diffY > 0) {
                 return 0;
             } else {
                 return 3;
             }
-        } else if(diffX > 0) {
-            if(diffY < 0) {
+        } else if (diffX > 0) {
+            if (diffY < 0) {
                 return 7;
-            } else if(diffY > 0) {
+            } else if (diffY > 0) {
                 return 2;
             } else {
                 return 4;
             }
         } else {
-            if(diffY < 0) {
+            if (diffY < 0) {
                 return 6;
-            } else if(diffY > 0) {
+            } else if (diffY > 0) {
                 return 1;
             } else {
                 return -1;
@@ -159,7 +156,7 @@ export class WalkingQueue {
 
         const originalPosition = this.actor.position;
 
-        if(this.actor.pathfinding.canMoveTo(originalPosition, walkPosition)) {
+        if (this.actor.pathfinding.canMoveTo(originalPosition, walkPosition)) {
             const oldChunk = activeWorld.chunkManager.getChunkForWorldPosition(originalPosition);
             const lastMapRegionUpdatePosition = this.actor.lastMapRegionUpdatePosition;
 
@@ -167,7 +164,7 @@ export class WalkingQueue {
             const walkDiffY = walkPosition.y - originalPosition.y;
             const walkDir = this.calculateDirection(walkDiffX, walkDiffY);
 
-            if(walkDir === -1) {
+            if (walkDir === -1) {
                 this.resetDirections();
                 return;
             }

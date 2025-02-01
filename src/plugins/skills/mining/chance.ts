@@ -1,5 +1,5 @@
-import { randomBetween } from '@engine/util';
-import { IHarvestable } from '@engine/world/config';
+import { randomBetween } from '@engine/util/num';
+import type { IHarvestable } from '@engine/world/config/harvestable-object';
 
 /**
  * Roll a random number between 0 and 255 and compare it to the percent needed to mine the ore.
@@ -10,14 +10,9 @@ import { IHarvestable } from '@engine/world/config';
  *
  * @returns True if the tree was successfully cut, false otherwise
  */
-export const canMine = (
-    ore: IHarvestable,
-    toolLevel: number,
-    miningLevel: number
-): boolean => {
+export const canMine = (ore: IHarvestable, toolLevel: number, miningLevel: number): boolean => {
     const successChance = randomBetween(0, 255);
 
-    const percentNeeded =
-        ore.baseChance + toolLevel + miningLevel;
+    const percentNeeded = ore.baseChance + toolLevel + miningLevel;
     return successChance <= percentNeeded;
 };

@@ -1,6 +1,5 @@
-import { Player } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
 import { Position } from '@engine/world/position';
-
 
 /**
  * Various camera options for cutscenes.
@@ -18,12 +17,10 @@ export interface CameraOptions {
     lookAcceleration?: number;
 }
 
-
 /**
  * Controls a game cutscene for a specific player.
  */
 export class Cutscene {
-
     public readonly player: Player;
     private _cameraX: number;
     private _cameraY: number;
@@ -39,7 +36,7 @@ export class Cutscene {
     public constructor(player: Player, options?: CameraOptions) {
         this.player = player;
 
-        if(options) {
+        if (options) {
             this.setCamera(options);
         }
     }
@@ -49,16 +46,24 @@ export class Cutscene {
      * @param options The camera options to use.
      */
     public setCamera(options: CameraOptions): void {
-        const { cameraX, cameraY, cameraHeight, cameraMovementSpeed, cameraAcceleration,
-            lookX, lookY, lookHeight, lookMovementSpeed, lookAcceleration } = options;
+        const {
+            cameraX,
+            cameraY,
+            cameraHeight,
+            cameraMovementSpeed,
+            cameraAcceleration,
+            lookX,
+            lookY,
+            lookHeight,
+            lookMovementSpeed,
+            lookAcceleration,
+        } = options;
 
-        if(cameraX && cameraY) {
-            this.snapCameraTo(cameraX, cameraY, cameraHeight || 400,
-                cameraMovementSpeed || 0,  cameraAcceleration || 100);
+        if (cameraX && cameraY) {
+            this.snapCameraTo(cameraX, cameraY, cameraHeight || 400, cameraMovementSpeed || 0, cameraAcceleration || 100);
         }
-        if(lookX && lookY) {
-            this.lookAt(lookX, lookY, lookHeight || 400,
-                lookMovementSpeed || 0,  lookAcceleration || 100);
+        if (lookX && lookY) {
+            this.lookAt(lookX, lookY, lookHeight || 400, lookMovementSpeed || 0, lookAcceleration || 100);
         }
     }
 
@@ -70,8 +75,13 @@ export class Cutscene {
      * @param movementSpeed The general speed of the camera movement. Defaults to 0 (immediate).
      * @param acceleration The acceleration speed of the camera movement. Defaults to 100 (instantaneous).
      */
-    public snapCameraTo(cameraX: number, cameraY: number, height: number = 400, movementSpeed: number = 0,
-        acceleration: number = 100): void {
+    public snapCameraTo(
+        cameraX: number,
+        cameraY: number,
+        height: number = 400,
+        movementSpeed: number = 0,
+        acceleration: number = 100,
+    ): void {
         this._cameraX = cameraX;
         this._cameraY = cameraY;
         this._cameraHeight = height;
@@ -88,8 +98,7 @@ export class Cutscene {
      * @param movementSpeed The general speed of the camera movement. Defaults to 0 (immediate).
      * @param acceleration The acceleration speed of the camera movement. Defaults to 100 (instantaneous).
      */
-    public lookAt(lookX: number, lookY: number, height: number = 400, movementSpeed: number = 0,
-        acceleration: number = 100): void {
+    public lookAt(lookX: number, lookY: number, height: number = 400, movementSpeed: number = 0, acceleration: number = 100): void {
         this._lookX = lookX;
         this._lookY = lookY;
         this._lookHeight = height;
@@ -105,7 +114,6 @@ export class Cutscene {
         this.player.outgoingPackets.resetCamera();
         this.player.cutscene = null;
     }
-
 
     public get cameraX(): number {
         return this._cameraX;

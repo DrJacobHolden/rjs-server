@@ -9,7 +9,7 @@ const varbitMasks: number[] = [];
  * @return index to morph into
  */
 export function getVarbitMorphIndex(varbitId, playerConfig) {
-    if(varbitMasks.length === 0) {
+    if (varbitMasks.length === 0) {
         let i = 2;
         for (let i_7_ = 0; i_7_ < 32; i_7_++) {
             varbitMasks[i_7_] = -1 + i;
@@ -18,7 +18,7 @@ export function getVarbitMorphIndex(varbitId, playerConfig) {
     }
     const varbitDefinition = filestore.configStore.varbitStore.getVarbit(varbitId);
 
-    if(!varbitDefinition) {
+    if (!varbitDefinition) {
         throw new Error(`Could not find varbit definition for id ${varbitId}`);
     }
 
@@ -28,5 +28,5 @@ export function getVarbitMorphIndex(varbitId, playerConfig) {
     // TODO: Unknown
     const i_8_ = varbitMasks[mostSignificantBit - leastSignificantBit];
     const configValue = playerConfig && playerConfig[configId] ? playerConfig[configId] : 0;
-    return ((configValue) >> leastSignificantBit & i_8_);
+    return (configValue >> leastSignificantBit) & i_8_;
 }

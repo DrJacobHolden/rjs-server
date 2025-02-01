@@ -1,8 +1,9 @@
-import { itemInteractionActionHandler } from '@engine/action';
-import { Item } from '@engine/world/items/item';
-import { getItemFromContainer, ItemContainer } from '@engine/world/items/item-container';
-import { itemIds } from '@engine/world/config/item-ids';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 import { findItem, findShop, widgets } from '@engine/config/config-handler';
+import { itemIds } from '@engine/world/config/item-ids';
+import type { Item } from '@engine/world/items/item';
+import type { ItemContainer } from '@engine/world/items/item-container';
+import { getItemFromContainer } from '@engine/world/items/item-container';
 import { logger } from '@runejs/common';
 
 function removeCoins(inventory: ItemContainer, coinsIndex: number, cost: number): void {
@@ -17,32 +18,32 @@ function removeCoins(inventory: ItemContainer, coinsIndex: number, cost: number)
     inventory.set(coinsIndex, { itemId: itemIds.coins, amount: amountAfterPurchase });
 }
 
-export const handler: itemInteractionActionHandler = (details) => {
+export const handler: itemInteractionActionHandler = details => {
     const { player, itemId, itemSlot, widgetId, option } = details;
 
-    if(!player.interfaceState.findWidget(widgetId)) {
+    if (!player.interfaceState.findWidget(widgetId)) {
         return;
     }
 
     const openedShopKey = player.metadata.lastOpenedShopKey;
-    if(!openedShopKey) {
+    if (!openedShopKey) {
         return;
     }
 
     const shop = findShop(openedShopKey);
-    if(!shop) {
+    if (!shop) {
         return;
     }
 
     const shopContainer = shop.container;
     const shopItem = getItemFromContainer(itemId, itemSlot, shopContainer);
 
-    if(!shopItem) {
+    if (!shopItem) {
         // The specified item was not found in the specified slot.
         return;
     }
 
-    if(shopItem.amount <= 0) {
+    if (shopItem.amount <= 0) {
         // Out of stock
         return;
     }
@@ -50,35 +51,35 @@ export const handler: itemInteractionActionHandler = (details) => {
     const buyAmounts = {
         'buy-1': 1,
         'buy-5': 5,
-        'buy-10': 10
+        'buy-10': 10,
     };
     let buyAmount = buyAmounts[option];
-    if(shopItem.amount < buyAmount) {
+    if (shopItem.amount < buyAmount) {
         buyAmount = shopItem.amount;
     }
 
     const buyItem = findItem(itemId);
-    if(!buyItem) {
+    if (!buyItem) {
         logger.error(`Could not find cache item for item id ${itemId} in shop ${openedShopKey}`);
         return;
     }
     const buyItemValue = shop.getBuyFromShopPrice(buyItem);
-    player.sendMessage(`${buyItem.key} : ${buyItemValue}, ${buyItem.value}`)
+    player.sendMessage(`${buyItem.key} : ${buyItemValue}, ${buyItem.value}`);
     let buyCost = buyAmount * buyItemValue;
     const coinsIndex = player.hasCoins(buyCost);
 
-    if(coinsIndex === -1) {
+    if (coinsIndex === -1) {
         player.sendMessage(`You don't have enough coins.`);
         return;
     }
 
     const inventory = player.inventory;
 
-    if(buyItem.stackable) {
+    if (buyItem.stackable) {
         const inventoryStackSlot = inventory.items.findIndex(item => itemId === itemId);
 
-        if(inventoryStackSlot === -1) {
-            if(inventory.getFirstOpenSlot() === -1) {
+        if (inventoryStackSlot === -1) {
+            if (inventory.getFirstOpenSlot() === -1) {
                 player.sendMessage(`You don't have enough space in your inventory.`);
                 return;
             }
@@ -86,11 +87,13 @@ export const handler: itemInteractionActionHandler = (details) => {
             const inventoryItem = inventory.items[inventoryStackSlot];
 
             if (!inventoryItem) {
-                logger.error(`Coult not find inventory item at slot ${inventoryStackSlot} for player ${player.username} while trying to stack`);
+                logger.error(
+                    `Coult not find inventory item at slot ${inventoryStackSlot} for player ${player.username} while trying to stack`,
+                );
                 return;
             }
 
-            if(inventoryItem.amount + buyAmount >= 2147483647) {
+            if (inventoryItem.amount + buyAmount >= 2147483647) {
                 player.sendMessage(`You don't have enough space in your inventory.`);
                 return;
             }
@@ -99,7 +102,8 @@ export const handler: itemInteractionActionHandler = (details) => {
             removeCoins(inventory, coinsIndex, buyCost);
 
             const item: Item = {
-                itemId, amount: inventoryItem.amount + buyAmount
+                itemId,
+                amount: inventoryItem.amount + buyAmount,
             };
 
             inventory.set(inventoryStackSlot, item);
@@ -107,15 +111,15 @@ export const handler: itemInteractionActionHandler = (details) => {
     } else {
         let bought = 0;
 
-        for(let i = 0; i < buyAmount; i++) {
-            if(inventory.add({ itemId, amount: 1 }) !== null) {
+        for (let i = 0; i < buyAmount; i++) {
+            if (inventory.add({ itemId, amount: 1 }) !== null) {
                 bought++;
             } else {
                 break;
             }
         }
 
-        if(bought !== buyAmount) {
+        if (bought !== buyAmount) {
             player.sendMessage(`You don't have enough space in your inventory.`);
         }
 
@@ -135,9 +139,9 @@ export default {
         {
             type: 'item_interaction',
             widgets: widgets.shop,
-            options: [ 'buy-1', 'buy-5', 'buy-10' ],
+            options: ['buy-1', 'buy-5', 'buy-10'],
             handler,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

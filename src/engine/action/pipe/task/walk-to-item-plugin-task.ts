@@ -1,15 +1,15 @@
-import { ItemDetails } from '@engine/config';
-import { ActorWorldItemInteractionTask } from '@engine/task/impl';
-import { WorldItem } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { SpawnedItemInteractionHook } from '../spawned-item-interaction.action';
+import type { SpawnedItemInteractionHook } from '@engine/action/pipe/spawned-item-interaction.action';
+import type { ItemDetails } from '@engine/config/item-config';
+import { ActorWorldItemInteractionTask } from '@engine/task/impl/actor-world-item-interaction-task';
+import type { Player } from '@engine/world/actor/player/player';
+import type { WorldItem } from '@engine/world/items/world-item';
 
 /**
-* This is a task to migrate old `walkTo` item interaction actions to the new task system.
-*
-* This is a first-pass implementation to allow for removal of the old action system.
-* It will be refactored in future to be more well suited to our plugin system.
-*/
+ * This is a task to migrate old `walkTo` item interaction actions to the new task system.
+ *
+ * This is a first-pass implementation to allow for removal of the old action system.
+ * It will be refactored in future to be more well suited to our plugin system.
+ */
 export class WalkToItemPluginTask extends ActorWorldItemInteractionTask<Player> {
     /**
      * The plugins to execute when the player arrives at the item.
@@ -22,10 +22,7 @@ export class WalkToItemPluginTask extends ActorWorldItemInteractionTask<Player> 
     private itemDetails: ItemDetails;
 
     constructor(plugins: SpawnedItemInteractionHook[], player: Player, worldItem: WorldItem, itemDetails: ItemDetails) {
-        super(
-            player,
-            worldItem
-        );
+        super(player, worldItem);
 
         this.plugins = plugins;
         this.itemDetails = itemDetails;
@@ -53,7 +50,7 @@ export class WalkToItemPluginTask extends ActorWorldItemInteractionTask<Player> 
             plugin.handler({
                 player: this.actor,
                 worldItem: worldItem,
-                itemDetails: this.itemDetails
+                itemDetails: this.itemDetails,
             });
         });
 

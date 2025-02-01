@@ -1,4 +1,4 @@
-name: Lint & Build Project
+name: Check & Build Project
 
 on:
     pull_request:
@@ -23,7 +23,13 @@ jobs:
                 run: npm i
 
             -   name: Run Linter
-                run: npm run lint
+                run: npm run lint:fin
+
+            -   name: Run Formatter
+                run: npm run format:fin
+
+            -   name: Run Tests
+                run: npm run test:fin
 
             -   name: Run Typecheck
                 run: npm run typecheck

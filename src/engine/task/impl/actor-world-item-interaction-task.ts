@@ -1,5 +1,5 @@
-import { WorldItem } from '@engine/world';
-import { Actor } from '../../world/actor/actor';
+import type { WorldItem } from '@engine/world/items/world-item';
+import type { Actor } from '../../world/actor/actor';
 import { ActorWalkToTask } from './actor-walk-to-task';
 
 /**
@@ -17,15 +17,8 @@ export abstract class ActorWorldItemInteractionTask<TActor extends Actor = Actor
      * @param actor The actor executing this task.
      * @param worldItem The world item to interact with.
      */
-    constructor (
-        actor: TActor,
-        worldItem: WorldItem,
-    ) {
-        super(
-            actor,
-            worldItem.position,
-            1
-        );
+    constructor(actor: TActor, worldItem: WorldItem) {
+        super(actor, worldItem.position, 1);
 
         if (!worldItem) {
             this.stop();
@@ -33,7 +26,6 @@ export abstract class ActorWorldItemInteractionTask<TActor extends Actor = Actor
         }
 
         this._worldItem = worldItem;
-
     }
 
     /**

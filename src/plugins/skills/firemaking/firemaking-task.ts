@@ -1,11 +1,12 @@
-import { ActorWorldItemInteractionTask } from '@engine/task/impl';
-import { WorldItem } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { animationIds, soundIds } from '@engine/world/config';
+import { ActorWorldItemInteractionTask } from '@engine/task/impl/actor-world-item-interaction-task';
+import type { Player } from '@engine/world/actor/player/player';
+import { animationIds } from '@engine/world/config/animation-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
+import type { WorldItem } from '@engine/world/items/world-item';
 import { canLight } from './chance';
 import { FIREMAKING_LOGS } from './data';
 import { lightFire } from './light-fire';
-import { Burnable } from './types';
+import type { Burnable } from './types';
 
 /**
  * A firemaking task on a {@link WorldItem} log.
@@ -41,10 +42,7 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
      * @param player The player that is attempting to light the fire.
      * @param logWorldItem The world item that represents the log.
      */
-    constructor(
-        player: Player,
-        logWorldItem: WorldItem
-    ) {
+    constructor(player: Player, logWorldItem: WorldItem) {
         super(player, logWorldItem);
 
         const logInfo = FIREMAKING_LOGS.find(l => l.logItem.gameId === logWorldItem.itemId);
@@ -125,5 +123,5 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
  * @param worldItemLog The WorldItem that represents the log.
  */
 export function runFiremakingTask(player: Player, worldItemLog: WorldItem) {
-    player.enqueueTask(FiremakingTask, [ worldItemLog ]);
+    player.enqueueTask(FiremakingTask, [worldItemLog]);
 }

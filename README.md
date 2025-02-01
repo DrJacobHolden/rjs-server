@@ -48,4 +48,8 @@ Before running these commands, you must:
 * `npm run standalone` Launches all three servers concurrently without building
 * `npm run build:watch` Builds the application and watches for changes
 * `npm run build` Builds the application
-* `npm run lint` Runs the linter against the codebase to look for code style issues
+* `npm run lint` Runs Biome in linting mode, use `lint:fix` to autofix
+* `npm run format` Runs Biome in formatting mode, use `format:fix` to autofix
+* `npm run test` Runs all tests with Jest
+* `npm run typecheck` Typechecks the project
+* `npm run fin` Combines lint:fix, format:fix, test and typecheck into a single command

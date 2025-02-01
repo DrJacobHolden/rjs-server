@@ -1,28 +1,24 @@
-import { objectIds } from '@engine/world/config/object-ids';
-import { objectInteractionActionHandler } from '@engine/action';
-import { ItemContainer } from '@engine/world/items/item-container';
-import { itemInteractionActionHandler } from '@engine/action';
-import { fromNote, Item } from '@engine/world/items/item';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { widgets } from '@engine/config/config-handler';
+import { objectIds } from '@engine/world/config/object-ids';
+import type { Item } from '@engine/world/items/item';
+import { fromNote } from '@engine/world/items/item';
 
 export const openDepositBoxInterface: objectInteractionActionHandler = ({ player }) => {
-
     player.interfaceState.openWidget(widgets.bank.depositBoxWidget.widgetId, {
         slot: 'screen',
-        multi: true
+        multi: true,
     });
     player.interfaceState.openWidget(widgets.disabledTab, {
         slot: 'tabarea',
-        multi: true
+        multi: true,
     });
-
 
     player.outgoingPackets.sendUpdateAllWidgetItems(widgets.bank.depositBoxWidget, player.inventory);
 };
 
-
-
-export const depositItem: itemInteractionActionHandler = (details) => {
+export const depositItem: itemInteractionActionHandler = details => {
     // Check if player might be spawning widget clientside
     if (!details.player.interfaceState.findWidget(widgets.bank.depositBoxWidget.widgetId)) {
         return;
@@ -47,13 +43,12 @@ export const depositItem: itemInteractionActionHandler = (details) => {
         countToRemove = +details.option.replace('deposit-', '');
     }
 
-
     const playerInventory = details.player.inventory;
     const playerBank = details.player.bank;
     const slotsWithItem = playerInventory.findAll(details.itemId);
 
     let itemAmount: number = 0;
-    slotsWithItem.forEach((slot) => {
+    slotsWithItem.forEach(slot => {
         const item = playerInventory.items[slot];
 
         if (!item) {
@@ -74,7 +69,6 @@ export const depositItem: itemInteractionActionHandler = (details) => {
         details.player.sendMessage('Your bank is full.');
         return;
     }
-
 
     const itemToAdd: Item = { itemId: itemIdToAdd, amount: 0 };
     while (countToRemove > 0 && playerInventory.has(details.itemId)) {
@@ -98,12 +92,9 @@ export const depositItem: itemInteractionActionHandler = (details) => {
 
     playerBank.addStacking(itemToAdd);
 
-
     details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, details.player.inventory);
     details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.bank.depositBoxWidget, details.player.inventory);
 };
-
-
 
 export default {
     pluginId: 'rs:bank_deposit_box',
@@ -111,14 +102,15 @@ export default {
         {
             type: 'object_interaction',
             objectIds: objectIds.depositBox,
-            options: [ 'deposit' ],
+            options: ['deposit'],
             walkTo: true,
-            handler: openDepositBoxInterface
-        }, {
+            handler: openDepositBoxInterface,
+        },
+        {
             type: 'item_interaction',
             widgets: widgets.bank.depositBoxWidget,
-            options: [ 'deposit-1', 'deposit-5', 'deposit-10', 'deposit-all' ],
+            options: ['deposit-1', 'deposit-5', 'deposit-10', 'deposit-all'],
             handler: depositItem,
-        }
-    ]
+        },
+    ],
 };

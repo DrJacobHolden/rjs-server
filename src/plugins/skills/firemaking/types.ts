@@ -1,4 +1,4 @@
-import { ItemDetails } from '@engine/config';
+import type { ItemDetails } from '@engine/config/item-config';
 
 /**
  * The definition for a burnable log.
@@ -18,4 +18,4 @@ export type Burnable = {
      * The experience gained for lighting the log.
      */
     experienceGained: number;
-}
+};

@@ -1,6 +1,8 @@
-import { Player, Npc } from '@engine/world/actor';
-import { ActionHook, getActionHooks, ActionPipe, RunnableHooks } from '@engine/action';
-
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player } from '@engine/world/actor/player/player';
 
 /**
  * Defines a button action hook.
@@ -16,12 +18,10 @@ export interface MagicOnNPCActionHook extends ActionHook<MagicOnNPCAction, magic
     cancelActions?: boolean;
 }
 
-
 /**
  * The button action hook handler function to be called when the hook's conditions are met.
  */
 export type magiconnpcActionHandler = (buttonAction: MagicOnNPCAction) => void | Promise<void>;
-
 
 /**
  * Details about a button action being performed.
@@ -37,7 +37,6 @@ export interface MagicOnNPCAction {
     buttonId: number;
 }
 
-
 /**
  * The pipe that the game engine hands button actions off to.
  * @param npc
@@ -45,7 +44,7 @@ export interface MagicOnNPCAction {
  * @param widgetId
  * @param buttonId
  */
-const magicOnNpcActionPipe = (npc:Npc, player: Player, widgetId: number, buttonId: number): RunnableHooks<MagicOnNPCAction> => {
+const magicOnNpcActionPipe = (npc: Npc, player: Player, widgetId: number, buttonId: number): RunnableHooks<MagicOnNPCAction> => {
     //console.info(`pew pew you use magic on ${npc.name}!`);
 
     // Find all object action plugins that reference this location object
@@ -57,15 +56,12 @@ const magicOnNpcActionPipe = (npc:Npc, player: Player, widgetId: number, buttonI
             npc,
             player,
             widgetId,
-            buttonId
-        }
-    }
-
-
+            buttonId,
+        },
+    };
 };
-
 
 /**
  * Button action pipe definition.
  */
-export default [ 'magic_on_npc', magicOnNpcActionPipe ] as ActionPipe;
+export default ['magic_on_npc', magicOnNpcActionPipe] as ActionPipe;

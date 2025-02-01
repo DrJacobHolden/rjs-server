@@ -31,7 +31,6 @@
                 "style": "halberd"
             }
         }
-
     },
     "rs:steel_halberd": {
         "game_id": 3194,
@@ -261,8 +260,7 @@
             },
             "weapon_info": {
                 "style": "halberd"
-         }
-        
+            }
         }
     }
 }

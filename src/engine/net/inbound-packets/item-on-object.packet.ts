@@ -1,10 +1,11 @@
+import { widgets } from '@engine/config/config-handler';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import { getVarbitMorphIndex } from '@engine/util/varbits';
+import { activeWorld } from '@engine/world';
+import type { Player } from '@engine/world/actor/player/player';
+import { Position } from '@engine/world/position';
 import { logger } from '@runejs/common';
 import { filestore } from '@server/game/game-server';
-import { Position, activeWorld } from '@engine/world';
-import { widgets } from '@engine/config';
-import { getVarbitMorphIndex } from '@engine/util';
-import { Player } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
 
 const itemOnObjectPacket = (player: Player, packet: PacketData) => {
     const { buffer } = packet;
@@ -38,7 +39,7 @@ const itemOnObjectPacket = (player: Player, packet: PacketData) => {
     const objectPosition = new Position(objectX, objectY, level);
 
     const { object: locationObject, cacheOriginal } = activeWorld.findObjectAtLocation(player, objectId, objectPosition);
-    if(!locationObject) {
+    if (!locationObject) {
         return;
     }
 
@@ -48,25 +49,37 @@ const itemOnObjectPacket = (player: Player, packet: PacketData) => {
         logger.error(`Could not find object config for object id ${objectId}!`);
     } else if (objectConfig.configChangeDest) {
         let morphIndex = -1;
-        if(objectConfig.varbitId === -1) {
-            if(objectConfig.configId !== -1) {
-                const configValue = player.metadata.configs && player.metadata.configs[objectConfig.configId] ? player.metadata.configs[objectConfig.configId] : 0;
+        if (objectConfig.varbitId === -1) {
+            if (objectConfig.configId !== -1) {
+                const configValue =
+                    player.metadata.configs && player.metadata.configs[objectConfig.configId]
+                        ? player.metadata.configs[objectConfig.configId]
+                        : 0;
                 morphIndex = configValue;
-
             }
         } else {
             morphIndex = getVarbitMorphIndex(objectConfig.varbitId, player.metadata.configs);
         }
-        if(morphIndex !== -1) {
+        if (morphIndex !== -1) {
             objectConfig = filestore.configStore.objectStore.getObject(objectConfig.configChangeDest[morphIndex]);
         }
     }
 
-    player.actionPipeline.call('item_on_object', player, locationObject, objectConfig, objectPosition, usedItem, itemWidgetId, itemContainerId, cacheOriginal);
+    player.actionPipeline.call(
+        'item_on_object',
+        player,
+        locationObject,
+        objectConfig,
+        objectPosition,
+        usedItem,
+        itemWidgetId,
+        itemContainerId,
+        cacheOriginal,
+    );
 };
 
 export default {
     opcode: 24,
     size: 14,
-    handler: itemOnObjectPacket
+    handler: itemOnObjectPacket,
 };

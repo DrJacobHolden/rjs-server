@@ -1,5 +1,5 @@
+import type { SkillName } from '@engine/world/actor/skills';
 import * as combatStylesImport from '../../../../data/config/combat-styles.json';
-import { SkillName } from '@engine/world/actor/skills';
 
 export interface CombatStyles {
     [key: string]: CombatStyle[];

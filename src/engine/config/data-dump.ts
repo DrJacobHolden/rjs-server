@@ -1,21 +1,19 @@
-import { join } from 'path';
 import { writeFileSync } from 'fs';
-import { filestore } from '@server/game/game-server';
+import { join } from 'path';
 import { logger } from '@runejs/common';
-import { ItemConfig, NpcConfig, ObjectConfig, WidgetBase } from '@runejs/filestore';
-
+import type { ItemConfig, NpcConfig, ObjectConfig, WidgetBase } from '@runejs/filestore';
+import { filestore } from '@server/game/game-server';
 
 export interface DataDumpResult {
     successful: boolean;
     filePath: string;
 }
 
-
 function dump<T>(fileName: string, definitions: T[]): DataDumpResult {
     const filePath = join('data/dump', fileName);
 
     const arr: T[] = [];
-    for(let i = 0; i < definitions.length; i++) {
+    for (let i = 0; i < definitions.length; i++) {
         arr.push(definitions[i]);
     }
 
@@ -23,13 +21,13 @@ function dump<T>(fileName: string, definitions: T[]): DataDumpResult {
         writeFileSync(filePath, JSON.stringify(arr, null, 4));
         return {
             successful: true,
-            filePath
+            filePath,
         };
-    } catch(error) {
+    } catch (error) {
         logger.error(`Error dumping ${fileName}`);
         return {
             successful: false,
-            filePath
+            filePath,
         };
     }
 }

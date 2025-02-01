@@ -1,8 +1,8 @@
-export function hexToRgb(hex: number): { r: number, b: number, g: number } {
+export function hexToRgb(hex: number): { r: number; b: number; g: number } {
     return {
         r: (hex >> 16) & 0xff,
         g: (hex >> 8) & 0xff,
-        b: hex & 0xff
+        b: hex & 0xff,
     };
 }
 
@@ -23,7 +23,7 @@ export function hexToHexString(hex: number): string {
 }
 
 export function rgbTo16Bit(r: number, g: number, b: number): number {
-    return ((r & 0x1f) << 11) | ((g & 0x3f) << 5) | (b & 0x1f) << 0;
+    return ((r & 0x1f) << 11) | ((g & 0x3f) << 5) | ((b & 0x1f) << 0);
 }
 
 export const colors = {
@@ -32,5 +32,5 @@ export const colors = {
     red: 0xff0000,
     black: 0x000000,
     blue: 0x01bdfe,
-    lightred: 0xef101f
+    lightred: 0xef101f,
 };

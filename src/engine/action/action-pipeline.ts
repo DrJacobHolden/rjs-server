@@ -1,31 +1,24 @@
-import { Subscription } from 'rxjs';
-
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { TaskExecutor } from '@engine/action/hook/task';
+import type { Actor } from '@engine/world/actor/actor';
+import { isPlayer } from '@engine/world/actor/util';
 import { logger } from '@runejs/common';
-import { LandscapeObject } from '@runejs/filestore';
-
-import { Actor, Player } from '@engine/world/actor';
-import { ActionHook, TaskExecutor } from '@engine/action';
-import { Position } from '@engine/world';
-
+import type { Subscription } from 'rxjs';
 
 /**
  * The priority of an queueable action within the pipeline.
  */
 export type ActionStrength = 'weak' | 'normal' | 'strong';
 
-
 /**
  * Content action type definitions.
  */
 export type ActionType =
-    'button'
+    | 'button'
     | 'widget_interaction'
-
     | 'npc_init'
     | 'npc_interaction'
-
     | 'object_interaction'
-
     | 'item_interaction'
     | 'item_on_object'
     | 'item_on_npc'
@@ -35,11 +28,9 @@ export type ActionType =
     | 'item_swap'
     | 'move_item'
     | 'spawned_item_interaction'
-
     | 'magic_on_item'
     | 'magic_on_player'
     | 'magic_on_npc'
-
     | 'player_init'
     | 'player_command'
     | 'player_interaction'
@@ -47,24 +38,21 @@ export type ActionType =
     | 'equipment_change'
     | 'prayer';
 
-
 export const gentleActions: ActionType[] = [
-    'button', 'widget_interaction', 'player_init', 'npc_init',
-    'move_item', 'item_swap', 'player_command', 'region_change'
+    'button',
+    'widget_interaction',
+    'player_init',
+    'npc_init',
+    'move_item',
+    'item_swap',
+    'player_command',
+    'region_change',
 ];
-
 
 /**
  * Methods in which action hooks in progress may be cancelled.
  */
-export type ActionCancelType =
-    'manual-movement'
-    | 'pathing-movement'
-    | 'generic'
-    | 'keep-widgets-open'
-    | 'button'
-    | 'widget';
-
+export type ActionCancelType = 'manual-movement' | 'pathing-movement' | 'generic' | 'keep-widgets-open' | 'button' | 'widget';
 
 /**
  * The definition for the actual action pipe handler function.
@@ -74,8 +62,7 @@ export type ActionPipeHandler = (...args: any[]) => RunnableHooks | void;
 /**
  * Basic definition of a game engine action file (.action.ts exports).
  */
-export type ActionPipe = [ ActionType, ActionPipeHandler ];
-
+export type ActionPipe = [ActionType, ActionPipeHandler];
 
 /**
  * A list of filtered hooks for an actor to run.
@@ -87,13 +74,11 @@ export interface RunnableHooks<T = any> {
     hooks?: ActionHook[];
 }
 
-
 /**
  * A specific actor's action pipeline handler.
  * Records action pipes and distributes content actions from the game engine down to execute plugin hooks.
  */
 export class ActionPipeline {
-
     private static pipes = new Map<string, ActionPipeHandler>();
 
     private runningTasks: TaskExecutor<any>[] = [];
@@ -101,8 +86,7 @@ export class ActionPipeline {
     private movementSubscription: Subscription;
 
     public constructor(public readonly actor: Actor) {
-        this.movementSubscription = this.actor.walkingQueue.movementQueued$
-            .subscribe(async () => this.cancelRunningTasks());
+        this.movementSubscription = this.actor.walkingQueue.movementQueued$.subscribe(async () => this.cancelRunningTasks());
     }
 
     public static getPipe(action: ActionType): ActionPipeHandler | null {
@@ -119,11 +103,11 @@ export class ActionPipeline {
 
     public async call(action: ActionType, ...args: any[]): Promise<void> {
         const actionHandler = ActionPipeline.pipes.get(action.toString());
-        if(actionHandler) {
+        if (actionHandler) {
             try {
                 await this.runActionHandler(actionHandler, args);
-            } catch(error) {
-                if(error) {
+            } catch (error) {
+                if (error) {
                     logger.error(`Error handling action ${action.toString()}`);
                     logger.error(error);
                 }
@@ -132,14 +116,14 @@ export class ActionPipeline {
     }
 
     public async cancelRunningTasks(): Promise<void> {
-        if(this.canceling || !this.runningTasks || this.runningTasks.length === 0) {
+        if (this.canceling || !this.runningTasks || this.runningTasks.length === 0) {
             return;
         }
 
         this.canceling = true;
 
-        for(const runningTask of this.runningTasks) {
-            if(runningTask.running) {
+        for (const runningTask of this.runningTasks) {
+            if (runningTask.running) {
                 await runningTask.stop();
             }
         }
@@ -152,23 +136,23 @@ export class ActionPipeline {
     private async runActionHandler(actionHandler: any, args: any[]): Promise<void> {
         const runnableHooks: RunnableHooks | null | undefined = await actionHandler(...args);
 
-        if(!runnableHooks?.hooks || runnableHooks.hooks.length === 0) {
+        if (!runnableHooks?.hooks || runnableHooks.hooks.length === 0) {
             return;
         }
 
-        for(let i = 0; i < runnableHooks.hooks.length; i++) {
+        for (let i = 0; i < runnableHooks.hooks.length; i++) {
             const hook = runnableHooks.hooks[i];
-            if(!hook) {
+            if (!hook) {
                 continue;
             }
 
             // Some actions are non-cancelling
-            if(gentleActions.indexOf(hook.type) === -1) {
+            if (gentleActions.indexOf(hook.type) === -1) {
                 await this.cancelRunningTasks();
             }
 
             await this.runHook(hook, runnableHooks.action);
-            if(!hook.multi) {
+            if (!hook.multi) {
                 // If the highest priority hook does not allow other hooks
                 // to run during this same action, then return here to break
                 // out of the loop and complete execution.
@@ -180,7 +164,7 @@ export class ActionPipeline {
     private async runHook(actionHook: ActionHook, action: any): Promise<void> {
         const { handler, task } = actionHook;
 
-        if(task) {
+        if (task) {
             // Schedule task-based hook
             const taskExecutor = new TaskExecutor(this.actor, task, actionHook, action);
             this.runningTasks.push(taskExecutor);
@@ -190,23 +174,22 @@ export class ActionPipeline {
 
             // Cleanup and remove the task once completed
             const taskIdx = this.runningTasks.findIndex(task => task.taskId === taskExecutor.taskId);
-            if(taskIdx !== -1) {
+            if (taskIdx !== -1) {
                 this.runningTasks.splice(taskIdx, 1);
             }
-        } else if(handler) {
+        } else if (handler) {
             // Run basic hook
             await handler(action);
         }
     }
 
     public get paused(): boolean {
-        if(this.actor instanceof Player) {
-            if(this.actor.interfaceState.widgetOpen()) {
+        if (isPlayer(this.actor)) {
+            if (this.actor.interfaceState.widgetOpen()) {
                 return true;
             }
         }
 
         return false;
     }
-
 }

@@ -1,10 +1,9 @@
-import { logger } from '@runejs/common';
-
-import { ActionPipe, ActionPipeline } from '@engine/action';
-import { getFiles } from '@engine/util';
-import { BUILD_DIR } from '@engine/config';
 import { join } from 'path';
-
+import type { ActionPipe } from '@engine/action/action-pipeline';
+import { ActionPipeline } from '@engine/action/action-pipeline';
+import { BUILD_DIR } from '@engine/config/directories';
+import { getFiles } from '@engine/util/files';
+import { logger } from '@runejs/common';
 
 /**
  * Finds and loads all available action pipe files (`*.action.ts`).
@@ -15,8 +14,8 @@ export async function loadActionFiles(): Promise<void> {
     const blacklist = [];
     const loadedActions: string[] = [];
 
-    for await(const path of getFiles(PIPE_DIRECTORY, blacklist)) {
-        if(!path.endsWith('.action.ts') && !path.endsWith('.action.js')) {
+    for await (const path of getFiles(PIPE_DIRECTORY, blacklist)) {
+        if (!path.endsWith('.action.ts') && !path.endsWith('.action.js')) {
             continue;
         }
 
@@ -24,11 +23,11 @@ export async function loadActionFiles(): Promise<void> {
 
         try {
             const importedAction = (require(location)?.default || null) as ActionPipe | null;
-            if(importedAction && Array.isArray(importedAction) && importedAction[0] && importedAction[1]) {
+            if (importedAction && Array.isArray(importedAction) && importedAction[0] && importedAction[1]) {
                 ActionPipeline.register(importedAction[0], importedAction[1]);
                 loadedActions.push(importedAction[0]);
             }
-        } catch(error) {
+        } catch (error) {
             logger.error(`Error loading action file at ${location}:`);
             logger.error(error);
         }

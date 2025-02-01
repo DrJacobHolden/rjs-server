@@ -1,7 +1,7 @@
-import { Player } from '@engine/world/actor/player/player';
-import { Coords, Position } from '@engine/world/position';
 import { activeWorld } from '@engine/world';
-
+import type { Player } from '@engine/world/actor/player/player';
+import type { Coords } from '@engine/world/position';
+import { Position } from '@engine/world/position';
 
 /**
  * Finds the local coordinates of the room that the player is currently in within their PoH.
@@ -11,7 +11,7 @@ import { activeWorld } from '@engine/world';
 export const getCurrentRoom = (player: Player): Coords | null => {
     const customMap = player.metadata?.customMap;
 
-    if(!customMap) {
+    if (!customMap) {
         return null;
     }
 
@@ -27,6 +27,6 @@ export const getCurrentRoom = (player: Player): Coords | null => {
     return {
         x: currentRoomX,
         y: currentRoomY,
-        level: player.position.level
+        level: player.position.level,
     };
 };

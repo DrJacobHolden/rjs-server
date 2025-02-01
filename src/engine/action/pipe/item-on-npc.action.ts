@@ -1,10 +1,12 @@
-import { Player, Npc } from '@engine/world/actor';
-import { Position, Item } from '@engine/world';
-import {
-    ActionHook, getActionHooks, advancedNumberHookFilter, questHookFilter, stringHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
-import { WalkToActorPluginTask } from './task/walk-to-actor-plugin-task';
-
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { advancedNumberHookFilter, questHookFilter, stringHookFilter } from '@engine/action/hook/hook-filters';
+import { WalkToActorPluginTask } from '@engine/action/pipe/task/walk-to-actor-plugin-task';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Item } from '@engine/world/items/item';
+import type { Position } from '@engine/world/position';
 
 /**
  * Defines an item-on-npc action hook.
@@ -18,12 +20,10 @@ export interface ItemOnNpcActionHook extends ActionHook<ItemOnNpcAction, itemOnN
     walkTo: boolean;
 }
 
-
 /**
  * The item-on-npc action hook handler function to be called when the hook's conditions are met.
  */
 export type itemOnNpcActionHandler = (itemOnNpcAction: ItemOnNpcAction) => void;
-
 
 /**
  * Details about an item-on-npc action being performed.
@@ -43,7 +43,6 @@ export interface ItemOnNpcAction {
     itemContainerId: number;
 }
 
-
 /**
  * The pipe that the game engine hands item-on-npc actions off to.
  * @param player
@@ -53,23 +52,34 @@ export interface ItemOnNpcAction {
  * @param itemWidgetId
  * @param itemContainerId
  */
-const itemOnNpcActionPipe = (player: Player, npc: Npc, position: Position, item: Item,
-    itemWidgetId: number, itemContainerId: number): RunnableHooks<ItemOnNpcAction> | null => {
+const itemOnNpcActionPipe = (
+    player: Player,
+    npc: Npc,
+    position: Position,
+    item: Item,
+    itemWidgetId: number,
+    itemContainerId: number,
+): RunnableHooks<ItemOnNpcAction> | null => {
     const morphedNpc = player.getMorphedNpcDetails(npc);
 
     // Find all item on npc action plugins that reference this npc and item
-    let matchingHooks = getActionHooks<ItemOnNpcActionHook>('item_on_npc').filter(plugin =>
-        questHookFilter(player, plugin) &&
-        stringHookFilter(plugin.npcs, morphedNpc?.key || npc.key) && advancedNumberHookFilter(plugin.itemIds, item.itemId));
+    let matchingHooks = getActionHooks<ItemOnNpcActionHook>('item_on_npc').filter(
+        plugin =>
+            questHookFilter(player, plugin) &&
+            stringHookFilter(plugin.npcs, morphedNpc?.key || npc.key) &&
+            advancedNumberHookFilter(plugin.itemIds, item.itemId),
+    );
     const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
 
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
-        player.outgoingPackets.chatboxMessage(`Unhandled item on npc interaction: ${ item.itemId } on ${ morphedNpc?.name || npc.name } ` +
-            `(id-${ morphedNpc?.gameId || npc.id }) @ ${ position.x },${ position.y },${ position.level }`);
+    if (matchingHooks.length === 0) {
+        player.outgoingPackets.chatboxMessage(
+            `Unhandled item on npc interaction: ${item.itemId} on ${morphedNpc?.name || npc.name} ` +
+                `(id-${morphedNpc?.gameId || npc.id}) @ ${position.x},${position.y},${position.level}`,
+        );
         if (morphedNpc) {
             player.outgoingPackets.chatboxMessage(`Note: (id-${morphedNpc.gameId}) is a morphed NPC. The parent NPC is (id-${npc.id}).`);
         }
@@ -79,11 +89,13 @@ const itemOnNpcActionPipe = (player: Player, npc: Npc, position: Position, item:
     const walkToPlugins = matchingHooks.filter(plugin => plugin.walkTo);
 
     if (walkToPlugins.length > 0) {
-        player.enqueueBaseTask(new WalkToActorPluginTask(walkToPlugins, player, 'npc', npc, {
-            item,
-            itemWidgetId,
-            itemContainerId
-        }));
+        player.enqueueBaseTask(
+            new WalkToActorPluginTask(walkToPlugins, player, 'npc', npc, {
+                item,
+                itemWidgetId,
+                itemContainerId,
+            }),
+        );
 
         return null;
     }
@@ -96,13 +108,12 @@ const itemOnNpcActionPipe = (player: Player, npc: Npc, position: Position, item:
             position,
             item,
             itemWidgetId,
-            itemContainerId
-        }
-    }
+            itemContainerId,
+        },
+    };
 };
-
 
 /**
  * Item-on-npc action pipe definition.
  */
-export default [ 'item_on_npc', itemOnNpcActionPipe ] as ActionPipe;
+export default ['item_on_npc', itemOnNpcActionPipe] as ActionPipe;

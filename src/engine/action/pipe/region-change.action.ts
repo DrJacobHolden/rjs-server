@@ -1,8 +1,10 @@
-import { Player } from '@engine/world/actor';
-import { Coords, Position } from '@engine/world';
-import { RegionType } from '@engine/world/map';
-import { ActionHook, getActionHooks, ActionPipe } from '@engine/action';
-
+import type { ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import type { Player } from '@engine/world/actor/player/player';
+import type { RegionType } from '@engine/world/map/region';
+import type { Position } from '@engine/world/position';
+import { Coords } from '@engine/world/position';
 
 /**
  * Defines a player region change action hook.
@@ -16,12 +18,10 @@ export interface RegionChangeActionHook extends ActionHook<RegionChangeAction, r
     teleporting?: boolean;
 }
 
-
 /**
  * The player region change action hook handler function to be called when the hook's conditions are met.
  */
 export type regionChangeActionHandler = (regionChangeAction: RegionChangeAction) => void;
-
 
 /**
  * Details about a player region change action being performed.
@@ -51,7 +51,6 @@ export interface RegionChangeAction {
     regionTypes: RegionType[];
 }
 
-
 /**
  * Creates a RegionChangeAction object from the given inputs.
  *
@@ -63,44 +62,49 @@ export interface RegionChangeAction {
  * @param currentPosition The player's current position.
  * @param teleporting Whether or not the player is teleporting; defaults to false.
  */
-export const regionChangeActionFactory = (player: Player,
-    originalPosition: Position, currentPosition: Position,
-    teleporting: boolean = false): RegionChangeAction | null => {
+export const regionChangeActionFactory = (
+    player: Player,
+    originalPosition: Position,
+    currentPosition: Position,
+    teleporting: boolean = false,
+): RegionChangeAction | null => {
     const regionTypes: RegionType[] = [];
     const originalMapRegionId: number = ((originalPosition.x >> 6) << 8) + (originalPosition.y >> 6);
     const currentMapRegionId: number = ((currentPosition.x >> 6) << 8) + (currentPosition.y >> 6);
     const originalChunkCoords: Coords = {
         x: originalPosition.chunkX,
         y: originalPosition.chunkY,
-        level: originalPosition.level
+        level: originalPosition.level,
     };
     const currentChunkCoords: Coords = {
         x: currentPosition.chunkX,
         y: currentPosition.chunkY,
-        level: currentPosition.level
+        level: currentPosition.level,
     };
 
-    if(originalMapRegionId !== currentMapRegionId) {
+    if (originalMapRegionId !== currentMapRegionId) {
         regionTypes.push('region');
     }
 
-    if(!Coords.equals(originalChunkCoords, currentChunkCoords)) {
+    if (!Coords.equals(originalChunkCoords, currentChunkCoords)) {
         regionTypes.push('chunk');
     }
 
-    if(regionTypes.length === 0) {
+    if (regionTypes.length === 0) {
         return null;
     }
 
     return {
-        player, regionTypes, teleporting,
+        player,
+        regionTypes,
+        teleporting,
 
         originalPosition,
         originalChunkCoords,
         originalMapRegionCoords: {
             x: originalPosition.x >> 6,
             y: originalPosition.y >> 6,
-            level: originalPosition.level
+            level: originalPosition.level,
         },
         originalMapRegionId,
 
@@ -109,68 +113,69 @@ export const regionChangeActionFactory = (player: Player,
         currentMapRegionCoords: {
             x: currentPosition.x >> 6,
             y: currentPosition.y >> 6,
-            level: currentPosition.level
+            level: currentPosition.level,
         },
-        currentMapRegionId
+        currentMapRegionId,
     };
 };
-
 
 /**
  * The pipe that the game engine hands player region change actions off to.
  * @param actionData
  */
 const regionChangeActionPipe = (actionData: RegionChangeAction): void => {
-    if(!actionData) {
+    if (!actionData) {
         return;
     }
 
     const { regionTypes } = actionData;
 
-    if(!regionTypes || regionTypes.length === 0) {
+    if (!regionTypes || regionTypes.length === 0) {
         return;
     }
 
     // Find all action hooks that match the provided input
-    const actionList = getActionHooks<RegionChangeActionHook>('region_change')?.filter(actionHook => {
-        if(actionHook.teleporting && !actionData.teleporting) {
-            return false;
-        }
-
-        if(actionHook.regionType) {
-            return regionTypes.indexOf(actionHook.regionType) !== -1;
-        } else if(actionHook.regionTypes && actionHook.regionTypes.length !== 0) {
-            let valid = false;
-            for(const type of actionHook.regionTypes) {
-                if(regionTypes.indexOf(type) !== -1) {
-                    valid = true;
-                    break;
-                }
+    const actionList =
+        getActionHooks<RegionChangeActionHook>('region_change')?.filter(actionHook => {
+            if (actionHook.teleporting && !actionData.teleporting) {
+                return false;
             }
 
-            return valid;
-        }
+            if (actionHook.regionType) {
+                return regionTypes.indexOf(actionHook.regionType) !== -1;
+            } else if (actionHook.regionTypes && actionHook.regionTypes.length !== 0) {
+                let valid = false;
+                for (const type of actionHook.regionTypes) {
+                    if (regionTypes.indexOf(type) !== -1) {
+                        valid = true;
+                        break;
+                    }
+                }
 
-        return false;
-    }) || null;
+                return valid;
+            }
 
-    if(!actionList || actionList.length === 0) {
+            return false;
+        }) || null;
+
+    if (!actionList || actionList.length === 0) {
         // No matching actions found
         return;
     }
 
-    actionList.forEach(async actionHook =>
-        new Promise<void>(resolve => {
-            if (actionHook && actionHook.handler) {
-                actionHook.handler(actionData);
-            }
+    actionList.forEach(
+        async actionHook =>
+            new Promise<void>(resolve => {
+                if (actionHook && actionHook.handler) {
+                    actionHook.handler(actionData);
+                }
 
-            resolve();
-        }));
+                resolve();
+            }),
+    );
 };
-
 
 /**
  * Player region change action pipe definition.
  */
-export default [ 'region_change', regionChangeActionPipe ] as ActionPipe;
+export default ['region_change', regionChangeActionPipe] as ActionPipe;

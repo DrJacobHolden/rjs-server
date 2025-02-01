@@ -1,9 +1,10 @@
-import { Player } from '@engine/world/actor/player/player';
-import { IHarvestable } from '@engine/world/config/harvestable-object';
-import { soundIds } from '@engine/world/config/sound-ids';
-import { Skill } from '@engine/world/actor/skills';
-import { getBestAxe, HarvestTool } from '@engine/world/config/harvest-tool';
 import { findItem } from '@engine/config/config-handler';
+import type { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
+import type { HarvestTool } from '@engine/world/config/harvest-tool';
+import { getBestAxe } from '@engine/world/config/harvest-tool';
+import type { IHarvestable } from '@engine/world/config/harvestable-object';
+import { soundIds } from '@engine/world/config/sound-ids';
 import { logger } from '@runejs/common';
 
 /**

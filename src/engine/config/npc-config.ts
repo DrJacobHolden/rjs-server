@@ -1,11 +1,10 @@
-import { DefensiveBonuses } from '@engine/config/item-config';
+import type { QuestRequirement } from '@engine/action/hook/action-hook';
+import type { DefensiveBonuses } from '@engine/config/item-config';
+import { logger } from '@runejs/common';
 import { loadConfigurationFiles } from '@runejs/common/fs';
+import { NpcConfig } from '@runejs/filestore';
 import { filestore } from '@server/game/game-server';
 import _ from 'lodash';
-import { NpcConfig } from '@runejs/filestore';
-import { logger } from '@runejs/common';
-import { QuestRequirement } from '@engine/action';
-
 
 export interface NpcSkills {
     [key: string]: number;
@@ -55,9 +54,11 @@ export interface NpcServerConfig {
         ranged_strength?: number;
     };
     defensive_stats?: DefensiveBonuses;
-    variations?: [{
-        suffix: string;
-    } & NpcServerConfig];
+    variations?: [
+        {
+            suffix: string;
+        } & NpcServerConfig,
+    ];
     animations?: NpcCombatAnimations;
     drop_table?: DropTable[];
     metadata: { [key: string]: unknown };
@@ -67,9 +68,8 @@ export interface NpcServerConfig {
  * Full server + cache details about a specific game NPC.
  */
 export class NpcDetails extends NpcConfig {
-
     extends?: string | string[];
-    key: string;
+    key?: string;
     skills?: NpcSkills;
     killable?: boolean;
     respawnTime?: number;
@@ -77,13 +77,12 @@ export class NpcDetails extends NpcConfig {
     defensiveStats?: DefensiveBonuses;
     combatAnimations?: NpcCombatAnimations;
     dropTable?: DropTable[] = [];
-    metadata: { [key: string]: unknown } = {};
+    metadata?: { [key: string]: unknown } = {};
 
     public constructor(defaultValues: { [key: string]: any }) {
         super();
-        Object.keys(defaultValues).forEach(key => this[key] = defaultValues[key]);
+        Object.keys(defaultValues).forEach(key => (this[key] = defaultValues[key]));
     }
-
 }
 
 export function translateNpcServerConfig(npcKey: string | undefined, config: NpcServerConfig): NpcDetails {
@@ -93,34 +92,34 @@ export function translateNpcServerConfig(npcKey: string | undefined, config: Npc
         skills: config.skills || {},
         killable: config.killable || false,
         respawnTime: config.respawn_time || 1,
-        offensiveStats: config.offensive_stats ? {
-            speed: config.offensive_stats.speed || undefined,
-            attack: config.offensive_stats.attack || undefined,
-            strength: config.offensive_stats.strength || undefined,
-            magic: config.offensive_stats.magic || undefined,
-            magicStrength: config.offensive_stats.magic_strength || undefined,
-            ranged: config.offensive_stats.ranged || undefined,
-            rangedStrength: config.offensive_stats.ranged_strength || undefined
-        } : undefined,
+        offensiveStats: config.offensive_stats
+            ? {
+                  speed: config.offensive_stats.speed || undefined,
+                  attack: config.offensive_stats.attack || undefined,
+                  strength: config.offensive_stats.strength || undefined,
+                  magic: config.offensive_stats.magic || undefined,
+                  magicStrength: config.offensive_stats.magic_strength || undefined,
+                  ranged: config.offensive_stats.ranged || undefined,
+                  rangedStrength: config.offensive_stats.ranged_strength || undefined,
+              }
+            : undefined,
         defensiveStats: config.defensive_stats || undefined,
         combatAnimations: config.animations || {},
         dropTable: config.drop_table || undefined,
-        metadata: config.metadata || {}
+        metadata: config.metadata || {},
     });
 }
 
 export async function loadNpcConfigurations(path: string): Promise<{
     npcs: { [key: string]: NpcDetails };
-    npcIds: { [key: number]: string }; npcPresets: NpcPresetConfiguration;
+    npcIds: { [key: number]: string };
+    npcPresets: NpcPresetConfiguration;
 }> {
     const npcIds: { [key: number]: string } = {};
     const npcs: { [key: string]: NpcDetails } = {};
     let npcPresets: NpcPresetConfiguration = {};
 
-    const files = await loadConfigurationFiles<
-    { presets: NpcPresetConfiguration | undefined }
-    & { [key: string]: NpcServerConfig }
-    >(path);
+    const files = await loadConfigurationFiles<{ presets: NpcPresetConfiguration | undefined } & { [key: string]: NpcServerConfig }>(path);
 
     files.forEach(npcConfigs => {
         const npcKeys = Object.keys(npcConfigs);
@@ -133,22 +132,26 @@ export async function loadNpcConfigurations(path: string): Promise<{
                     npcIds[npcConfig.game_id] = key;
                     npcs[key] = {
                         ...translateNpcServerConfig(key, npcConfig),
-                        ...filestore.configStore.npcStore.getNpc(npcConfig.game_id)
+                        ...filestore.configStore.npcStore.getNpc(npcConfig.game_id),
                     };
                 }
                 if (npcConfig.variations) {
                     for (const variation of npcConfig.variations) {
                         try {
                             const subKey = key + ':' + variation.suffix;
-                            const baseItem = JSON.parse(JSON.stringify({
-                                ...translateNpcServerConfig(key, npcConfig),
-                                ...filestore.configStore.npcStore.getNpc(npcConfig.game_id)
-                            }));
+                            const baseItem = JSON.parse(
+                                JSON.stringify({
+                                    ...translateNpcServerConfig(key, npcConfig),
+                                    ...filestore.configStore.npcStore.getNpc(npcConfig.game_id),
+                                }),
+                            );
 
-                            const subBaseItem = JSON.parse(JSON.stringify({
-                                ...translateNpcServerConfig(subKey, variation),
-                                ...filestore.configStore.npcStore.getNpc(variation.game_id)
-                            }));
+                            const subBaseItem = JSON.parse(
+                                JSON.stringify({
+                                    ...translateNpcServerConfig(subKey, variation),
+                                    ...filestore.configStore.npcStore.getNpc(variation.game_id),
+                                }),
+                            );
                             npcIds[variation.game_id] = subKey;
                             npcs[subKey] = _.merge(baseItem, subBaseItem);
                         } catch (error) {

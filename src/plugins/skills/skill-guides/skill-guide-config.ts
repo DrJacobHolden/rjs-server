@@ -1,5 +1,6 @@
+import { itemMap } from '@engine/config/config-handler';
+import type { ItemDetails } from '@engine/config/item-config';
 import { loadConfigurationFiles } from '@runejs/common/fs';
-import { itemMap, ItemDetails } from '@engine/config';
 
 interface SkillGuideConfiguration {
     id: number;
@@ -40,24 +41,24 @@ export async function loadSkillGuideConfigurations(path: string): Promise<SkillG
     const skillGuides: SkillGuide[] = [];
 
     const files = await loadConfigurationFiles<SkillGuideConfiguration>(path);
-    files.forEach((skillGuide) => {
-        if(!skillGuide?.sub_guides) {
+    files.forEach(skillGuide => {
+        if (!skillGuide?.sub_guides) {
             return;
         }
 
         const subGuides: SkillSubGuide[] = [];
-        skillGuide.sub_guides.forEach((subGuide) => {
+        skillGuide.sub_guides.forEach(subGuide => {
             const subGuideLines: SkillSubGuide['lines'] = [];
-            subGuide.lines.forEach((line) => {
+            subGuide.lines.forEach(line => {
                 subGuideLines.push({
                     item: itemMap[line.item],
                     text: line.text,
-                    level: line.level
+                    level: line.level,
                 });
             });
             subGuides.push({
                 name: subGuide.name,
-                lines: subGuideLines
+                lines: subGuideLines,
             });
         });
         skillGuides.push({

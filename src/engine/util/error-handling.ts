@@ -20,22 +20,19 @@ export class ActionsCancelledWarning extends Error {
     }
 }
 
-const warnings = [
-    WidgetsClosedWarning,
-    ActionsCancelledWarning
-];
+const warnings = [WidgetsClosedWarning, ActionsCancelledWarning];
 
 export function initErrorHandling(): void {
     process.on('unhandledRejection', (error: any, promise) => {
-        for(const t of warnings) {
-            if(error instanceof t) {
+        for (const t of warnings) {
+            if (error instanceof t) {
                 logger.warn(`Promise cancelled with warning: ${error.name}`);
                 return;
             }
         }
 
         logger.error(`Unhandled promise rejection from ${promise}, reason: ${error}`);
-        if(error && error['stack']) {
+        if (error && error['stack']) {
             logger.error((error as any).stack);
         }
     });
