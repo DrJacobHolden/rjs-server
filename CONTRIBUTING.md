@@ -10,6 +10,12 @@ RuneJS was created with the intention of utilizing JavaScript/TypeScript and Nod
 
 Ultimately if you're looking to contribute, it's best to check in with us on Discord to see if we're already working on a specific feature or have plans for it already. Add us at **Tyn#0001**
 
+## Code Style
+
+Code style (linting and formatting) are handled by [Biome](https://biomejs.dev/). It is recommended that you install [the Biome extension for your IDE](https://biomejs.dev/guides/editors/first-party-extensions/).
+
+Running `npm run fin` will perform all necessary checks (linting, formatting, typechecking and tests).
+
 ## Testing
 
 Unit tests can be written using Jest. To execute the test suite, run `npm test`
