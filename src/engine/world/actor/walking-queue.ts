@@ -6,6 +6,7 @@ import { regionChangeActionFactory } from '@engine/action';
 import { Subject } from 'rxjs';
 import { activeWorld } from '@engine/world';
 import { logger } from '@runejs/common';
+import { isNpc, isPlayer } from '@engine/world/actor/util';
 
 
 /**
@@ -180,7 +181,7 @@ export class WalkingQueue {
             let runDir = -1;
 
             // @TODO npc running
-            if(this.actor instanceof Player) {
+            if(isPlayer(this.actor)) {
                 if(this.actor.settings.runEnabled && this.queue.length !== 0) {
                     const runPosition = this.queue.shift();
 
@@ -217,7 +218,7 @@ export class WalkingQueue {
 
             this.movementEvent.next(this.actor.position);
 
-            if(this.actor instanceof Player) {
+            if(isPlayer(this.actor)) {
                 const mapDiffX = this.actor.position.x - (lastMapRegionUpdatePosition.chunkX * 8);
                 const mapDiffY = this.actor.position.y - (lastMapRegionUpdatePosition.chunkY * 8);
                 if(mapDiffX < 16 || mapDiffX > 87 || mapDiffY < 16 || mapDiffY > 87) {
@@ -227,12 +228,12 @@ export class WalkingQueue {
             }
 
             if(!oldChunk.equals(newChunk)) {
-                if(this.actor instanceof Player) {
+                if(isPlayer(this.actor)) {
                     this.actor.metadata.updateChunk = { newChunk, oldChunk };
 
                     this.actor.actionPipeline.call('region_change', regionChangeActionFactory(
                         this.actor, originalPosition, this.actor.position));
-                } else if(this.actor instanceof Npc) {
+                } else if(isNpc(this.actor)) {
                     oldChunk.removeNpc(this.actor);
                     newChunk.addNpc(this.actor);
                 }

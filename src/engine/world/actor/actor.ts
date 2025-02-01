@@ -17,6 +17,7 @@ import { ObjectConfig } from '@runejs/filestore';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
 import { Npc } from '@engine/world/actor/npc';
 import { Player } from '@engine/world/actor/player';
+import { isNpc } from '@engine/world/actor/util';
 
 
 export type ActorType = 'player' | 'npc';
@@ -357,7 +358,7 @@ export abstract class Actor {
             return;
         }
 
-        if(this.isNpc()) {
+        if(isNpc(this)) {
             const nearbyPlayers = activeWorld.findNearbyPlayers(this.position, 24, this.instance.instanceId);
             if(nearbyPlayers.length === 0) {
                 // No need for this actor to move if there are no players nearby to witness it, save some memory. :)
@@ -483,14 +484,6 @@ export abstract class Actor {
 
     protected tick() {
         this.scheduler.tick();
-    }
-
-    public isPlayer(): this is Player {
-        return this.type === 'player';
-    }
-
-    public isNpc(): this is Npc {
-        return this.type === 'npc';
     }
 
     public get position(): Position {

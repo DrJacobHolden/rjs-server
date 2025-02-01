@@ -10,6 +10,7 @@ import { Actor } from './actor';
 import { Player } from './player';
 import { SkillName } from './skills';
 import { logger } from '@runejs/common';
+import { isPlayer } from '@engine/world/actor/util';
 
 /**
  * Represents a non-player character within the game world.
@@ -135,7 +136,7 @@ export class Npc extends Actor {
                 return;
             }
 
-            if(assailant instanceof Player) {
+            if(isPlayer(assailant)) {
                 const itemDrops = calculateNpcDrops(assailant, npcDetails);
                 itemDrops.forEach(drop => {
                     const droppedItem = findItem(drop.itemKey);
@@ -151,7 +152,7 @@ export class Npc extends Actor {
                     }
 
                     activeWorld.globalInstance.spawnWorldItem({ itemId: droppedItem.gameId, amount: drop.amount },
-                        deathPosition, { owner: assailant instanceof Player ? assailant : undefined, expires: 300 });
+                        deathPosition, { owner: assailant, expires: 300 });
                 })
             }
         });

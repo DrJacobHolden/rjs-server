@@ -6,6 +6,7 @@ import { LandscapeObject } from '@runejs/filestore';
 import { Actor, Player } from '@engine/world/actor';
 import { ActionHook, TaskExecutor } from '@engine/action';
 import { Position } from '@engine/world';
+import { isPlayer } from '@engine/world/actor/util';
 
 
 /**
@@ -200,7 +201,7 @@ export class ActionPipeline {
     }
 
     public get paused(): boolean {
-        if(this.actor instanceof Player) {
+        if(isPlayer(this.actor)) {
             if(this.actor.interfaceState.widgetOpen()) {
                 return true;
             }

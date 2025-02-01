@@ -1048,7 +1048,7 @@ export class Player extends Actor {
      * Transform's the player's appearance into the specified NPC.
      * @param npc The NPC to copy the appearance of, or null to reset.
      */
-    public transformInto(npc: Npc | NpcDetails | string | number | null): void {
+    public transformInto(npc: NpcDetails | string | number | null): void {
         if(!npc) {
             delete this.savedMetadata.npcTransformation;
             this.updateFlags.appearanceUpdateRequired = true;
@@ -1062,8 +1062,6 @@ export class Player extends Actor {
                 } else {
                     npc = parseInt(npc, 10);
                 }
-            } else if(npc instanceof Npc) {
-                npc = npc.id;
             } else {
                 npc = npc.gameId;
             }

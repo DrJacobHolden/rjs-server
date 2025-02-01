@@ -5,6 +5,7 @@ import { Npc } from '@engine/world/actor/npc';
 import { registerNewActors, SyncTask, syncTrackedActors } from './actor-sync';
 import { Player } from '../player';
 import { activeWorld } from '@engine/world';
+import { isPlayer } from '@engine/world/actor/util';
 
 
 /**
@@ -146,7 +147,7 @@ export class NpcSyncTask extends SyncTask<void> {
             } else {
                 let worldIndex = actor.worldIndex;
 
-                if(actor instanceof Player) {
+                if(isPlayer(actor)) {
                     // Client checks if index is less than 32768.
                     // If it is, it looks for an NPC.
                     // If it isn't, it looks for a player (subtracting 32768 to find the index).

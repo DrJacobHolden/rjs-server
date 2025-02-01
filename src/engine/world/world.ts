@@ -15,6 +15,7 @@ import { TravelLocations, ExamineCache, parseScenerySpawns } from '@engine/world
 import { loadPlugins } from '@engine/plugins';
 import { TaskScheduler, Task } from '@engine/task';
 import { Isaac } from '@engine/net';
+import { isPlayer } from '@engine/world/actor/util';
 
 
 export interface QuadtreeKey {
@@ -100,7 +101,7 @@ export class World {
         const objectChunk = this.chunkManager.getChunkForWorldPosition(objectPosition);
 
         let customMap = false;
-        if(actor instanceof Player && actor.metadata.customMap) {
+        if(isPlayer(actor) && actor.metadata.customMap) {
             customMap = true;
             const templateMapObject = this.findCustomMapObject(actor, objectId, objectPosition);
             if(templateMapObject) {
@@ -113,7 +114,7 @@ export class World {
         let tileModifications;
         let personalTileModifications;
 
-        if(actor.isPlayer()) {
+        if(isPlayer(actor)) {
             const instance = actor.instance;
 
             if (!instance) {
@@ -130,7 +131,7 @@ export class World {
         if(!landscapeObject) {
             const tileObjects = [ ...tileModifications.mods.spawnedObjects ];
 
-            if(actor.isPlayer()) {
+            if(isPlayer(actor)) {
                 tileObjects.push(...personalTileModifications.mods.spawnedObjects);
             }
 
@@ -146,7 +147,7 @@ export class World {
 
         const hiddenTileObjects = [ ...tileModifications.mods.hiddenObjects ];
 
-        if(actor.isPlayer()) {
+        if(isPlayer(actor)) {
             hiddenTileObjects.push(...personalTileModifications.mods.hiddenObjects);
         }
 
