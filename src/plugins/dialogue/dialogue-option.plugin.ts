@@ -1,4 +1,4 @@
-import { widgetInteractionActionHandler } from '@engine/action';
+import type { widgetInteractionActionHandler } from '@engine/action/pipe/widget-interaction.action';
 
 const dialogueIds = [
     64, 65, 66, 67, 241,

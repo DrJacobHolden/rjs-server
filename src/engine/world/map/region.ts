@@ -3,8 +3,7 @@
  * map: 64x64 tile (13x13 tile chunks) full map region file.
  * chunk: 8x8 tile chunk within a map.
  */
-import { Position } from '@engine/world/position';
-
+import type { Position } from '@engine/world/position';
 
 export type RegionType = 'mapfile' | 'region' | 'chunk';
 

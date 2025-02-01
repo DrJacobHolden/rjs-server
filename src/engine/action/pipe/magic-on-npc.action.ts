@@ -1,6 +1,8 @@
-import { Player, Npc } from '@engine/world/actor';
-import { ActionHook, getActionHooks, ActionPipe, RunnableHooks } from '@engine/action';
-
+import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player } from '@engine/world/actor/player/player';
 
 /**
  * Defines a button action hook.

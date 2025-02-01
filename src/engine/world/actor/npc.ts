@@ -1,15 +1,21 @@
 import { v4 } from 'uuid';
 import EventEmitter from 'events';
-
 import { filestore } from '@server/game/game-server';
-import { Position, directionData, QuadtreeKey, WorldInstance, activeWorld } from '@engine/world';
-import { findItem, findNpc, NpcCombatAnimations, NpcDetails, NpcSpawn } from '@engine/config';
-import { soundIds, animationIds } from '@engine/world/config';
-
+import { activeWorld } from '@engine/world';
 import { Actor } from './actor';
-import { Player } from './player';
-import { SkillName } from './skills';
+import type { SkillName } from './skills';
 import { logger } from '@runejs/common';
+import { isPlayer } from '@engine/world/actor/util';
+import { findNpc, findItem } from '@engine/config/config-handler';
+import type { NpcCombatAnimations, NpcDetails } from '@engine/config/npc-config';
+import type { NpcSpawn } from '@engine/config/npc-spawn-config';
+import type { Player } from '@engine/world/actor/player/player';
+import { animationIds } from '@engine/world/config/animation-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
+import { directionData } from '@engine/world/direction';
+import type { WorldInstance } from '@engine/world/instances';
+import type { Position } from '@engine/world/position';
+import type { QuadtreeKey } from '@engine/world/world';
 
 /**
  * Represents a non-player character within the game world.
@@ -125,17 +131,17 @@ export class Npc extends Actor {
             const deathPosition = defender.position;
 
             let deathAnim: number = animationIds.death;
-            deathAnim = findNpc((defender as Npc).id)?.combatAnimations?.death || animationIds.death
+            deathAnim = findNpc((defender as Npc).id).combatAnimations?.death || animationIds.death
 
             defender.playAnimation(deathAnim);
             activeWorld.playLocationSound(deathPosition, defender.instance.instanceId, soundIds.npc.human.maleDeath, 5);
             const npcDetails = findNpc((defender as Npc).id);
 
-            if(!npcDetails || !npcDetails.dropTable) {
+            if(!npcDetails.dropTable) {
                 return;
             }
 
-            if(assailant instanceof Player) {
+            if(isPlayer(assailant)) {
                 const itemDrops = calculateNpcDrops(assailant, npcDetails);
                 itemDrops.forEach(drop => {
                     const droppedItem = findItem(drop.itemKey);
@@ -151,7 +157,7 @@ export class Npc extends Actor {
                     }
 
                     activeWorld.globalInstance.spawnWorldItem({ itemId: droppedItem.gameId, amount: drop.amount },
-                        deathPosition, { owner: assailant instanceof Player ? assailant : undefined, expires: 300 });
+                        deathPosition, { owner: assailant, expires: 300 });
                 })
             }
         });
@@ -171,11 +177,6 @@ export class Npc extends Actor {
 
         if(respawn) {
             const npcDetails = findNpc(this.id);
-
-            if(!npcDetails) {
-                return;
-            }
-
             activeWorld.scheduleNpcRespawn(new Npc(npcDetails, this.npcSpawn));
         }
     }
@@ -229,12 +230,6 @@ export class Npc extends Actor {
      */
     public transformInto(npcKey: string): void {
         const npcDetails = findNpc(npcKey);
-
-        if(!npcDetails) {
-            logger.error(`Unable to find npc with key: ${npcKey} for transformation.`);
-            return;
-        }
-
         this.id = npcDetails.gameId;
         this.updateFlags.appearanceUpdateRequired = true;
     }

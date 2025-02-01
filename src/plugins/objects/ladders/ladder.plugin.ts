@@ -1,12 +1,10 @@
-import { objectInteractionActionHandler } from '@engine/action';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { dialogueAction } from '@engine/world/actor/player/dialogue-action';
 import { Position } from '@engine/world/position';
 import { logger } from '@runejs/common';
 import { ActorTeleportTask } from '@engine/task/impl/actor-teleport-task';
-import { Task } from '@engine/task';
-import { ActorTask } from '@engine/task/impl';
-import { Actor, Player } from '@engine/world/actor';
-
+import { ActorTask } from '@engine/task/impl/actor-task';
+import type { Actor } from '@engine/world/actor/actor';
 
 const planes = { min: 0, max: 3 };
 const validate: (level: number) => boolean = (level) => {

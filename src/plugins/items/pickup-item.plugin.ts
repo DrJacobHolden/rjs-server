@@ -1,8 +1,9 @@
-import { ActionCancelType, spawnedItemInteractionHandler } from '@engine/action';
-import { Item } from '@engine/world/items/item';
+import type { Item } from '@engine/world/items/item';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { widgets } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
+import type { spawnedItemInteractionHandler } from '@engine/action/pipe/spawned-item-interaction.action';
+import type { ActionCancelType } from '@engine/action/action-pipeline';
 
 
 export const handler: spawnedItemInteractionHandler = ({ player, worldItem, itemDetails }) => {

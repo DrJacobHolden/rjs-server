@@ -1,25 +1,23 @@
 import 'json5/lib/register';
+import type { ItemPresetConfiguration } from '@engine/config/item-config';
+import { ItemDetails, loadItemConfigurations } from '@engine/config/item-config';
+import type { ItemSpawn } from '@engine/config/item-spawn-config';
+import { loadItemSpawnConfigurations } from '@engine/config/item-spawn-config';
+import type { MusicTrack } from '@engine/config/music-regions-config';
+import { loadMusicRegionConfigurations } from '@engine/config/music-regions-config';
+import type { NpcDetails, NpcPresetConfiguration } from '@engine/config/npc-config';
+import { loadNpcConfigurations, translateNpcServerConfig } from '@engine/config/npc-config';
+import type { NpcSpawn } from '@engine/config/npc-spawn-config';
+import { loadNpcSpawnConfigurations } from '@engine/config/npc-spawn-config';
+import type { Shop } from '@engine/config/shop-config';
+import { loadShopConfigurations } from '@engine/config/shop-config';
+import { questMap } from '@engine/plugins/loader';
+import type { Quest } from '@engine/world/actor/player/quest';
 import { logger } from '@runejs/common';
-import _ from 'lodash';
-import {
-    ItemDetails,
-    ItemPresetConfiguration,
-    loadItemConfigurations,
-} from '@engine/config/item-config';
+import type { ObjectConfig, XteaRegion } from '@runejs/filestore';
+import { loadXteaRegionFiles } from '@runejs/filestore';
 import { filestore } from '@server/game/game-server';
-import {
-    loadNpcConfigurations,
-    NpcDetails,
-    NpcPresetConfiguration,
-    translateNpcServerConfig
-} from '@engine/config/npc-config';
-import { loadNpcSpawnConfigurations, NpcSpawn } from '@engine/config/npc-spawn-config';
-import { loadShopConfigurations, Shop } from '@engine/config/shop-config';
-import { Quest } from '@engine/world/actor';
-import { ItemSpawn, loadItemSpawnConfigurations } from '@engine/config/item-spawn-config';
-import { loadMusicRegionConfigurations, MusicTrack } from '@engine/config/music-regions-config';
-import { loadXteaRegionFiles, ObjectConfig, XteaRegion } from '@runejs/filestore';
-import { questMap } from '@engine/plugins';
+import _ from 'lodash';
 
 
 export let itemMap: { [key: string]: ItemDetails };
@@ -149,35 +147,39 @@ export const findItem = (itemKey: number | string): ItemDetails | null => {
 };
 
 
-export const findNpc = (npcKey: number | string): NpcDetails | null => {
-    if(!npcKey) {
-        return null;
+export const findNpc = (inputKey: number | string): NpcDetails => {
+    if(!inputKey) {
+        throw new Error('No NPC was provided to findNpc.');
     }
 
-    if(typeof npcKey === 'number') {
-        const gameId = npcKey;
-        npcKey = npcIdMap[gameId];
+    // Pathway for finding an NPC by its game id
+    if(typeof inputKey === 'number') {
+        const gameId = inputKey;
+        const npcKey = npcIdMap[gameId];
 
+        // If we can't find a config in the project for this NPC - we fallback
+        // to the cache which is the basic info loaded by `fileserver`.
         if(!npcKey) {
             const cacheNpc = filestore.configStore.npcStore.getNpc(gameId);
             if(cacheNpc) {
-                return cacheNpc as any;
+                return cacheNpc;
             } else {
                 logger.warn(`NPC ${gameId} is not yet configured on the server and a matching cache NPC was not found.`);
-                return null;
+                throw new Error(`NPC ${gameId} is not yet configured on the server and a matching cache NPC was not found.`);
             }
         }
     }
 
-    let npc = npcMap[npcKey];
+    // Otherwise we got a string identifier for the npcs
+    let npc = npcMap[inputKey];
     if(!npc) {
         // Try fetching variation with suffix 0
         npc = npcMap[`${npc}:0`]
     }
 
     if(!npc) {
-        logger.warn(`NPC ${npcKey} is not yet configured on the server and a matching cache NPC was not provided.`);
-        return null;
+        logger.warn(`NPC ${inputKey} is not yet configured on the server and a matching cache NPC was not provided.`);
+        throw new Error(`NPC ${inputKey} is not yet configured on the server and a matching cache NPC was not provided.`);
     }
 
     if(npc.extends) {

@@ -1,12 +1,9 @@
-import { Subscription } from 'rxjs';
-
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { TaskExecutor } from '@engine/action/hook/task';
+import type { Actor } from '@engine/world/actor/actor';
+import { isPlayer } from '@engine/world/actor/util';
 import { logger } from '@runejs/common';
-import { LandscapeObject } from '@runejs/filestore';
-
-import { Actor, Player } from '@engine/world/actor';
-import { ActionHook, TaskExecutor } from '@engine/action';
-import { Position } from '@engine/world';
-
+import type { Subscription } from 'rxjs';
 
 /**
  * The priority of an queueable action within the pipeline.
@@ -200,7 +197,7 @@ export class ActionPipeline {
     }
 
     public get paused(): boolean {
-        if(this.actor instanceof Player) {
+        if(isPlayer(this.actor)) {
             if(this.actor.interfaceState.widgetOpen()) {
                 return true;
             }

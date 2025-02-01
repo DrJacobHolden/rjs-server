@@ -1,5 +1,5 @@
-import { Position } from '../position';
-import { Actor } from './actor';
+import type { Position } from '../position';
+import type { Actor } from './actor';
 
 /**
  * A specific chat message.

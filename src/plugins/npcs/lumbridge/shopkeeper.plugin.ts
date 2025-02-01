@@ -1,6 +1,5 @@
-import { npcInteractionActionHandler } from '@engine/action';
+import type { npcInteractionActionHandler } from '@engine/action/pipe/npc-interaction.action';
 import { findShop } from '@engine/config/config-handler';
-
 
 const action: npcInteractionActionHandler = ({ player }) => {
     findShop('rs:lumbridge_general_store')?.open(player);

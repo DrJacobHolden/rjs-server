@@ -1,4 +1,4 @@
-import { QuestCompletion, QuestJournalHandler } from '@engine/config/quest-config';
+import type { QuestCompletion, QuestJournalHandler } from '@engine/config/quest-config';
 
 
 export class Quest {

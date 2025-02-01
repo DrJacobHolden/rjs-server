@@ -5,11 +5,10 @@ export interface Magic {
     BaseDamage: number;
     EffectID: number;
     DamageCalculation(): number;
-    
+
 
 }
 export abstract class Magic {
-    
+
 
 }
-

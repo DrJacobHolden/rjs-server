@@ -1,14 +1,16 @@
-import { createConnection, Socket } from 'net';
+import type { Socket } from 'net';
+import { createConnection } from 'net';
 
 import { logger } from '@runejs/common';
 import { ByteBuffer } from '@runejs/common';
 import { parseServerConfig, SocketServer } from '@runejs/common/net';
 import { LoginResponseCode } from '@runejs/login-server';
 
-import { Isaac } from '@engine/net';
 import { activeWorld } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { GameServerConfig, GameServerConnection } from '@server/game';
+import { GameServerConnection } from '@server/game/game-server-connection';
+import type { GameServerConfig } from '@server/game/game-server-config';
+import { Isaac } from '@engine/net/isaac';
+import { Player } from '@engine/world/actor/player/player';
 
 
 const serverConfig = parseServerConfig<GameServerConfig>();

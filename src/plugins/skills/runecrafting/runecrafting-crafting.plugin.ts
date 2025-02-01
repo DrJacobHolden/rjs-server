@@ -1,8 +1,6 @@
 /**
  * @Author NickNick
  */
-
-import { objectInteractionActionHandler, ObjectInteractionAction } from '@engine/action';
 import { Skill } from '@engine/world/actor/skills';
 import {
     altars, combinationRunes,
@@ -10,12 +8,13 @@ import {
     getEntityIds, runeMultiplier,
     runes,
 } from '@plugins/skills/runecrafting/runecrafting-constants';
-import { itemOnObjectActionHandler, ItemOnObjectAction } from '@engine/action';
-import { RunecraftingCombinationRune } from '@plugins/skills/runecrafting/runecrafting-types';
+import type { RunecraftingCombinationRune } from '@plugins/skills/runecrafting/runecrafting-types';
 import { randomBetween } from '@engine/util/num';
 import { itemIds } from '@engine/world/config/item-ids';
 import { findItem, widgets } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
+import type { itemOnObjectActionHandler, ItemOnObjectAction } from '@engine/action/pipe/item-on-object.action';
+import type { objectInteractionActionHandler, ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
 
 
 const craftRune: objectInteractionActionHandler = (details: ObjectInteractionAction) => {

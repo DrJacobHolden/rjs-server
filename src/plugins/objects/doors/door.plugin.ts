@@ -1,7 +1,7 @@
 import { directionData, WNES } from '@engine/world/direction';
-import { objectInteractionActionHandler } from '@engine/action';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { soundIds } from '@engine/world/config/sound-ids';
-import { LandscapeObject } from '@runejs/filestore';
+import type { LandscapeObject } from '@runejs/filestore';
 
 // @TODO move to yaml config
 const doors = [

@@ -1,6 +1,6 @@
 import { filestore } from '@server/game/game-server';
 import { findItem, itemMap, widgets } from '@engine/config/config-handler';
-import { ParentWidget, StaticItemWidget, WidgetBase } from '@runejs/filestore';
+import type { ParentWidget, StaticItemWidget, WidgetBase } from '@runejs/filestore';
 
 
 export interface Item {

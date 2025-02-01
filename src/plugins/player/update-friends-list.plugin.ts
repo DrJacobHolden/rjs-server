@@ -1,6 +1,5 @@
 import { PrivateMessaging } from '@engine/world/actor/player/private-messaging';
-import { playerInitActionHandler } from '@engine/action';
-
+import type { playerInitActionHandler } from '@engine/action/pipe/player-init.action';
 
 export const handler: playerInitActionHandler = ({ player }) => {
     PrivateMessaging.playerLoggedIn(player);

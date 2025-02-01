@@ -1,7 +1,7 @@
-import { buttonActionHandler } from '@engine/action';
-import { Player } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
 import { itemIds } from '@engine/world/config/item-ids';
 import { widgets } from '@engine/config/config-handler';
+import type { buttonActionHandler } from '@engine/action/pipe/button.action';
 
 interface Emote {
     animationId: number;

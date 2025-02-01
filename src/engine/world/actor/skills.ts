@@ -1,9 +1,10 @@
 import { startsWithVowel } from '@engine/util/strings';
 import { serverConfig } from '@server/game/game-server';
-import { gfxIds } from '@engine/world/config';
-import { Actor } from './actor';
-import { Player } from './player';
+import type { Actor } from './actor';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
+import { isPlayer } from './util';
+import type { Player } from '@engine/world/actor/player/player';
+import { gfxIds } from '@engine/world/config/gfx-ids';
 
 export enum Skill {
     ATTACK,
@@ -226,14 +227,14 @@ export class Skills extends SkillShortcuts {
 
         this.setExp(skill, finalExp);
 
-        if(this.actor.isPlayer()) {
+        if(isPlayer(this.actor)) {
             this.actor.outgoingPackets.updateSkill(this.getSkillId(skill), finalLevel, finalExp);
         }
 
         if(currentLevel !== finalLevel) {
             this.setLevel(skill, finalLevel);
 
-            if(this.actor.isPlayer()) {
+            if(isPlayer(this.actor)) {
                 const achievementDetails = skillDetails[this.getSkillId(skill)];
                 if(!achievementDetails) {
                     return;
@@ -262,7 +263,7 @@ export class Skills extends SkillShortcuts {
     }
 
     public showLevelUpDialogue(skill: number | SkillName, level: number): void {
-        if(!(this.actor.isPlayer())) {
+        if(!isPlayer(this.actor)) {
             return;
         }
 

@@ -1,9 +1,9 @@
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { objectIds } from '@engine/world/config/object-ids';
 import { dump } from 'js-yaml';
 import { writeFileSync } from 'fs';
 import { logger } from '@runejs/common';
-import { LandscapeObject } from '@runejs/filestore';
+import type { LandscapeObject } from '@runejs/filestore';
 
 const spawnSceneryAction: commandActionHandler = ({ player, args }) => {
     const locationObjectSearch: string = (args.locationObjectSearch as string).trim();

@@ -1,5 +1,5 @@
-import { commandActionHandler } from '@engine/action';
-import { TravelLocation } from '@engine/world/config/travel-locations';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
+import type { TravelLocation } from '@engine/world/config/travel-locations';
 import { activeWorld } from '@engine/world';
 
 const action: commandActionHandler = (details) => {

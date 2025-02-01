@@ -1,5 +1,4 @@
-import { commandActionHandler } from '@engine/action';
-
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
 const setLevelAction: commandActionHandler = ({ player, args }) => {
     const skillId = args?.skillId || null;

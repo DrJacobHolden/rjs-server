@@ -1,14 +1,14 @@
 import { ByteBuffer } from '@runejs/common';
 
-import { UpdateFlags } from '@engine/world/actor/update-flags';
+import type { UpdateFlags } from '@engine/world/actor/update-flags';
 import { Packet, PacketType } from '@engine/net/packet';
 import { stringToLong } from '@engine/util/strings';
 import { findItem, findNpc } from '@engine/config/config-handler';
-import { EquipmentSlot, EquipmentType, ItemDetails } from '@engine/config/item-config';
+import type { EquipmentSlot, EquipmentType, ItemDetails } from '@engine/config/item-config';
 import { appendMovement, registerNewActors, SyncTask, syncTrackedActors } from './actor-sync';
-import { Player } from '../player';
+import type { Player } from '../player';
 import { activeWorld } from '@engine/world';
-
+import { isPlayer } from '@engine/world/actor/util';
 
 /**
  * Handles the chonky player synchronization packet.
@@ -173,7 +173,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                 const actor = updateFlags.faceActor;
                 let worldIndex = actor.worldIndex;
 
-                if(actor instanceof Player) {
+                if(isPlayer(actor)) {
                     // Client checks if index is less than 32768.
                     // If it is, it looks for an NPC.
                     // If it isn't, it looks for a player (subtracting 32768 to find the index).
@@ -298,13 +298,13 @@ export class PlayerSyncTask extends SyncTask<void> {
             if(player.savedMetadata.npcTransformation) {
                 const npc = findNpc(player.savedMetadata.npcTransformation);
                 animations = [
-                    npc?.animations?.stand || 0x328, // stand
-                    npc?.animations?.turnAround || 0x337, // stand turn
-                    npc?.animations?.walk || 0x333, // walk
-                    npc?.animations?.turnAround || 0x334, // turn 180
-                    npc?.animations?.turnRight || 0x335, // turn 90
-                    npc?.animations?.turnLeft || 0x336, // turn 90 reverse
-                    npc?.animations?.walk || 0x338, // run
+                    npc.animations?.stand || 0x328, // stand
+                    npc.animations?.turnAround || 0x337, // stand turn
+                    npc.animations?.walk || 0x333, // walk
+                    npc.animations?.turnAround || 0x334, // turn 180
+                    npc.animations?.turnRight || 0x335, // turn 90
+                    npc.animations?.turnLeft || 0x336, // turn 90 reverse
+                    npc.animations?.walk || 0x338, // run
                 ];
             }
 

@@ -1,8 +1,8 @@
-import { Player } from '../world/actor/player/player';
+import type { ByteBuffer } from '@runejs/common';
 import { logger } from '@runejs/common';
-import { ByteBuffer } from '@runejs/common';
 import { getFiles } from '../util/files';
-import { BUILD_DIR } from '@engine/config';
+import type { Player } from '@engine/world/actor/player/player';
+import { BUILD_DIR } from '@engine/config/directories';
 
 interface InboundPacket {
     opcode: number;

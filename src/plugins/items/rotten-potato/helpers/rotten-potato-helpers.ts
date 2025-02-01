@@ -1,8 +1,8 @@
 import { findItem, widgets } from '@engine/config/config-handler';
-import { ItemDetails } from '@engine/config/item-config';
+import type { ItemDetails } from '@engine/config/item-config';
 import { Rights } from '@engine/world/actor/player/player';
-import { ItemOnItemAction } from '@engine/action/pipe/item-on-item.action';
-import { WidgetInteractionAction } from '@engine/action/pipe/widget-interaction.action';
+import type { ItemOnItemAction } from '@engine/action/pipe/item-on-item.action';
+import type { WidgetInteractionAction } from '@engine/action/pipe/widget-interaction.action';
 
 /**
  * The rotten potato item.

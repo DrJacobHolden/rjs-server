@@ -1,14 +1,11 @@
 import { objectIds } from '@engine/world/config/object-ids';
-import { objectInteractionActionHandler, ObjectInteractionAction, ButtonActionHook, ObjectInteractionActionHook } from '@engine/action';
-import { buttonActionHandler } from '@engine/action';
 import { Skill } from '@engine/world/actor/skills';
 import { colors } from '@engine/util/colors';
-import { findItem, widgets } from '@engine/config/config-handler';
-import { PlayerQuest } from '@engine/config/quest-config';
+import { widgets } from '@engine/config/config-handler';
 import { widgetButtonIds, widgetItems } from '@plugins/skills/smithing/smelting-constants';
 import { SmeltingTask } from './smelting-task';
-import { Bar } from '@plugins/skills/smithing/smelting-types';
-import { logger } from '@runejs/common';
+import type { buttonActionHandler, ButtonActionHook } from '@engine/action/pipe/button.action';
+import type { objectInteractionActionHandler, ObjectInteractionAction, ObjectInteractionActionHook } from '@engine/action/pipe/object-interaction.action';
 
 
 export const openSmeltingInterface: objectInteractionActionHandler = (details) => {

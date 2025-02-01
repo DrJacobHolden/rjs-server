@@ -1,7 +1,7 @@
-import { itemSwapActionHandler } from '@engine/action';
-import { ItemContainer } from '@engine/world/items/item-container';
-import { Player } from '@engine/world/actor/player/player';
+import type { ItemContainer } from '@engine/world/items/item-container';
+import type { Player } from '@engine/world/actor/player/player';
 import { widgets } from '@engine/config/config-handler';
+import type { itemSwapActionHandler } from '@engine/action/pipe/item-swap.action';
 
 type WidgetDetail = [ number, number, (player: Player) => ItemContainer ];
 

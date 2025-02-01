@@ -1,5 +1,5 @@
-import { findItem } from '@engine/config';
-import { Burnable } from './types';
+import { findItem } from '@engine/config/config-handler';
+import type { Burnable } from './types';
 
 // using ! here because we know the items exist
 export const FIREMAKING_LOGS: Burnable[] = [

@@ -1,5 +1,6 @@
-import { Player } from '@engine/world/actor';
-import { TaskExecutor, MagicOnNPCActionHook, MagicOnNPCAction } from '@engine/action';
+import type { TaskExecutor } from '@engine/action/hook/task';
+import type { MagicOnNPCAction, MagicOnNPCActionHook } from '@engine/action/pipe/magic-on-npc.action';
+import type { Player } from '@engine/world/actor/player/player';
 import { logger } from '@runejs/common';
 
 const buttonIds: number[] = [

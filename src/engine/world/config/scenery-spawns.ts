@@ -1,7 +1,7 @@
 import { logger } from '@runejs/common';
 import { JSON_SCHEMA, load } from 'js-yaml';
 import { readFileSync } from 'fs';
-import { LandscapeObject } from '@runejs/filestore';
+import type { LandscapeObject } from '@runejs/filestore';
 
 export function parseScenerySpawns(): LandscapeObject[] {
     try {

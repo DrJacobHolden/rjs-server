@@ -1,6 +1,8 @@
-import { Npc } from '@engine/world/actor';
-import { ActionHook, getActionHooks, stringHookFilter, ActionPipe } from '@engine/action';
-
+import type { ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { stringHookFilter } from '@engine/action/hook/hook-filters';
+import type { Npc } from '@engine/world/actor/npc';
 
 /**
  * Defines an npc init action hook.

@@ -2,12 +2,12 @@ import { logger } from '@runejs/common';
 import { parseServerConfig, SocketServer } from '@runejs/common/net';
 import { Filestore } from '@runejs/filestore';
 
-import { activateGameWorld, World } from '@engine/world';
-import { loadCoreConfigurations, loadGameConfigurations, xteaRegions } from '@engine/config';
-import { loadPackets } from '@engine/net';
-import { watchForChanges, watchSource } from '@engine/util';
-import { GatewayServer } from '@server/gateway';
-import { GameServerConfig } from '@server/game';
+import { activateGameWorld } from '@engine/world';
+import type { GameServerConfig } from '@server/game/game-server-config';
+import { GatewayServer } from '@server/gateway/gateway-server';
+import { loadCoreConfigurations, loadGameConfigurations, xteaRegions } from '@engine/config/config-handler';
+import { loadPackets } from '@engine/net/inbound-packet-handler';
+import { watchForChanges, watchSource } from '@engine/util/files';
 
 
 /**

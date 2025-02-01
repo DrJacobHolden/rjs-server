@@ -1,7 +1,7 @@
-import { NpcInteractionActionHook } from '@engine/action';
-import { Emote, goto, execute, Achievements, giveAchievement } from '@engine/world/actor';
-import { animationIds } from '@engine/world/config';
-import { dialogue } from '@engine/world/actor/dialogue';
+import type { NpcInteractionActionHook } from '@engine/action/pipe/npc-interaction.action';
+import { dialogue, Emote, execute, goto } from '@engine/world/actor/dialogue';
+import { giveAchievement, Achievements } from '@engine/world/actor/player/achievements';
+import { animationIds } from '@engine/world/config/animation-ids';
 
 
 const handler = async ({ player, npc }) => {

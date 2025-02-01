@@ -1,14 +1,13 @@
-import { npcInitActionHandler } from '@engine/action';
-import { World } from '@engine/world';
 import { Position } from '@engine/world/position';
 import { findNpc } from '@engine/config/config-handler';
-import { Npc } from '@engine/world/actor/npc';
+import type { Npc } from '@engine/world/actor/npc';
 import { randomBetween } from '@engine/util/num';
 import { activeWorld } from '@engine/world';
+import type { npcInitActionHandler } from '@engine/action/pipe/npc-init.action';
+import { World } from '@engine/world/world';
 
 const npcs = ['rs:guard:0', 'rs:guard:1']
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const npcObjects = npcs.map((sNpc) => findNpc(sNpc)!);
+const npcObjects = npcs.map((sNpc) => findNpc(sNpc));
 
 interface DialogueNpcTree {
     a?: string;

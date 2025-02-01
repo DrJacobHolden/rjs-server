@@ -1,5 +1,4 @@
-import { commandActionHandler } from '@engine/action';
-import { Skill } from '@engine/world/actor/skills';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
 const action: commandActionHandler = (details) => {
     const { player } = details;

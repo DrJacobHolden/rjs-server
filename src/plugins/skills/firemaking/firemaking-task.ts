@@ -1,11 +1,12 @@
-import { ActorWorldItemInteractionTask } from '@engine/task/impl';
-import { WorldItem } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { animationIds, soundIds } from '@engine/world/config';
+import { ActorWorldItemInteractionTask } from '@engine/task/impl/actor-world-item-interaction-task';
+import type { Player } from '@engine/world/actor/player/player';
+import { animationIds } from '@engine/world/config/animation-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
+import type { WorldItem } from '@engine/world/items/world-item';
 import { canLight } from './chance';
 import { FIREMAKING_LOGS } from './data';
 import { lightFire } from './light-fire';
-import { Burnable } from './types';
+import type { Burnable } from './types';
 
 /**
  * A firemaking task on a {@link WorldItem} log.

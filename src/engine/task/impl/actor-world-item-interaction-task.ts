@@ -1,5 +1,5 @@
-import { WorldItem } from '@engine/world';
-import { Actor } from '../../world/actor/actor';
+import type { WorldItem } from '@engine/world/items/world-item';
+import type { Actor } from '../../world/actor/actor';
 import { ActorWalkToTask } from './actor-walk-to-task';
 
 /**

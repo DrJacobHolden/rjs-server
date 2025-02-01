@@ -1,7 +1,8 @@
+import type { ActionType } from '@engine/action/action-pipeline';
+import { sortActionHooks, type ActionHook } from '@engine/action/hook/action-hook';
 import { loadPluginFiles } from '@engine/plugins/content-plugin';
-import { Quest } from '@engine/world/actor';
+import { Quest } from '@engine/world/actor/player/quest';
 import { logger } from '@runejs/common';
-import { ActionHook, ActionType, sortActionHooks } from '@engine/action';
 
 /**
  * A type for describing the plugin action hook map.

@@ -1,8 +1,7 @@
-import { loadConfigurationFiles } from '@runejs/common/fs';
-import { SkillName } from '@engine/world/actor/skills';
-import { logger } from '@runejs/common';
 import { deepMerge } from '@engine/util/objects';
-
+import type { SkillName } from '@engine/world/actor/skills';
+import { logger } from '@runejs/common';
+import { loadConfigurationFiles } from '@runejs/common/fs';
 
 export type WeaponStyle = 'axe' | 'hammer' | 'bow' | 'claws' | 'crossbow' | 'gun' | 'slash_sword'
     | '2h_sword' | 'pickaxe' | 'halberd' | 'polestaff' | 'scythe' | 'spear' | 'mace'

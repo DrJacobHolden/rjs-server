@@ -1,9 +1,9 @@
-import { LandscapeObject } from '@runejs/filestore';
-import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl';
-import { Player } from '@engine/world/actor';
-import { ObjectInteractionAction } from '../object-interaction.action';
-import { ItemOnObjectAction } from '../item-on-object.action';
-import { ActionHook } from '@engine/action/hook';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import type { ItemOnObjectAction } from '@engine/action/pipe/item-on-object.action';
+import type { ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
+import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl/actor-landscape-object-interaction-task';
+import type { Player } from '@engine/world/actor/player/player';
+import type { LandscapeObject } from '@runejs/filestore';
 
 /**
  * All actions supported by this plugin task.

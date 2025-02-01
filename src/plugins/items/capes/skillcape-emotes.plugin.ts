@@ -1,6 +1,6 @@
 import { lockEmote, unlockEmote } from '@plugins/buttons/player-emotes.plugin';
-import { equipmentChangeActionHandler } from '@engine/action';
 import { itemIds } from '@engine/world/config/item-ids';
+import type { equipmentChangeActionHandler } from '@engine/action/pipe/equipment-change.action';
 
 export const skillcapeIds: Array<number> = Object.keys(
     itemIds.skillCapes).flatMap(skill => [itemIds.skillCapes[skill].untrimmed, itemIds.skillCapes[skill].trimmed]

@@ -1,10 +1,11 @@
-import { ContainerUpdateEvent, ItemContainer } from '@engine/world/items/item-container';
+import type { ContainerUpdateEvent } from '@engine/world/items/item-container';
+import { ItemContainer } from '@engine/world/items/item-container';
 import { findItem, widgets } from '@engine/config/config-handler';
 import { loadConfigurationFiles } from '@runejs/common/fs';
-import { Player } from '@engine/world/actor/player/player';
-import { ItemDetails } from '@engine/config/item-config';
-import { WidgetClosedEvent } from '@engine/interface';
-import { Subscription } from 'rxjs';
+import type { Player } from '@engine/world/actor/player/player';
+import type { ItemDetails } from '@engine/config/item-config';
+import type { Subscription } from 'rxjs';
+import type { WidgetClosedEvent } from '@engine/interface/interface-state';
 
 
 export type ShopStock = { itemKey: string, amount: number, restock?: number }[];

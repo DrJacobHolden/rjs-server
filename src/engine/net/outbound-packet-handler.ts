@@ -1,18 +1,19 @@
-import { Socket } from 'net';
-import { LandscapeObject } from '@runejs/filestore';
+import type { Socket } from 'net';
+import type { LandscapeObject } from '@runejs/filestore';
 import { ByteBuffer, logger } from '@runejs/common';
-
-import { serverConfig } from '@server/game';
-import { Packet, PacketType } from '@engine/net';
-import { xteaRegions } from '@engine/config';
 import { activeWorld } from '@engine/world';
-import { stringToLong } from '@engine/util';
-import { ChunkUpdateItem, Position } from '@engine/world';
-import { Player, SidebarTab, Npc } from '@engine/world/actor';
-import { ItemContainer, Item, WorldItem } from '@engine/world/items';
-import { Chunk, ConstructedChunk, ConstructedRegion } from '@engine/world/map';
-
-
+import { xteaRegions } from '@engine/config/config-handler';
+import { Packet, PacketType } from '@engine/net/packet';
+import { stringToLong } from '@engine/util/strings';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player, SidebarTab } from '@engine/world/actor/player/player';
+import type { Item } from '@engine/world/items/item';
+import { ItemContainer } from '@engine/world/items/item-container';
+import type { WorldItem } from '@engine/world/items/world-item';
+import type { Chunk, ChunkUpdateItem } from '@engine/world/map/chunk';
+import type { ConstructedRegion, ConstructedChunk } from '@engine/world/map/region';
+import { Position } from '@engine/world/position';
+import { serverConfig } from '@server/game/game-server';
 
 /**
  * A helper class for sending various network packets back to the game client.

@@ -1,8 +1,8 @@
 import { logger } from '@runejs/common';
-import { widgets } from '@engine/config';
-import { Player } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
-import { Position } from '@engine/world';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import type { Player } from '@engine/world/actor/player/player';
+import { widgets } from '@engine/config/config-handler';
+import { Position } from '@engine/world/position';
 
 /**
  * Parses the item on world item packet and calls the `item_on_world_item` action pipeline.

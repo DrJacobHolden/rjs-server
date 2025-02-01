@@ -2,8 +2,7 @@ import { Chunk } from './chunk';
 import { Position } from '../position';
 import { logger } from '@runejs/common';
 import { filestore } from '@server/game/game-server';
-import { LandscapeFile, LandscapeObject, MapFile } from '@runejs/filestore';
-
+import type { LandscapeFile, LandscapeObject, MapFile } from '@runejs/filestore';
 
 export class Tile {
 

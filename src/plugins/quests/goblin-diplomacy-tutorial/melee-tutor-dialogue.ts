@@ -1,5 +1,5 @@
 import { dialogue, Emote, execute } from '@engine/world/actor/dialogue';
-import { QuestDialogueHandler } from '@engine/config/quest-config';
+import type { QuestDialogueHandler } from '@engine/config/quest-config';
 
 
 export const harlanDialogueHandler: QuestDialogueHandler = {

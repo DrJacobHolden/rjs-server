@@ -1,11 +1,9 @@
-import { Socket } from 'net';
+import type { Socket } from 'net';
 
 import { logger } from '@runejs/common';
 import { ByteBuffer } from '@runejs/common';
-
-import { handlePacket, incomingPackets } from '@engine/net';
-import { Player } from '@engine/world/actor';
-
+import type { Player } from '@engine/world/actor/player/player';
+import { handlePacket, incomingPackets } from '@engine/net/inbound-packet-handler';
 
 export class GameServerConnection {
 

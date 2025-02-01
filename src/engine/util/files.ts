@@ -1,7 +1,8 @@
 import util from 'util';
 import fs from 'fs';
 import { watch } from 'chokidar';
-import { Observable, Subject } from 'rxjs';
+import type { Observable } from 'rxjs';
+import { Subject } from 'rxjs';
 
 
 const readdir = util.promisify(fs.readdir);

@@ -1,11 +1,12 @@
-import { LandscapeObject, ObjectConfig } from '@runejs/filestore';
-import { Position, Item } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import {
-    ActionHook, getActionHooks, advancedNumberHookFilter, questHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
-import { WalkToObjectPluginTask } from './task/walk-to-object-plugin-task';
-
+import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { questHookFilter, advancedNumberHookFilter } from '@engine/action/hook/hook-filters';
+import { WalkToObjectPluginTask } from '@engine/action/pipe/task/walk-to-object-plugin-task';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Item } from '@engine/world/items/item';
+import type { Position } from '@engine/world/position';
+import type { LandscapeObject, ObjectConfig } from '@runejs/filestore';
 
 /**
  * Defines an item-on-object action hook.

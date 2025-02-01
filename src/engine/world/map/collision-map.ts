@@ -1,7 +1,7 @@
-import { Chunk } from './chunk';
+import type { Chunk } from './chunk';
 import { filestore } from '@server/game/game-server';
-import { WorldInstance } from '@engine/world/instances';
-import { LandscapeObject } from '@runejs/filestore';
+import type { WorldInstance } from '@engine/world/instances';
+import type { LandscapeObject } from '@runejs/filestore';
 import { activeWorld } from '@engine/world';
 import { logger } from '@runejs/common';
 

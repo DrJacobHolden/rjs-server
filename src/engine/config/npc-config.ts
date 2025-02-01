@@ -1,11 +1,10 @@
-import { DefensiveBonuses } from '@engine/config/item-config';
+import type { QuestRequirement } from '@engine/action/hook/action-hook';
+import type { DefensiveBonuses } from '@engine/config/item-config';
+import { logger } from '@runejs/common';
 import { loadConfigurationFiles } from '@runejs/common/fs';
+import { NpcConfig } from '@runejs/filestore';
 import { filestore } from '@server/game/game-server';
 import _ from 'lodash';
-import { NpcConfig } from '@runejs/filestore';
-import { logger } from '@runejs/common';
-import { QuestRequirement } from '@engine/action';
-
 
 export interface NpcSkills {
     [key: string]: number;
@@ -69,7 +68,7 @@ export interface NpcServerConfig {
 export class NpcDetails extends NpcConfig {
 
     extends?: string | string[];
-    key: string;
+    key?: string;
     skills?: NpcSkills;
     killable?: boolean;
     respawnTime?: number;
@@ -77,7 +76,7 @@ export class NpcDetails extends NpcConfig {
     defensiveStats?: DefensiveBonuses;
     combatAnimations?: NpcCombatAnimations;
     dropTable?: DropTable[] = [];
-    metadata: { [key: string]: unknown } = {};
+    metadata?: { [key: string]: unknown } = {};
 
     public constructor(defaultValues: { [key: string]: any }) {
         super();

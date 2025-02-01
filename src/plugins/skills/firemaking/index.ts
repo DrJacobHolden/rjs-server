@@ -1,9 +1,10 @@
-import { itemOnItemActionHandler, ItemOnItemActionHook, ItemOnWorldItemActionHook } from '@engine/action';
-import { itemIds } from '@engine/world/config';
 import { FIREMAKING_LOGS } from './data';
 import { canChain } from './chance';
 import { canLightFireAtCurrentPosition, lightFire } from './light-fire';
 import { runFiremakingTask } from './firemaking-task';
+import type { itemOnItemActionHandler, ItemOnItemActionHook } from '@engine/action/pipe/item-on-item.action';
+import type { ItemOnWorldItemActionHook } from '@engine/action/pipe/item-on-world-item.action';
+import { itemIds } from '@engine/world/config/item-ids';
 
 /**
  * Action hook for lighting a log with a tinderbox in the player's inventory.

@@ -1,6 +1,5 @@
-import { LandscapeObject } from '@runejs/filestore';
-import { Position } from '@engine/world';
-import { Actor } from '@engine/world/actor';
+import type { Actor } from '@engine/world/actor/actor';
+import type { Position } from '@engine/world/position';
 import { ActorWalkToTask } from './actor-walk-to-task';
 
 /**

@@ -1,5 +1,5 @@
-import { randomBetween } from '@engine/util';
-import { IHarvestable } from '@engine/world/config';
+import { randomBetween } from '@engine/util/num';
+import type { IHarvestable } from '@engine/world/config/harvestable-object';
 
 /**
  * Roll a random number between 0 and 255 and compare it to the percent needed to mine the ore.

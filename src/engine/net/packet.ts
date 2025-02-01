@@ -1,4 +1,4 @@
-import { Isaac } from './isaac';
+import type { Isaac } from './isaac';
 import { ByteBuffer } from '@runejs/common';
 
 /**

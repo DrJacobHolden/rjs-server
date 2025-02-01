@@ -1,9 +1,8 @@
 import { Position } from '@engine/world/position';
 import { Player } from '@engine/world/actor/player/player';
-import { World } from '@engine/world';
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { activeWorld } from '@engine/world';
-import { Isaac } from '@engine/net';
+import { World } from '@engine/world/world';
 
 
 const handler: commandActionHandler = ({ player, args }) => {

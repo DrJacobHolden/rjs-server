@@ -1,5 +1,4 @@
-import { LandscapeObject } from '@runejs/filestore';
-
+import type { LandscapeObject } from '@runejs/filestore';
 
 export interface ModifiedLandscapeObject extends LandscapeObject {
     metadata?: { [key: string]: any };

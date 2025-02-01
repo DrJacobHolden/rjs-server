@@ -1,10 +1,11 @@
-import { Actor, Player } from '@engine/world/actor';
-import { ActionHook } from '@engine/action/hook';
-import { NpcInteractionAction } from '../npc-interaction.action';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import type { ItemOnNpcAction } from '@engine/action/pipe/item-on-npc.action';
+import type { ItemOnPlayerAction } from '@engine/action/pipe/item-on-player.action';
+import type { NpcInteractionAction } from '@engine/action/pipe/npc-interaction.action';
+import type { PlayerInteractionAction } from '@engine/action/pipe/player-interaction.action';
 import { ActorActorInteractionTask } from '@engine/task/impl/actor-actor-interaction-task';
-import { ItemOnNpcAction } from '../item-on-npc.action';
-import { PlayerInteractionAction } from '../player-interaction.action';
-import { ItemOnPlayerAction } from '../item-on-player.action';
+import type { Actor } from '@engine/world/actor/actor';
+import type { Player } from '@engine/world/actor/player/player';
 
 /**
  * All actions supported by this plugin task.

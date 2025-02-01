@@ -1,6 +1,7 @@
-import { Player } from '@engine/world/actor';
-import { ActionHook, getActionHooks, ActionPipe } from '@engine/action';
-
+import type { ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import type { Player } from '@engine/world/actor/player/player';
 
 /**
  * Defines a player init action hook.

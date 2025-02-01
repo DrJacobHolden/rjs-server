@@ -1,4 +1,4 @@
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
 
 const spawnPotato: commandActionHandler = (details) => {

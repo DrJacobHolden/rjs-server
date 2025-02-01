@@ -1,4 +1,4 @@
-import { commandActionHandler, PlayerCommandActionHook } from '@engine/action';
+import type { commandActionHandler, PlayerCommandActionHook } from '@engine/action/pipe/player-command.action';
 
 const action: commandActionHandler = (details): void => {
     const { player, args } = details;

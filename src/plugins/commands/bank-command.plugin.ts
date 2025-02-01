@@ -1,8 +1,7 @@
-import { commandActionHandler } from '@engine/action';
-import { openBankInterface } from '@plugins/objects/bank/bank.plugin';
-import { getActionHooks } from '@engine/action/hook';
-import { ObjectInteractionActionHook } from '@engine/action';
+import { getActionHooks } from '@engine/action/hook/action-hook';
 import { advancedNumberHookFilter } from '@engine/action/hook/hook-filters';
+import type { ObjectInteractionActionHook } from '@engine/action/pipe/object-interaction.action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { objectIds } from '@engine/world/config/object-ids';
 
 const action: commandActionHandler = (details) => {

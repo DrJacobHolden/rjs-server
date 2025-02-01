@@ -1,11 +1,11 @@
-import { Npc } from '@engine/world/actor/npc';
+import type { Npc } from '@engine/world/actor/npc';
 import { Player } from '@engine/world/actor/player/player';
 import { filestore } from '@server/game/game-server';
 import { logger } from '@runejs/common';
 import _ from 'lodash';
 import { wrapText } from '@engine/util/strings';
 import { findNpc } from '@engine/config/config-handler';
-import { ParentWidget, TextWidget } from '@runejs/filestore';
+import type { ParentWidget, TextWidget } from '@runejs/filestore';
 
 
 export enum Emote {
@@ -358,7 +358,7 @@ function parseDialogueTree(player: Player, npcParticipants: NpcParticipant[], di
                 npc = participant.npc;
                 if (typeof npc !== 'number') {
                     if (typeof npc === 'string') {
-                        npc = findNpc(npc)?.gameId || 0;
+                        npc = findNpc(npc).gameId;
                     } else {
                         npc = npc.id;
                     }

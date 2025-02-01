@@ -1,7 +1,9 @@
-import { itemInteractionActionHandler } from '@engine/action';
-import { findItem, widgets } from '@engine/config';
-import { Achievements, Skill, giveAchievement } from '@engine/world/actor';
-import { animationIds, soundIds } from '@engine/world/config';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
+import { findItem, widgets } from '@engine/config/config-handler';
+import { giveAchievement, Achievements } from '@engine/world/actor/player/achievements';
+import { Skill } from '@engine/world/actor/skills';
+import { animationIds } from '@engine/world/config/animation-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
 
 const action: itemInteractionActionHandler = (details) => {
     const { player, option } = details;

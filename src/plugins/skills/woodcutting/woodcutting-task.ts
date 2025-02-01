@@ -1,18 +1,19 @@
 import { Skill } from '@engine/world/actor/skills';
 import { canInitiateHarvest } from '@engine/world/skill-util/harvest-skill';
-import { getTreeFromHealthy, IHarvestable } from '@engine/world/config/harvestable-object';
+import type { IHarvestable } from '@engine/world/config/harvestable-object';
+import { getTreeFromHealthy } from '@engine/world/config/harvestable-object';
 import { randomBetween } from '@engine/util/num';
 import { colorText } from '@engine/util/strings';
 import { colors } from '@engine/util/colors';
 import { rollBirdsNestType } from '@engine/world/skill-util/harvest-roll';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { findItem, findObject } from '@engine/config/config-handler';
-import { activeWorld } from '@engine/world';
 import { canCut } from './chance';
-import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl';
-import {  Player } from '@engine/world/actor';
-import { LandscapeObject } from '@runejs/filestore';
+import type { LandscapeObject } from '@runejs/filestore';
 import { logger } from '@runejs/common';
+import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl/actor-landscape-object-interaction-task';
+import type { Player } from '@engine/world/actor/player/player';
+import { activeWorld } from '@engine/world';
 
 class WoodcuttingTask extends ActorLandscapeObjectInteractionTask<Player> {
     /**

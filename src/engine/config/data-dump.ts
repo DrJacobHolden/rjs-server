@@ -1,9 +1,8 @@
-import { join } from 'path';
-import { writeFileSync } from 'fs';
-import { filestore } from '@server/game/game-server';
 import { logger } from '@runejs/common';
-import { ItemConfig, NpcConfig, ObjectConfig, WidgetBase } from '@runejs/filestore';
-
+import type { NpcConfig, ItemConfig, ObjectConfig, WidgetBase } from '@runejs/filestore';
+import { filestore } from '@server/game/game-server';
+import { writeFileSync } from 'fs';
+import { join } from 'path';
 
 export interface DataDumpResult {
     successful: boolean;

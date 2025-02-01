@@ -1,13 +1,13 @@
-import { objectInteractionActionHandler } from '@engine/action';
 import { dialogueAction, DialogueEmote } from '@engine/world/actor/player/dialogue-action';
 import { animationIds } from '@engine/world/config/animation-ids';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { itemIds } from '@engine/world/config/item-ids';
 import { objectIds } from '@engine/world/config/object-ids';
-import { itemOnObjectActionHandler } from '@engine/action';
-import { Player } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
 import { findItem, findNpc } from '@engine/config/config-handler';
-import { ObjectConfig } from '@runejs/filestore';
+import type { ObjectConfig } from '@runejs/filestore';
+import type { itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 
 
 function milkCow(details: { objectConfig: ObjectConfig, player: Player }): void {
@@ -28,12 +28,8 @@ function milkCow(details: { objectConfig: ObjectConfig, player: Player }): void 
         player.sendMessage(`You milk the ${objectConfig.name} and receive some milk.`);
     } else {
         const gilleGroats = findNpc('rs:gillie_groats');
-        // TODO: `findNpc` should probably throw this error internally.
-        if (gilleGroats === null) {
-            throw new Error('Failed to find NPC Gillie Groats.');
-        }
-
         const gillieId = gilleGroats.gameId;
+
         dialogueAction(player)
             .then(async d => d.npc(gillieId, DialogueEmote.LAUGH_1, [`Tee hee! You've never milked a cow before, have you?`]))
             .then(async d => d.player(DialogueEmote.CALM_TALK_1, ['Erm... No. How could you tell?']))

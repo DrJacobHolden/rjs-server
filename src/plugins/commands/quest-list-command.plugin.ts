@@ -1,5 +1,5 @@
-import { commandActionHandler } from '@engine/action';
-import { questMap } from '@engine/plugins';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
+import { questMap } from '@engine/plugins/loader';
 
 const action: commandActionHandler = (details) => {
     for (const quest of Object.values(questMap)) {

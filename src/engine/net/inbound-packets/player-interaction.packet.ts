@@ -1,8 +1,8 @@
 import { logger } from '@runejs/common';
-
-import { activeWorld, World } from '@engine/world';
-import { Player, playerOptions } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import { playerOptions, type Player } from '@engine/world/actor/player/player';
+import { activeWorld } from '@engine/world';
+import { World } from '@engine/world/world';
 
 const playerInteractionPacket = (player: Player, packet: PacketData) => {
     const { buffer, packetId } = packet;

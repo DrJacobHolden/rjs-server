@@ -1,6 +1,4 @@
-import { objectInteractionActionHandler } from '@engine/action';
-import { World } from '@engine/world';
-
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 
 export const action: objectInteractionActionHandler = (details) => {
     details.player.busy = true;

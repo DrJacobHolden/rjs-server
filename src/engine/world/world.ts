@@ -4,17 +4,29 @@ import { lastValueFrom, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { logger } from '@runejs/common';
-import { LandscapeObject } from '@runejs/filestore';
+import type { LandscapeObject } from '@runejs/filestore';
 
-import { schedule, WorldInstance, Direction, Position, activeWorld } from '@engine/world';
-import { findItem, findNpc, findObject, itemSpawns, npcSpawns, NpcDetails, NpcSpawn } from '@engine/config';
-import { Player, Npc, Actor } from '@engine/world/actor';
-import { loadActionFiles } from '@engine/action';
-import { ChunkManager, ConstructedRegion, getTemplateLocalX, getTemplateLocalY } from '@engine/world/map';
-import { TravelLocations, ExamineCache, parseScenerySpawns } from '@engine/world/config';
-import { loadPlugins } from '@engine/plugins';
-import { TaskScheduler, Task } from '@engine/task';
-import { Isaac } from '@engine/net';
+import { isPlayer } from './actor/util';
+import type { Actor } from '@engine/world/actor/actor';
+import { ChunkManager } from '@engine/world/map/chunk-manager';
+import { Player } from '@engine/world/actor/player/player';
+import { Npc } from '@engine/world/actor/npc';
+import { Position } from '@engine/world/position';
+import type { Task } from '@engine/task/task';
+import { loadActionFiles } from '@engine/action/loader';
+import { findObject, itemSpawns, findItem, npcSpawns, findNpc } from '@engine/config/config-handler';
+import { NpcSpawn } from '@engine/config/npc-spawn-config';
+import { loadPlugins } from '@engine/plugins/loader';
+import { TaskScheduler } from '@engine/task/task-scheduler';
+import { activeWorld } from '@engine/world';
+import { ExamineCache } from '@engine/world/config/examine-data';
+import { parseScenerySpawns } from '@engine/world/config/scenery-spawns';
+import { TravelLocations } from '@engine/world/config/travel-locations';
+import { WorldInstance } from '@engine/world/instances';
+import type { ConstructedRegion } from '@engine/world/map/region';
+import { getTemplateLocalX, getTemplateLocalY } from '@engine/world/map/region';
+import { schedule } from '@engine/world/task';
+import type { Direction } from '@engine/world/direction';
 
 
 export interface QuadtreeKey {
@@ -100,7 +112,7 @@ export class World {
         const objectChunk = this.chunkManager.getChunkForWorldPosition(objectPosition);
 
         let customMap = false;
-        if(actor instanceof Player && actor.metadata.customMap) {
+        if(isPlayer(actor) && actor.metadata.customMap) {
             customMap = true;
             const templateMapObject = this.findCustomMapObject(actor, objectId, objectPosition);
             if(templateMapObject) {
@@ -113,7 +125,7 @@ export class World {
         let tileModifications;
         let personalTileModifications;
 
-        if(actor.isPlayer()) {
+        if(isPlayer(actor)) {
             const instance = actor.instance;
 
             if (!instance) {
@@ -130,7 +142,7 @@ export class World {
         if(!landscapeObject) {
             const tileObjects = [ ...tileModifications.mods.spawnedObjects ];
 
-            if(actor.isPlayer()) {
+            if(isPlayer(actor)) {
                 tileObjects.push(...personalTileModifications.mods.spawnedObjects);
             }
 
@@ -146,7 +158,7 @@ export class World {
 
         const hiddenTileObjects = [ ...tileModifications.mods.hiddenObjects ];
 
-        if(actor.isPlayer()) {
+        if(isPlayer(actor)) {
             hiddenTileObjects.push(...personalTileModifications.mods.hiddenObjects);
         }
 
@@ -387,12 +399,8 @@ export class World {
 
     public spawnGlobalNpcs(): void {
         npcSpawns.forEach(npcSpawn => {
-            const npcDetails = findNpc(npcSpawn.npcKey) || null;
-            if(npcDetails && npcDetails.gameId !== undefined) {
-                this.registerNpc(new Npc(npcDetails, npcSpawn));
-            } else {
-                logger.error(`NPC ${npcSpawn.npcKey} can not be spawned; it has not yet been registered on the server.`);
-            }
+            const npcDetails = findNpc(npcSpawn.npcKey);
+            this.registerNpc(new Npc(npcDetails, npcSpawn));
         });
     }
 
@@ -403,12 +411,8 @@ export class World {
         }
 
         const npcData = findNpc(npcKey);
-        if(!npcData) {
-            throw new Error(`NPC ${npcKey} not found in the cache`);
-        }
-
         const npc = new Npc(npcData,
-            new NpcSpawn(typeof npcData === 'number' ? `unknown_${npcData}` : npcData.key,
+            new NpcSpawn(npcData.key ? npcData.key : `unknown_${npcData}` ,
                 position, movementRadius, face));
 
         // TODO (jkm) this function doesn't use the passed in `instanceId`!

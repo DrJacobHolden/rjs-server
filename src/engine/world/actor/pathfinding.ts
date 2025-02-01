@@ -1,11 +1,11 @@
-import { Actor } from '@engine/world/actor/actor';
+import type { Actor } from '@engine/world/actor/actor';
 import { Position } from '../position';
-import { Chunk } from '@engine/world/map/chunk';
-import { Player } from '@engine/world/actor/player/player';
+import type { Chunk } from '@engine/world/map/chunk';
 import { logger } from '@runejs/common';
-import { WorldInstance } from '@engine/world/instances';
-import { Tile } from '@engine/world/map/chunk-manager';
+import type { WorldInstance } from '@engine/world/instances';
+import type { Tile } from '@engine/world/map/chunk-manager';
 import { activeWorld } from '@engine/world';
+import { isPlayer } from '@engine/world/actor/util';
 
 
 class Point {
@@ -447,7 +447,7 @@ export class Pathfinding {
     }
 
     private get instance(): WorldInstance {
-        return this.actor instanceof Player ? this.actor.instance : activeWorld.globalInstance;
+        return isPlayer(this.actor) ? this.actor.instance : activeWorld.globalInstance;
     }
 
 }

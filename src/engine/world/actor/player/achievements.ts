@@ -1,4 +1,4 @@
-import { Player } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
 import { serverConfig } from '@server/game/game-server';
 import { gfxIds } from '@engine/world/config/gfx-ids';
 

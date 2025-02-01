@@ -1,16 +1,15 @@
-import {
-    itemOnObjectActionHandler, ItemOnObjectActionHook, ItemInteractionActionHook
-} from '@engine/action';
 import { widgets } from '@engine/config/config-handler';
 import { Skill } from '@engine/world/actor/skills';
 import { anvilIds, bars, smithables, widgetItems } from '@plugins/skills/smithing/forging-constants';
 import { itemIds } from '@engine/world/config/item-ids';
-import { Smithable } from '@plugins/skills/smithing/forging-types';
-import { Player } from '@engine/world/actor/player/player';
+import type { Smithable } from '@plugins/skills/smithing/forging-types';
+import type { Player } from '@engine/world/actor/player/player';
 import { findItem } from '@engine/config/config-handler';
 import { Position } from '@engine/world/position';
 import { ForgingTask } from './forging-task';
 import { logger } from '@runejs/common';
+import type { ItemInteractionActionHook } from '@engine/action/pipe/item-interaction.action';
+import type { itemOnObjectActionHandler, ItemOnObjectActionHook } from '@engine/action/pipe/item-on-object.action';
 
 /**
  * Get the item ids of all the smithable items, as a flat array.

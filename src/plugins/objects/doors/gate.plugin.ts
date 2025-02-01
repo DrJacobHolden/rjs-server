@@ -1,10 +1,10 @@
 import { Position } from '@engine/world/position';
 import { directionData, WNES } from '@engine/world/direction';
 import { logger } from '@runejs/common';
-import { ModifiedLandscapeObject } from '@engine/world/map/landscape-object';
-import { objectInteractionActionHandler } from '@engine/action';
+import type { ModifiedLandscapeObject } from '@engine/world/map/landscape-object';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { soundIds } from '@engine/world/config/sound-ids';
-import { Chunk } from '@engine/world/map/chunk';
+import type { Chunk } from '@engine/world/map/chunk';
 import { activeWorld } from '@engine/world';
 
 const gates = [

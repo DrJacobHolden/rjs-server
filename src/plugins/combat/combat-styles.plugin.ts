@@ -1,12 +1,14 @@
-import { equipmentChangeActionHandler, EquipmentChangeAction } from '@engine/action/pipe/equipment-change.action';
-import { ItemDetails, WeaponStyle, weaponWidgetIds } from '@engine/config/item-config';
+import type { equipmentChangeActionHandler, EquipmentChangeAction } from '@engine/action/pipe/equipment-change.action';
+import type { ItemDetails, WeaponStyle } from '@engine/config/item-config';
+import { weaponWidgetIds } from '@engine/config/item-config';
 import { widgetScripts } from '@engine/world/config/widget';
-import { Player, SidebarTab } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
+import { SidebarTab } from '@engine/world/actor/player/player';
 import { findItem, widgets } from '@engine/config/config-handler';
-import { buttonActionHandler } from '@engine/action/pipe/button.action';
+import type { buttonActionHandler } from '@engine/action/pipe/button.action';
 import { combatStyles } from '@engine/world/actor/combat';
 import { serverConfig } from '@server/game/game-server';
-import { playerInitActionHandler } from '@engine/action/pipe/player-init.action';
+import type { playerInitActionHandler } from '@engine/action/pipe/player-init.action';
 
 
 export function updateCombatStyle(player: Player, weaponStyle: WeaponStyle, styleIndex: number): void {

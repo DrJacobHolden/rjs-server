@@ -1,4 +1,4 @@
-import { npcInteractionActionHandler } from '@engine/action';
+import type { npcInteractionActionHandler } from '@engine/action/pipe/npc-interaction.action';
 import { dialogueAction, DialogueEmote } from '@engine/world/actor/player/dialogue-action';
 import { findShop } from '@engine/config/config-handler';
 

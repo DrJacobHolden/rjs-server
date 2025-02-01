@@ -1,12 +1,19 @@
-import { LandscapeObject } from '@runejs/filestore';
-import { equipmentIndices, findItem } from '@engine/config';
-import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl';
-import { colors, colorText, randomBetween } from '@engine/util';
-import { Player, Skill } from '@engine/world/actor';
-import { HarvestTool, IHarvestable, selectWeightedItem, soundIds } from '@engine/world/config';
+import type { LandscapeObject } from '@runejs/filestore';
 import { checkForGemBoost } from '@engine/world/skill-util/glory-boost';
 import { rollGemType } from '@engine/world/skill-util/harvest-roll';
 import { canMine } from './chance';
+import { findItem } from '@engine/config/config-handler';
+import { equipmentIndices } from '@engine/config/item-config';
+import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl/actor-landscape-object-interaction-task';
+import { colors } from '@engine/util/colors';
+import { randomBetween } from '@engine/util/num';
+import { colorText } from '@engine/util/strings';
+import type { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
+import type { HarvestTool } from '@engine/world/config/harvest-tool';
+import type { IHarvestable } from '@engine/world/config/harvestable-object';
+import { selectWeightedItem } from '@engine/world/config/harvestable-object';
+import { soundIds } from '@engine/world/config/sound-ids';
 
 /**
  * A task that handles mining. It is a subclass of ActorLandscapeObjectInteractionTask, which means that it will

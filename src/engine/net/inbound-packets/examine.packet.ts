@@ -1,5 +1,5 @@
-import { Player } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import type { Player } from '@engine/world/actor/player/player';
 import { activeWorld } from '@engine/world';
 
 const examinePacket = (player: Player, packet: PacketData) => {
@@ -34,4 +34,3 @@ export default [ {
     size: 2,
     handler: examinePacket
 } ];
-

@@ -1,14 +1,15 @@
 import { objectIds } from '@engine/world/config/object-ids';
 import { widgetScripts } from '@engine/world/config/widget';
-import { objectInteractionActionHandler } from '@engine/action';
-import { ItemContainer } from '@engine/world/items/item-container';
-import { itemInteractionActionHandler } from '@engine/action';
-import { fromNote, Item, toNote } from '@engine/world/items/item';
-import { buttonActionHandler } from '@engine/action';
+import type { ItemContainer } from '@engine/world/items/item-container';
+import type { Item } from '@engine/world/items/item';
+import { fromNote, toNote } from '@engine/world/items/item';
 import { dialogue, Emote, execute } from '@engine/world/actor/dialogue';
 import { widgets } from '@engine/config/config-handler';
-import { Player } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
 import { logger } from '@runejs/common';
+import type { buttonActionHandler } from '@engine/action/pipe/button.action';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 
 
 const buttonIds: number[] = [

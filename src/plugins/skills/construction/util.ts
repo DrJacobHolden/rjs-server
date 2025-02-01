@@ -1,5 +1,6 @@
-import { Player } from '@engine/world/actor/player/player';
-import { Coords, Position } from '@engine/world/position';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Coords } from '@engine/world/position';
+import { Position } from '@engine/world/position';
 import { activeWorld } from '@engine/world';
 
 

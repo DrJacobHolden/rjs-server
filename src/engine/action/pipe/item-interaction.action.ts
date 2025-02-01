@@ -1,10 +1,11 @@
-import { Player } from '@engine/world/actor';
-import { findItem, ItemDetails } from '@engine/config';
-import {
-    ActionHook, getActionHooks, numberHookFilter, stringHookFilter, questHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
+import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { questHookFilter, numberHookFilter, stringHookFilter } from '@engine/action/hook/hook-filters';
+import { findItem } from '@engine/config/config-handler';
+import type { ItemDetails } from '@engine/config/item-config';
+import type { Player } from '@engine/world/actor/player/player';
 import { logger } from '@runejs/common';
-
 
 /**
  * Defines an item action hook.

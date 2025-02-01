@@ -1,13 +1,13 @@
-import { ByteBuffer } from '@runejs/common';
+import type { ByteBuffer } from '@runejs/common';
 
-import { Packet } from '@engine/net/packet';
-import { Npc } from '@engine/world/actor/npc';
-import { Position } from '@engine/world/position';
-import { QuadtreeKey } from '@engine/world';
-import { Actor } from '@engine/world/actor/actor';
-import { Player } from '../player';
+import type { Packet } from '@engine/net/packet';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Position } from '@engine/world/position';
+import type { Actor } from '../../actor';
+import type { Player } from '../player';
 import { activeWorld } from '@engine/world';
-
+import { isNpc, isPlayer } from '../../util';
+import type { QuadtreeKey } from '@engine/world/world';
 
 /**
  * Handles the registration of nearby NPCs or Players for the specified player.
@@ -31,7 +31,7 @@ export function registerNewActors(packet: Packet, player: Player, trackedActors:
     for(const newActor of newActors) {
         const nearbyActor = newActor.actor;
 
-        if(nearbyActor instanceof Player) {
+        if(isPlayer(nearbyActor)) {
             if(player.equals(nearbyActor)) {
                 // Other player is actually this player!
                 continue;
@@ -41,7 +41,7 @@ export function registerNewActors(packet: Packet, player: Player, trackedActors:
                 // Other player is no longer in the game world
                 continue;
             }
-        } else if(nearbyActor instanceof Npc) {
+        } else if(isNpc(nearbyActor)) {
             if(!activeWorld.npcExists(nearbyActor)) {
                 // Npc is no longer in the game world
                 continue;
@@ -86,7 +86,7 @@ export function syncTrackedActors(packet: Packet, playerPosition: Position, appe
         const trackedActor: Actor = trackedActors[i];
         let exists = true;
 
-        if(trackedActor.isPlayer()) {
+        if(isPlayer(trackedActor)) {
             if(!activeWorld.playerOnline(trackedActor)) {
                 exists = false;
             }

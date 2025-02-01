@@ -1,7 +1,7 @@
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { Npc } from '@engine/world/actor/npc';
 import { findNpc } from '@engine/config/config-handler';
-import { NpcDetails } from '@engine/config/npc-config';
+import type { NpcDetails } from '@engine/config/npc-config';
 import { NpcSpawn } from '@engine/config/npc-spawn-config';
 import { activeWorld } from '@engine/world';
 
@@ -14,25 +14,14 @@ const action: commandActionHandler = ({ player, args }) => {
     }
 
     if(typeof npcKey === 'string') {
-        npcDetails = findNpc(npcKey) || null;
-
-        if(!npcDetails) {
-            player.sendMessage(`NPC ${npcKey} is not yet registered on the server.`);
-            return;
-        }
-
+        npcDetails = findNpc(npcKey);
         npcKey = npcDetails.gameId;
-    }
-
-    if (!npcDetails) {
-        player.sendMessage(`NPC ${npcKey} is not yet registered on the server.`);
-        return;
     }
 
     const movementRadius: number = args.movementRadius as number;
 
     const npc = new Npc(npcDetails ? npcDetails : npcKey,
-        new NpcSpawn(npcDetails ? npcDetails.key : `unknown-${npcKey}`,
+        new NpcSpawn(npcDetails?.key ? npcDetails.key : `unknown-${npcKey}`,
             player.position.clone(), movementRadius, 'WEST'), player.instance);
 
     activeWorld.registerNpc(npc);

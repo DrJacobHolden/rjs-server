@@ -9,10 +9,9 @@ import { schedule } from '@engine/world/task';
 import { findNpc } from '@engine/config/config-handler';
 import { Cutscene } from '@engine/world/actor/player/cutscenes';
 import { soundIds } from '@engine/world/config/sound-ids';
-import { QuestStageHandler } from '@engine/config/quest-config';
-import { tabIndex } from '@engine/interface';
+import type { QuestStageHandler } from '@engine/config/quest-config';
 import { activeWorld } from '@engine/world';
-import { logger } from '@runejs/common';
+import { tabIndex } from '@engine/interface/interface-state';
 
 export const goblinDiplomacyStageHandler: QuestStageHandler = {
     0: async player => {
@@ -190,12 +189,6 @@ export const goblinDiplomacyStageHandler: QuestStageHandler = {
 
         function getAnim() {
             const goblinDetails = findNpc('rs:goblin');
-
-            if (!goblinDetails) {
-                logger.error('Could not find goblin details.');
-                return null;
-            }
-
             const anims = goblinDetails.combatAnimations;
 
             if (!anims) {

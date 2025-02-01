@@ -1,7 +1,7 @@
-import { QuestKey } from '@engine/config';
-import { ActionStrength, ActionType, HookTask } from '@engine/action';
-import { actionHookMap } from '@engine/plugins';
-
+import type { ActionStrength, ActionType } from '@engine/action/action-pipeline';
+import type { HookTask } from '@engine/action/hook/task';
+import type { QuestKey } from '@engine/config/quest-config';
+import { actionHookMap } from '@engine/plugins/loader';
 
 /**
  * Defines a quest requirement for an action hook.

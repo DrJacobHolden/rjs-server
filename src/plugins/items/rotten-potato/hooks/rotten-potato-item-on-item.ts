@@ -1,6 +1,6 @@
-import { itemOnItemActionHandler } from '@engine/action';
 import { RottenPotatoItem } from '@plugins/items/rotten-potato/helpers/rotten-potato-helpers';
 import { findItem } from '@engine/config/config-handler';
+import type { itemOnItemActionHandler } from '@engine/action/pipe/item-on-item.action';
 
 const itemOnPotato: itemOnItemActionHandler = (details) => {
     const slotToDelete = details.usedItem.itemId === RottenPotatoItem.gameId ? details.usedWithSlot : details.usedSlot;

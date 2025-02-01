@@ -1,8 +1,10 @@
-import { ActorTask } from '@engine/task/impl';
 import { findItem } from '@engine/config/config-handler';
-import { Player, Skill } from '@engine/world/actor';
-import { Smeltable } from './smelting-types';
-import { animationIds, soundIds } from '@engine/world/config';
+import type { Smeltable } from './smelting-types';
+import { ActorTask } from '@engine/task/impl/actor-task';
+import type { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
+import { animationIds } from '@engine/world/config/animation-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
 
 /**
  * A task that handles the smelting of an item.

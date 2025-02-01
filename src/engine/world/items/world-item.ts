@@ -1,6 +1,6 @@
-import { Position } from '@engine/world/position';
-import { Player } from '@engine/world/actor/player/player';
-import { WorldInstance } from '@engine/world/instances';
+import type { Position } from '@engine/world/position';
+import type { Player } from '@engine/world/actor/player/player';
+import type { WorldInstance } from '@engine/world/instances';
 
 
 export type WorldItem = {

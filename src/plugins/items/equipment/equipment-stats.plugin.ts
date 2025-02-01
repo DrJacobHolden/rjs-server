@@ -1,5 +1,4 @@
-import { buttonActionHandler } from '@engine/action';
-import { Player } from '@engine/world/actor/player/player';
+import type { buttonActionHandler } from '@engine/action/pipe/button.action';
 import { widgets } from '@engine/config/config-handler';
 
 export const handler: buttonActionHandler = (details) => {

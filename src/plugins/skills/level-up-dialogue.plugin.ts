@@ -1,4 +1,4 @@
-import { widgetInteractionActionHandler } from '@engine/action';
+import type { widgetInteractionActionHandler } from '@engine/action/pipe/widget-interaction.action';
 
 const widgetIds = [
     158, 161, 175,
