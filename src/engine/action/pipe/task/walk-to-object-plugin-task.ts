@@ -3,8 +3,8 @@ import type { ItemOnObjectAction } from '@engine/action/pipe/item-on-object.acti
 import type { ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
 import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl/actor-landscape-object-interaction-task';
 import type { Player } from '@engine/world/actor/player/player';
+import { Position } from '@engine/world/position';
 import type { LandscapeObject } from '@runejs/filestore';
-import { Position } from '@engine/world';
 
 /**
  * All actions supported by this plugin task.
@@ -44,7 +44,8 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
         const face = rendering?.face || 0;
 
         // If facing East or West, swap X and Y dimensions
-        if (face === 0 || face === 2) { // WEST or EAST
+        if (face === 0 || face === 2) {
+            // WEST or EAST
             [sizeX, sizeY] = [sizeY, sizeX];
         }
         super(
@@ -59,7 +60,6 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
         this.data = data;
     }
 
-
     protected onObjectReached(): void {
         const landscapeObject = this.landscapeObject;
         const landscapeObjectPosition = this.landscapeObjectPosition;
@@ -73,7 +73,7 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
         const objectCenter = new Position(
             landscapeObjectPosition.x + Math.floor((this.data.objectConfig?.rendering?.sizeX || 1) / 2),
             landscapeObjectPosition.y + Math.floor((this.data.objectConfig?.rendering?.sizeY || 1) / 2),
-            landscapeObjectPosition.level
+            landscapeObjectPosition.level,
         );
         this.actor.face(objectCenter);
 

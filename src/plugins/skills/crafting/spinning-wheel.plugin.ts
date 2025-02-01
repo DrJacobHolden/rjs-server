@@ -1,16 +1,16 @@
-import { objectInteractionActionHandler } from '@engine/action';
-import { buttonActionHandler } from '@engine/action';
-import { soundIds } from '@engine/world/config/sound-ids';
-import { itemIds } from '@engine/world/config/item-ids';
-import { Skill } from '@engine/world/actor/skills';
-import { animationIds } from '@engine/world/config/animation-ids';
-import { objectIds } from '@engine/world/config/object-ids';
+import { buttonActionHandler } from '@engine/action/pipe/button.action';
+import { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { findItem, widgets } from '@engine/config/config-handler';
-import { logger } from '@runejs/common';
-import { Player } from '@engine/world/actor';
-import { take } from 'rxjs/operators';
 import { ContentPlugin } from '@engine/plugins/plugin.types';
+import { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
 import { QueueType } from '@engine/world/actor/tick-queue';
+import { animationIds } from '@engine/world/config/animation-ids';
+import { itemIds } from '@engine/world/config/item-ids';
+import { objectIds } from '@engine/world/config/object-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
+import { logger } from '@runejs/common';
+import { take } from 'rxjs/operators';
 
 interface Spinnable {
     input: number | number[];
@@ -38,12 +38,7 @@ const bowString: Spinnable = {
     requiredLevel: 10,
 };
 const rootsCbowString: Spinnable = {
-    input: [
-        itemIds.roots.oak,
-        itemIds.roots.willow,
-        itemIds.roots.maple,
-        itemIds.roots.yew,
-    ],
+    input: [itemIds.roots.oak, itemIds.roots.willow, itemIds.roots.maple, itemIds.roots.yew],
     output: itemIds.crossbowString,
     experience: 15,
     requiredLevel: 10,
@@ -60,10 +55,7 @@ const magicAmuletString: Spinnable = {
     experience: 30,
     requiredLevel: 19,
 };
-const widgetButtonIds: Map<number, SpinnableButton> = new Map<
-number,
-SpinnableButton
->([
+const widgetButtonIds: Map<number, SpinnableButton> = new Map<number, SpinnableButton>([
     [100, { shouldTakeInput: false, count: 1, spinnable: ballOfWool }],
     [99, { shouldTakeInput: false, count: 5, spinnable: ballOfWool }],
     [98, { shouldTakeInput: false, count: 10, spinnable: ballOfWool }],
@@ -86,8 +78,7 @@ SpinnableButton
     [111, { shouldTakeInput: true, count: 0, spinnable: sinewCbowString }],
 ]);
 
-
-export const openSpinningInterface: objectInteractionActionHandler = (details) => {
+export const openSpinningInterface: objectInteractionActionHandler = details => {
     details.player.interfaceState.openWidget(widgets.whatWouldYouLikeToSpin, {
         slot: 'screen',
     });
@@ -134,7 +125,7 @@ async function spinProduct(player: Player, spinnable: Spinnable, count: number):
             // Queue as WEAK task
             await player.tickQueue.requestTicks({
                 ticks: i === 0 ? 0 : 3, // First action immediate, then 3 tick spacing
-                type: QueueType.WEAK
+                type: QueueType.WEAK,
             });
 
             // Play animation and sound each time
@@ -152,9 +143,7 @@ async function spinProduct(player: Player, spinnable: Spinnable, count: number):
     }
 }
 
-
-
-export const buttonClicked: buttonActionHandler = async (details) => {
+export const buttonClicked: buttonActionHandler = async details => {
     // Check if player might be spawning widget clientside
     if (!details.player.interfaceState.findWidget(459)) {
         return;
@@ -174,7 +163,7 @@ export const buttonClicked: buttonActionHandler = async (details) => {
         const outputName = findItem(product.spinnable.output)?.name || '';
         details.player.sendMessage(
             `You need a crafting level of ${product.spinnable.requiredLevel} to craft ${outputName.toLowerCase()}.`,
-            true
+            true,
         );
         return;
     }
@@ -207,7 +196,7 @@ export const buttonClicked: buttonActionHandler = async (details) => {
     }
 };
 
-export default <ContentPlugin>{
+export default (<ContentPlugin>{
     pluginId: 'rs:spinning_wheel',
     hooks: [
         {
@@ -224,4 +213,4 @@ export default <ContentPlugin>{
             handler: buttonClicked,
         },
     ],
-};
+});

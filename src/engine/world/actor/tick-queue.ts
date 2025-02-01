@@ -1,5 +1,5 @@
 import { Actor } from '@engine/world/actor/actor';
-import { Player } from '@engine/world/actor/player';
+import { Player } from '@engine/world/actor/player/player';
 import { ActionTimer } from '@engine/world/actor/timing/action-timer';
 
 /**
@@ -28,7 +28,7 @@ export enum QueueType {
      * Soft tasks cannot be interrupted and always execute when their time comes,
      * even during delays. Also forces modal interfaces closed.
      */
-    SOFT = 'soft'
+    SOFT = 'soft',
 }
 
 /**
@@ -53,8 +53,6 @@ export interface RequestTickOptions {
     useGlobalTimer?: boolean;
 }
 
-
-
 /**
  * Represents a queued tick task
  */
@@ -74,7 +72,6 @@ export interface TickTask {
 
     useGlobalTimer?: boolean;
 }
-
 
 /**
  * Manages tick-based timing and scheduling for an Actor.
@@ -154,11 +151,7 @@ export class TickQueue {
      * ```
      */
     public async requestTicks(options: RequestTickOptions): Promise<void> {
-        const {
-            ticks,
-            type = QueueType.NORMAL,
-            useGlobalTimer = false
-        } = options;
+        const { ticks, type = QueueType.NORMAL, useGlobalTimer = false } = options;
 
         // Handle STRONG tasks entering queue
         if (type === QueueType.STRONG) {
@@ -198,7 +191,7 @@ export class TickQueue {
             reject: rejectFunc!,
             type,
             startTick: this.currentTick,
-            useGlobalTimer
+            useGlobalTimer,
         };
 
         this.tasks.push(task);
@@ -234,8 +227,7 @@ export class TickQueue {
                 if (task.type === QueueType.SOFT || (!isDelayed && this.canProcessTask(task))) {
                     if (this.shouldCompleteTask(task)) {
                         // Handle modal interfaces for STRONG/SOFT tasks
-                        if (this.actor instanceof Player &&
-                            (task.type === QueueType.STRONG || task.type === QueueType.SOFT)) {
+                        if (this.actor instanceof Player && (task.type === QueueType.STRONG || task.type === QueueType.SOFT)) {
                             this.actor.interfaceState.closeAllSlots();
                         }
 
@@ -276,8 +268,9 @@ export class TickQueue {
         // For players, handle modal interfaces
         if (this.actor instanceof Player) {
             // NORMAL tasks skip if modal interface is open
-            if (task.type === QueueType.NORMAL
-            // && this.actor.interfaceState.hasModalOpen() // TODO: implement in player
+            if (
+                task.type === QueueType.NORMAL
+                // && this.actor.interfaceState.hasModalOpen() // TODO: implement in player
             ) {
                 return false;
             }

@@ -1,9 +1,12 @@
-import { IHarvestable, itemIds, objectIds, soundIds, WeightedItem } from '@engine/world/config';
-import { randomBetween } from '@engine/util';
+import { randomBetween } from '@engine/util/num';
+import { IHarvestable, WeightedItem } from '@engine/world/config/harvestable-object';
+import { itemIds } from '@engine/world/config/item-ids';
+import { objectIds } from '@engine/world/config/object-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
 
 export const WOODCUTTING_SOUNDS = {
     CHOP: soundIds.axeSwing, // Array of [88, 89, 90]
-    TREE_DEPLETED: soundIds.oreDepeleted // 3600
+    TREE_DEPLETED: soundIds.oreDepeleted, // 3600
 };
 
 interface AxeData {
@@ -12,8 +15,6 @@ interface AxeData {
     bonus: number;
 }
 
-
-
 export const AXES = new Map<number, AxeData>([
     [itemIds.axes.runite, { level: 41, animationId: 867, bonus: 8 }],
     [itemIds.axes.adamantite, { level: 31, animationId: 869, bonus: 7 }],
@@ -21,63 +22,62 @@ export const AXES = new Map<number, AxeData>([
     // [itemIds.axes.black, { level: 11, animationId: 873, bonus: 5 }],
     [itemIds.axes.steel, { level: 6, animationId: 875, bonus: 4 }],
     [itemIds.axes.iron, { level: 1, animationId: 877, bonus: 3 }],
-    [itemIds.axes.bronze, { level: 1, animationId: 879, bonus: 2 }]
+    [itemIds.axes.bronze, { level: 1, animationId: 879, bonus: 2 }],
 ]);
 
-
-
 const NORMAL_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.normal.map((tree) => [tree.default, tree.stump]),
-    ...objectIds.tree.dead.map((tree) => [tree.default, tree.stump]),
+    ...objectIds.tree.normal.map(tree => [tree.default, tree.stump]),
+    ...objectIds.tree.dead.map(tree => [tree.default, tree.stump]),
 ] as [number, number][]);
 
-const ACHEY_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.archey.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const ACHEY_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.archey.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const OAK_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.oak.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const OAK_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.oak.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
+const WILLOW_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.willow.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const WILLOW_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.willow.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const TEAK_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.teak.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
+const DRAMEN_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.dramen.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const TEAK_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.teak.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const MAPLE_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.maple.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const DRAMEN_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.dramen.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
-
-
-const MAPLE_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.maple.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
-
-
-const HOLLOW_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.hollow.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const HOLLOW_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.hollow.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
 const MAHOGANY_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.mahogany.map((tree) => [tree.default, tree.stump]),
+    ...objectIds.tree.mahogany.map(tree => [tree.default, tree.stump]),
 ] as [number, number][]);
 
+const YEW_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.yew.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const YEW_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.yew.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
-
-const MAGIC_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.magic.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
-
-
-
+const MAGIC_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.magic.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
 const Trees: IHarvestable[] = [
     {
@@ -88,7 +88,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 59,
         respawnHigh: 98,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: ACHEY_OBJECTS,
@@ -98,7 +98,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 59,
         respawnHigh: 98,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: OAK_OBJECTS,
@@ -108,7 +108,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 14,
         respawnHigh: 14,
         baseChance: 50,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: WILLOW_OBJECTS,
@@ -118,7 +118,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 14,
         respawnHigh: 14,
         baseChance: 30,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: TEAK_OBJECTS,
@@ -128,7 +128,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 15,
         respawnHigh: 15,
         baseChance: 0,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: DRAMEN_OBJECTS,
@@ -138,7 +138,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 0,
         respawnHigh: 0,
         baseChance: 100,
-        break: 0
+        break: 0,
     },
     {
         objects: MAPLE_OBJECTS,
@@ -148,7 +148,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 59,
         respawnHigh: 59,
         baseChance: 0,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: HOLLOW_OBJECTS,
@@ -158,7 +158,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 43,
         respawnHigh: 44,
         baseChance: 0,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: MAHOGANY_OBJECTS,
@@ -168,7 +168,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 14,
         respawnHigh: 14,
         baseChance: -5,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: YEW_OBJECTS,
@@ -178,7 +178,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 99,
         respawnHigh: 99,
         baseChance: -15,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: MAGIC_OBJECTS,
@@ -188,7 +188,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 199,
         respawnHigh: 199,
         baseChance: -25,
-        break: 100 / 8
+        break: 100 / 8,
     },
     {
         objects: DRAMEN_OBJECTS,
@@ -198,7 +198,7 @@ const Trees: IHarvestable[] = [
         respawnLow: 0,
         respawnHigh: 0,
         baseChance: 100,
-        break: 0
+        break: 0,
     },
     {
         objects: HOLLOW_OBJECTS,
@@ -208,10 +208,9 @@ const Trees: IHarvestable[] = [
         respawnLow: 43,
         respawnHigh: 44,
         baseChance: 0,
-        break: 100 / 8
+        break: 100 / 8,
     },
 ];
-
 
 export function getTreeIds(): number[] {
     const treeIds: number[] = [];
@@ -226,8 +225,8 @@ export function getTreeFromHealthy(id: number): IHarvestable {
     return Trees.find(tree => tree.objects.has(id)) as IHarvestable;
 }
 
-export function selectWeightedItem(items:string | WeightedItem[]): string {
-    if(typeof items === 'string') {
+export function selectWeightedItem(items: string | WeightedItem[]): string {
+    if (typeof items === 'string') {
         return items;
     }
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
@@ -243,9 +242,8 @@ export function selectWeightedItem(items:string | WeightedItem[]): string {
     return items[0].itemConfigId; // Fallback to first item
 }
 
-
-export function getPrimaryItem(items:string | WeightedItem[]): string {
-    if(typeof items === 'string') {
+export function getPrimaryItem(items: string | WeightedItem[]): string {
+    if (typeof items === 'string') {
         return items;
     }
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
