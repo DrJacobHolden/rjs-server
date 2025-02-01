@@ -1,6 +1,6 @@
-import { Position } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import type { Player } from '@engine/world/actor/player/player';
+import { Position } from '@engine/world/position';
 
 const pickupItemPacket = (player: Player, packet: PacketData) => {
     const { buffer } = packet;
@@ -16,14 +16,14 @@ const pickupItemPacket = (player: Player, packet: PacketData) => {
 
     let worldItem = worldItems.find(i => i.itemId === itemId) || null;
 
-    if(!worldItem) {
+    if (!worldItem) {
         const personalMods = player.personalInstance.getInstancedChunk(worldItemPosition);
         const personalItems = personalMods?.mods?.get(worldItemPosition.key)?.worldItems || [];
         worldItem = personalItems.find(i => i.itemId === itemId) || null;
     }
 
-    if(worldItem && !worldItem.removed) {
-        if(worldItem.owner && !worldItem.owner.equals(player)) {
+    if (worldItem && !worldItem.removed) {
+        if (worldItem.owner && !worldItem.owner.equals(player)) {
             return;
         }
 
@@ -34,5 +34,5 @@ const pickupItemPacket = (player: Player, packet: PacketData) => {
 export default {
     opcode: 85,
     size: 6,
-    handler: pickupItemPacket
+    handler: pickupItemPacket,
 };

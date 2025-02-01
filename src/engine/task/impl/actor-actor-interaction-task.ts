@@ -1,6 +1,6 @@
-import { Actor } from '@engine/world/actor';
+import { Task } from '@engine/task/task';
+import { Actor } from '@engine/world/actor/actor';
 import { ActorWalkToTask } from './actor-walk-to-task';
-import { Task } from '@engine/task';
 
 /**
  * A task for an actor to interact with another actor.
@@ -13,7 +13,10 @@ import { Task } from '@engine/task';
 export class ActorActorInteractionTask<TActor extends Actor, TOther extends Actor> extends Task {
     protected arrived: boolean = false;
 
-    constructor(protected actor: TActor, protected other: TOther) {
+    constructor(
+        protected actor: TActor,
+        protected other: TOther,
+    ) {
         super();
     }
 

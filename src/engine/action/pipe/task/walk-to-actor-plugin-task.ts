@@ -1,10 +1,11 @@
-import { Actor, Player } from '@engine/world/actor';
-import { ActionHook } from '@engine/action/hook';
-import { NpcInteractionAction } from '../npc-interaction.action';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import type { ItemOnNpcAction } from '@engine/action/pipe/item-on-npc.action';
+import type { ItemOnPlayerAction } from '@engine/action/pipe/item-on-player.action';
+import type { NpcInteractionAction } from '@engine/action/pipe/npc-interaction.action';
+import type { PlayerInteractionAction } from '@engine/action/pipe/player-interaction.action';
 import { ActorActorInteractionTask } from '@engine/task/impl/actor-actor-interaction-task';
-import { ItemOnNpcAction } from '../item-on-npc.action';
-import { PlayerInteractionAction } from '../player-interaction.action';
-import { ItemOnPlayerAction } from '../item-on-player.action';
+import type { Actor } from '@engine/world/actor/actor';
+import type { Player } from '@engine/world/actor/player/player';
 
 /**
  * All actions supported by this plugin task.
@@ -24,12 +25,16 @@ type ActorKey = 'otherPlayer' | 'npc';
 type ActorActionData<TAction extends ActorAction> = Omit<TAction, 'player' | ActorKey | 'position'>;
 
 /**
-* This is a task to migrate old `walkTo` item interaction actions to the new task system.
-*
-* This is a first-pass implementation to allow for removal of the old action system.
-* It will be refactored in future to be more well suited to our plugin system.
-*/
-export class WalkToActorPluginTask<TAction extends ActorAction, TActorKey extends ActorKey, TOtherActor extends Actor> extends ActorActorInteractionTask<Player, TOtherActor> {
+ * This is a task to migrate old `walkTo` item interaction actions to the new task system.
+ *
+ * This is a first-pass implementation to allow for removal of the old action system.
+ * It will be refactored in future to be more well suited to our plugin system.
+ */
+export class WalkToActorPluginTask<
+    TAction extends ActorAction,
+    TActorKey extends ActorKey,
+    TOtherActor extends Actor,
+> extends ActorActorInteractionTask<Player, TOtherActor> {
     /**
      * The plugins to execute when the player arrives at the object.
      */
@@ -39,11 +44,14 @@ export class WalkToActorPluginTask<TAction extends ActorAction, TActorKey extend
 
     private actorKey: TActorKey;
 
-    constructor(plugins: ActorActionHook<TAction>[], player: Player, actorKey: TActorKey, other: TOtherActor, data: ActorActionData<TAction>) {
-        super(
-            player,
-            other,
-        );
+    constructor(
+        plugins: ActorActionHook<TAction>[],
+        player: Player,
+        actorKey: TActorKey,
+        other: TOtherActor,
+        data: ActorActionData<TAction>,
+    ) {
+        super(player, other);
 
         this.plugins = plugins;
         this.data = data;
@@ -74,7 +82,7 @@ export class WalkToActorPluginTask<TAction extends ActorAction, TActorKey extend
                 player: this.actor,
                 position: otherPosition,
                 [this.actorKey]: other,
-                ...this.data
+                ...this.data,
             };
 
             // I wish I didn't have to cast here, but TypeScript is making it difficult

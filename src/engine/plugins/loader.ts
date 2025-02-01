@@ -1,7 +1,8 @@
+import type { ActionType } from '@engine/action/action-pipeline';
+import { type ActionHook, sortActionHooks } from '@engine/action/hook/action-hook';
 import { loadPluginFiles } from '@engine/plugins/content-plugin';
-import { Quest } from '@engine/world/actor';
+import { Quest } from '@engine/world/actor/player/quest';
 import { logger } from '@runejs/common';
-import { ActionHook, ActionType, sortActionHooks } from '@engine/action';
 
 /**
  * A type for describing the plugin action hook map.
@@ -36,24 +37,24 @@ export async function loadPlugins(): Promise<void> {
 
     const pluginActionHookList = plugins?.filter(plugin => !!plugin?.hooks)?.map(plugin => plugin.hooks);
 
-    if(pluginActionHookList && pluginActionHookList.length !== 0) {
-        pluginActionHookList.reduce(
-            (a, b) => (a || []).concat(b || []))?.forEach(action => {
-            if(!(action instanceof Quest)) {
-                if(!actionHookMap[action.type]) {
-                    actionHookMap[action.type] = [];
-                }
+    if (pluginActionHookList && pluginActionHookList.length !== 0) {
+        pluginActionHookList
+            .reduce((a, b) => (a || []).concat(b || []))
+            ?.forEach(action => {
+                if (!(action instanceof Quest)) {
+                    if (!actionHookMap[action.type]) {
+                        actionHookMap[action.type] = [];
+                    }
 
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                actionHookMap[action.type]!.push(action);
-            } else {
-                if(!actionHookMap['quest']) {
-                    actionHookMap['quest'] = [];
-                }
+                    actionHookMap[action.type]!.push(action);
+                } else {
+                    if (!actionHookMap['quest']) {
+                        actionHookMap['quest'] = [];
+                    }
 
-                actionHookMap['quest'].push(action);
-            }
-        });
+                    actionHookMap['quest'].push(action);
+                }
+            });
     } else {
         logger.warn(`No action hooks detected - update plugins.`);
     }
@@ -69,7 +70,5 @@ export async function loadPlugins(): Promise<void> {
     }
 
     // @TODO implement proper sorting rules
-    Object.keys(actionHookMap)
-        .forEach(key => actionHookMap[key] =
-            sortActionHooks(actionHookMap[key]));
+    Object.keys(actionHookMap).forEach(key => (actionHookMap[key] = sortActionHooks(actionHookMap[key])));
 }

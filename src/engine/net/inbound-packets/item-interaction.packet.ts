@@ -1,6 +1,6 @@
-import { getItemOption } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import type { Player } from '@engine/world/actor/player/player';
+import { getItemOption } from '@engine/world/items/item';
 
 const option1 = buffer => {
     const itemId = buffer.get('short', 'u');
@@ -78,32 +78,40 @@ const itemInteractionPacket = (player: Player, packet: PacketData) => {
     player.actionPipeline.call('item_interaction', player, itemId, slot, widgetId, containerId, option);
 };
 
-export default [{
-    opcode: 38,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 98,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 228,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 26,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 147,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 240,
-    size: 8,
-    handler: itemInteractionPacket
-}, {
-    opcode: 102,
-    size: 8,
-    handler: itemInteractionPacket
-}];
+export default [
+    {
+        opcode: 38,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 98,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 228,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 26,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 147,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 240,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 102,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+];

@@ -1,7 +1,6 @@
-import { commandActionHandler } from '@engine/action';
-import { Skill } from '@engine/world/actor/skills';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
-const action: commandActionHandler = (details) => {
+const action: commandActionHandler = details => {
     const { player } = details;
 
     if (player.metadata.lastPosition) {
@@ -14,8 +13,8 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'back' ],
-            handler: action
-        }
-    ]
+            commands: ['back'],
+            handler: action,
+        },
+    ],
 };

@@ -1,8 +1,8 @@
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import { activeWorld } from '@engine/world';
+import type { Player } from '@engine/world/actor/player/player';
+import { World } from '@engine/world/world';
 import { logger } from '@runejs/common';
-
-import { PacketData } from '@engine/net';
-import { activeWorld, World } from '@engine/world';
-import { Player } from '@engine/world/actor';
 
 const npcInteractionPacket = (player: Player, packet: PacketData) => {
     const { buffer, packetId } = packet;
@@ -46,8 +46,8 @@ const npcInteractionPacket = (player: Player, packet: PacketData) => {
 
     const actionIdx = actions[packetId];
     let optionName = `action-${actionIdx + 1}`;
-    if(options && options.length >= actionIdx) {
-        if(!options[actionIdx] || options[actionIdx].toLowerCase() === 'hidden') {
+    if (options && options.length >= actionIdx) {
+        if (!options[actionIdx] || options[actionIdx].toLowerCase() === 'hidden') {
             // Invalid action
             logger.info(npc);
             logger.error(`1: Invalid npc ${morphedNpc?.gameId || npc.id} option ${actionIdx + 1}, options: ${JSON.stringify(options)}`);
@@ -70,16 +70,20 @@ const npcInteractionPacket = (player: Player, packet: PacketData) => {
     player.actionPipeline.call('npc_interaction', player, npc, position, optionName.toLowerCase());
 };
 
-export default [{
-    opcode: 63,
-    size: 2,
-    handler: npcInteractionPacket
-}, {
-    opcode: 116,
-    size: 2,
-    handler: npcInteractionPacket
-}, {
-    opcode: 57,
-    size: 2,
-    handler: npcInteractionPacket
-}];
+export default [
+    {
+        opcode: 63,
+        size: 2,
+        handler: npcInteractionPacket,
+    },
+    {
+        opcode: 116,
+        size: 2,
+        handler: npcInteractionPacket,
+    },
+    {
+        opcode: 57,
+        size: 2,
+        handler: npcInteractionPacket,
+    },
+];

@@ -1,23 +1,20 @@
-import { objectInteractionActionHandler } from '@engine/action';
-import { dialogueAction, DialogueEmote } from '@engine/world/actor/player/dialogue-action';
+import type { itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import { findItem, findNpc } from '@engine/config/config-handler';
+import { DialogueEmote, dialogueAction } from '@engine/world/actor/player/dialogue-action';
+import type { Player } from '@engine/world/actor/player/player';
 import { animationIds } from '@engine/world/config/animation-ids';
-import { soundIds } from '@engine/world/config/sound-ids';
 import { itemIds } from '@engine/world/config/item-ids';
 import { objectIds } from '@engine/world/config/object-ids';
-import { itemOnObjectActionHandler } from '@engine/action';
-import { Player } from '@engine/world/actor/player/player';
-import { findItem, findNpc } from '@engine/config/config-handler';
-import { ObjectConfig } from '@runejs/filestore';
+import { soundIds } from '@engine/world/config/sound-ids';
+import type { ObjectConfig } from '@runejs/filestore';
 
-
-function milkCow(details: { objectConfig: ObjectConfig, player: Player }): void {
+function milkCow(details: { objectConfig: ObjectConfig; player: Player }): void {
     const { player, objectConfig } = details;
     const emptyBucketItem = findItem(itemIds.bucket);
     // TODO: `findItem` should probably throw this error internally.
     if (emptyBucketItem === null) {
-        throw new Error(
-            'Failed to milk cow as no item matching bucket was found.',
-        );
+        throw new Error('Failed to milk cow as no item matching bucket was found.');
     }
 
     if (player.hasItemInInventory(itemIds.bucket)) {
@@ -28,18 +25,24 @@ function milkCow(details: { objectConfig: ObjectConfig, player: Player }): void 
         player.sendMessage(`You milk the ${objectConfig.name} and receive some milk.`);
     } else {
         const gilleGroats = findNpc('rs:gillie_groats');
-        // TODO: `findNpc` should probably throw this error internally.
-        if (gilleGroats === null) {
-            throw new Error('Failed to find NPC Gillie Groats.');
-        }
-
         const gillieId = gilleGroats.gameId;
+
         dialogueAction(player)
             .then(async d => d.npc(gillieId, DialogueEmote.LAUGH_1, [`Tee hee! You've never milked a cow before, have you?`]))
             .then(async d => d.player(DialogueEmote.CALM_TALK_1, ['Erm... No. How could you tell?']))
-            .then(async d => d.npc(gillieId, DialogueEmote.LAUGH_2, [`Because you're spilling milk all over the floor. What a`, 'waste! You need something to hold the milk.']))
+            .then(async d =>
+                d.npc(gillieId, DialogueEmote.LAUGH_2, [
+                    `Because you're spilling milk all over the floor. What a`,
+                    'waste! You need something to hold the milk.',
+                ]),
+            )
             .then(async d => d.player(DialogueEmote.CONSIDERING, [`Ah yes, I really should have guessed that one, shouldn't`, 'I?']))
-            .then(async d => d.npc(gillieId, DialogueEmote.LAUGH_2, [`You're from the city aren't you... Try it again with a`, `${emptyBucketItem.name.toLowerCase()}.`]))
+            .then(async d =>
+                d.npc(gillieId, DialogueEmote.LAUGH_2, [
+                    `You're from the city aren't you... Try it again with a`,
+                    `${emptyBucketItem.name.toLowerCase()}.`,
+                ]),
+            )
             .then(async d => d.player(DialogueEmote.CALM_TALK_2, [`Right, I'll do that.`]))
             .then(d => {
                 d.close();
@@ -47,9 +50,9 @@ function milkCow(details: { objectConfig: ObjectConfig, player: Player }): void 
     }
 }
 
-export const actionItem: itemOnObjectActionHandler = (details) => milkCow(details);
+export const actionItem: itemOnObjectActionHandler = details => milkCow(details);
 
-export const actionInteract: objectInteractionActionHandler = (details) => milkCow(details);
+export const actionInteract: objectInteractionActionHandler = details => milkCow(details);
 
 export default {
     pluginId: 'rs:cow_milking',
@@ -59,14 +62,14 @@ export default {
             objectIds: objectIds.milkableCow,
             options: 'milk',
             walkTo: true,
-            handler: actionInteract
+            handler: actionInteract,
         },
         {
             type: 'item_on_object',
             objectIds: objectIds.milkableCow,
             itemIds: itemIds.bucket,
             walkTo: true,
-            handler: actionItem
-        }
-    ]
+            handler: actionItem,
+        },
+    ],
 };

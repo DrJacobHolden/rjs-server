@@ -1,23 +1,24 @@
-import { Player, Skill } from '@engine/world/actor';
-import { LandscapeObject } from '@runejs/filestore';
-import { findItem } from '@engine/config';
+import { ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
+import { findItem } from '@engine/config/config-handler';
+import { ContentPlugin } from '@engine/plugins/plugin.types';
+import { randomBetween } from '@engine/util/num';
+import { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
 import { QueueType } from '@engine/world/actor/tick-queue';
 import {
-    AXES, getPrimaryItem,
+    AXES,
+    WOODCUTTING_SOUNDS,
+    getPrimaryItem,
     getTreeFromHealthy,
-    getTreeIds, selectWeightedItem,
-    WOODCUTTING_SOUNDS
+    getTreeIds,
+    selectWeightedItem,
 } from '@plugins/skills/woodcutting/woodcutting.constants';
-import { randomBetween } from '@engine/util';
-import { ContentPlugin } from '@engine/plugins/plugin.types';
-import { ObjectInteractionAction } from '@engine/action';
-
+import { LandscapeObject } from '@runejs/filestore';
 
 const getBestAxe = (player: Player): number | null => {
     const availableAxes = [...AXES.entries()]
-        .filter(([axeId, data]) =>
-            player.hasItemInInventory(axeId) ||
-            player.isItemEquipped(axeId)).filter(([axeId, data]) => player.skills.hasLevel(Skill.WOODCUTTING, data.level))
+        .filter(([axeId, data]) => player.hasItemInInventory(axeId) || player.isItemEquipped(axeId))
+        .filter(([axeId, data]) => player.skills.hasLevel(Skill.WOODCUTTING, data.level))
         .sort(([, a], [, b]) => b.bonus - a.bonus);
 
     if (availableAxes.length === 0) {
@@ -31,9 +32,7 @@ const getBestAxe = (player: Player): number | null => {
 const handleSoundCycle = (player: Player, startTick: number): void => {
     const currentTick = player.tickQueue.currentTick;
     const relativeTick = (currentTick - startTick) % 3;
-    const chopSound = WOODCUTTING_SOUNDS.CHOP[
-        Math.floor(Math.random() * WOODCUTTING_SOUNDS.CHOP.length)
-    ];
+    const chopSound = WOODCUTTING_SOUNDS.CHOP[Math.floor(Math.random() * WOODCUTTING_SOUNDS.CHOP.length)];
     const volumes = [8, 0, 18]; // third, second, first chop
     player.playSound(chopSound, volumes[relativeTick]);
 };
@@ -45,7 +44,7 @@ const checkTreeDepletion = (player: Player, tree: LandscapeObject): boolean => {
     const depletionChance = treeData.break / 100;
 
     if (Math.random() < depletionChance) {
-        const respawnTicks = randomBetween(treeData.respawnLow, treeData.respawnHigh)
+        const respawnTicks = randomBetween(treeData.respawnLow, treeData.respawnHigh);
         // Scale by player count in area
         // const scaledTicks = Math.ceil(respawnTicks * (1 + player.region.playerCount * 0.1));
         const scaledTicks = respawnTicks;
@@ -54,10 +53,9 @@ const checkTreeDepletion = (player: Player, tree: LandscapeObject): boolean => {
 
         const brokenId = treeData.objects.get(tree.objectId);
 
-        if(brokenId) {
+        if (brokenId) {
             // await tree.transform(tree.nextStage, scaledTicks);
-            player.instance.replaceGameObject(brokenId,
-                tree, scaledTicks);
+            player.instance.replaceGameObject(brokenId, tree, scaledTicks);
         }
 
         return true;
@@ -74,7 +72,7 @@ const calculateSuccess = (player: Player, tree: LandscapeObject, axe: number): b
     // const low = treeData.baseChance + axeData.bonus;
     const high = treeData.baseChance + axeData.bonus;
 
-    return Math.random() * high < (playerLevel + axeData.bonus);
+    return Math.random() * high < playerLevel + axeData.bonus;
 };
 
 const startWoodcutting = async (details: ObjectInteractionAction): Promise<void> => {
@@ -99,7 +97,9 @@ const startWoodcutting = async (details: ObjectInteractionAction): Promise<void>
     const chopTree = async (): Promise<void> => {
         // Check if we can still chop
         if (player.inventory.isFull()) {
-            player.sendMessage(`Your inventory is too full to hold any more ${findItem(getPrimaryItem(treeData.items))?.name.toLowerCase()}.`);
+            player.sendMessage(
+                `Your inventory is too full to hold any more ${findItem(getPrimaryItem(treeData.items))?.name.toLowerCase()}.`,
+            );
             return;
         }
 
@@ -117,7 +117,7 @@ const startWoodcutting = async (details: ObjectInteractionAction): Promise<void>
             await player.tickQueue.requestTicks({
                 ticks: 3,
                 type: QueueType.WEAK,
-                useGlobalTimer: true
+                useGlobalTimer: true,
             });
 
             // Check for success
@@ -138,7 +138,6 @@ const startWoodcutting = async (details: ObjectInteractionAction): Promise<void>
 
             // Recursively continue chopping
             await chopTree();
-
         } catch (error) {
             // Handle interruption
             player.playAnimation(null);
@@ -149,21 +148,21 @@ const startWoodcutting = async (details: ObjectInteractionAction): Promise<void>
     await chopTree();
 };
 
-export default<ContentPlugin> {
+export default (<ContentPlugin>{
     pluginId: 'rs:woodcutting',
     hooks: [
         {
             type: 'object_interaction',
             objectIds: getTreeIds(),
             options: ['chop down'],
-            handler: async (details) => startWoodcutting(details),
-            walkTo: true
+            handler: async details => startWoodcutting(details),
+            walkTo: true,
         },
         {
             type: 'item_on_object',
             objectIds: getTreeIds(),
             itemIds: [...AXES.keys()],
-            handler: async (details) => startWoodcutting(details)
-        }
-    ]
-};
+            handler: async details => startWoodcutting(details),
+        },
+    ],
+});

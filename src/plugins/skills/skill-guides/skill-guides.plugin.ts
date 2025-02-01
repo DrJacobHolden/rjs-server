@@ -1,14 +1,10 @@
-import {
-    buttonActionHandler,
-    ButtonActionHook,
-    widgetInteractionActionHandler,
-    WidgetInteractionActionHook
-} from '@engine/action';
-import { Player } from '@engine/world/actor';
-import { widgets } from '@engine/config';
-import { SkillGuide, SkillSubGuide, loadSkillGuideConfigurations } from './skill-guide-config';
+import type { ButtonActionHook, buttonActionHandler } from '@engine/action/pipe/button.action';
+import type { WidgetInteractionActionHook, widgetInteractionActionHandler } from '@engine/action/pipe/widget-interaction.action';
+import { widgets } from '@engine/config/config-handler';
+import type { Player } from '@engine/world/actor/player/player';
 import { logger } from '@runejs/common';
-
+import type { SkillGuide, SkillSubGuide } from './skill-guide-config';
+import { loadSkillGuideConfigurations } from './skill-guide-config';
 
 const skillGuidePath = __dirname.replace(/dist/, 'src');
 const sidebarTextIds = [131, 108, 109, 112, 122, 125, 128, 143, 146, 149, 159, 162, 165];
@@ -23,14 +19,14 @@ function loadGuide(player: Player, guideId: number, subGuideId: number = 0, refr
         return;
     }
 
-    if(refreshSidebar) {
-        player.modifyWidget(widgets.skillGuide, { childId: 133, text: (guide.members ? 'Members only skill' : '') });
+    if (refreshSidebar) {
+        player.modifyWidget(widgets.skillGuide, { childId: 133, text: guide.members ? 'Members only skill' : '' });
 
-        for(let i = 0; i < sidebarTextIds.length; i++) {
+        for (let i = 0; i < sidebarTextIds.length; i++) {
             const sidebarId = sidebarIds[i];
             let hidden: boolean = true;
 
-            if(i >= guide.sub_guides.length) {
+            if (i >= guide.sub_guides.length) {
                 player.modifyWidget(widgets.skillGuide, { childId: sidebarTextIds[i], text: '' });
                 hidden = true;
             } else {
@@ -38,7 +34,7 @@ function loadGuide(player: Player, guideId: number, subGuideId: number = 0, refr
                 hidden = false;
             }
 
-            if(sidebarId !== -1) {
+            if (sidebarId !== -1) {
                 // Apparently you can never have only TWO subguides...
                 // Because childId 98 deletes both options 2 AND 3. So, good thing there are no guides with only 2 sections, I guess?...
                 // Verified this in an interface editor, and they are indeed grouped in a single layer for some reason...
@@ -49,13 +45,13 @@ function loadGuide(player: Player, guideId: number, subGuideId: number = 0, refr
 
     const subGuide: SkillSubGuide = guide.sub_guides[subGuideId];
 
-    player.modifyWidget(widgets.skillGuide, { childId: 1, text: (guide.name + ' - ' + subGuide.name) });
+    player.modifyWidget(widgets.skillGuide, { childId: 1, text: guide.name + ' - ' + subGuide.name });
 
-    const itemIds: number[] = subGuide.lines.map(g => (g.item?.gameId || 0)).concat(new Array(30 - subGuide.lines.length).fill(null));
+    const itemIds: number[] = subGuide.lines.map(g => g.item?.gameId || 0).concat(new Array(30 - subGuide.lines.length).fill(null));
     player.outgoingPackets.sendUpdateAllWidgetItemsById({ widgetId: widgets.skillGuide, containerId: 132 }, itemIds);
 
-    for(let i = 0; i < 30; i++) {
-        if(subGuide.lines.length <= i) {
+    for (let i = 0; i < 30; i++) {
+        if (subGuide.lines.length <= i) {
             player.modifyWidget(widgets.skillGuide, { childId: 5 + i, text: '' });
             player.modifyWidget(widgets.skillGuide, { childId: 45 + i, text: '' });
         } else {
@@ -66,31 +62,31 @@ function loadGuide(player: Player, guideId: number, subGuideId: number = 0, refr
 
     player.interfaceState.openWidget(widgets.skillGuide, {
         slot: 'screen',
-        multi: false
+        multi: false,
     });
     player.metadata.activeSkillGuide = guideId;
 }
 
-export const guideHandler: buttonActionHandler = async (details) => {
+export const guideHandler: buttonActionHandler = async details => {
     const { player, buttonId } = details;
 
-    if(!guides.length) {
+    if (!guides.length) {
         guides = await loadSkillGuideConfigurations(skillGuidePath);
     }
 
     loadGuide(player, buttonId);
 };
 
-export const subGuideHandler: widgetInteractionActionHandler = async (details) => {
+export const subGuideHandler: widgetInteractionActionHandler = async details => {
     const { player, childId } = details;
 
-    if(!guides.length) {
+    if (!guides.length) {
         guides = await loadSkillGuideConfigurations(skillGuidePath);
     }
 
     const activeSkillGuide = player.metadata.activeSkillGuide;
 
-    if(!activeSkillGuide) {
+    if (!activeSkillGuide) {
         return;
     }
 
@@ -103,7 +99,7 @@ export const subGuideHandler: widgetInteractionActionHandler = async (details) =
 
     const subGuideId = sidebarTextIds.indexOf(childId);
 
-    if(subGuideId >= guide.sub_guides.length) {
+    if (subGuideId >= guide.sub_guides.length) {
         return;
     }
 
@@ -116,13 +112,13 @@ export default {
         {
             type: 'button',
             widgetId: widgets.skillsTab,
-            handler: guideHandler
+            handler: guideHandler,
         } as ButtonActionHook,
         {
             type: 'widget_interaction',
             widgetIds: widgets.skillGuide,
             optionId: 0,
-            handler: subGuideHandler
-        } as WidgetInteractionActionHook
-    ]
+            handler: subGuideHandler,
+        } as WidgetInteractionActionHook,
+    ],
 };

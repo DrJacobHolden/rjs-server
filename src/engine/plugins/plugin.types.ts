@@ -1,4 +1,5 @@
-import { ActionType, MagicOnNPCAction, ObjectInteractionAction } from '@engine/action';
+import { ActionType, MagicOnNPCAction, ObjectInteractionAction } from '@engine/action/action-pipeline';
+import { ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
 import { Quest } from '@engine/world/actor/player/quest';
 
 // Base hook type that all hook types must extend
@@ -43,7 +44,7 @@ export interface NpcInteractionHook extends BaseHook {
 export interface ItemInteractionHook extends BaseHook {
     type: 'item_interaction';
     itemIds?: number | number[];
-    widgets?: { widgetId: number, containerId: number } | { widgetId: number, containerId: number }[];
+    widgets?: { widgetId: number; containerId: number } | { widgetId: number; containerId: number }[];
     options?: string | string[];
 }
 
@@ -73,7 +74,7 @@ export interface ItemOnPlayerHook extends BaseHook {
 // Item-on-item hook type
 export interface ItemOnItemHook extends BaseHook {
     type: 'item_on_item';
-    items: { item1: number, item2?: number }[];
+    items: { item1: number; item2?: number }[];
 }
 
 // Player/NPC init hook type
@@ -131,7 +132,7 @@ export interface MoveItemHook extends BaseHook {
 // Item on world item hook type
 export interface ItemOnWorldItemHook extends BaseHook {
     type: 'item_on_world_item';
-    items: { item?: number, worldItem?: number }[];
+    items: { item?: number; worldItem?: number }[];
 }
 
 // Spawned item interaction hook type
@@ -170,7 +171,6 @@ export interface PrayerHook extends BaseHook {
     type: 'prayer';
     prayers?: number | number[];
 }
-
 
 // Union of all possible hook types
 export type PluginHook =

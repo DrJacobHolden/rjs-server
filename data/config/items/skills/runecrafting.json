@@ -259,7 +259,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of air.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -270,7 +270,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of the body.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -281,7 +281,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of chaos.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -292,7 +292,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of the cosmos.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -303,7 +303,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of death.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -314,7 +314,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of the earth.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -325,7 +325,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of fire.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -336,7 +336,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of law.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -347,7 +347,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of the mind.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -358,7 +358,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of nature.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -369,7 +369,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of water.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -380,7 +380,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of blood.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"
@@ -391,7 +391,7 @@
         "tradable": true,
         "stackable": false,
         "examine": "A tiara infused with the properties of the soul.",
-        "weight": 1.000,
+        "weight": 1.0,
         "equippable": true,
         "equipment_data": {
             "equipment_slot": "head"

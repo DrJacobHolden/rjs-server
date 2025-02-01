@@ -1,6 +1,6 @@
-import { Player } from '@engine/world/actor/player/player';
-
-import { equipmentIndices, findItem } from '@engine/config';
+import { findItem } from '@engine/config/config-handler';
+import { equipmentIndices } from '@engine/config/item-config';
+import type { Player } from '@engine/world/actor/player/player';
 
 export function checkForGemBoost(player: Player): number {
     // Check if any charged glory is equipped

@@ -1,8 +1,7 @@
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
-
-const spawnPotato: commandActionHandler = (details) => {
-    details.player.giveItem('rs:rotten_potato')
+const spawnPotato: commandActionHandler = details => {
+    details.player.giveItem('rs:rotten_potato');
 };
 
 export default spawnPotato;

@@ -1,9 +1,17 @@
+import { join } from 'path';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import type { Quest } from '@engine/world/actor/player/quest';
 import { logger } from '@runejs/common';
 import { getFiles } from '@runejs/common/fs';
-import { join } from 'path';
-import { ContentPlugin } from '@engine/plugins/plugin.types';
 
-
+/**
+ * The definition of a single content plugin.
+ */
+export class ContentPlugin {
+    public pluginId: string;
+    public hooks?: ActionHook[];
+    public quests?: Quest[];
+}
 
 /**
  * Searches for and parses all plugin files within the /plugins directory.
@@ -13,32 +21,32 @@ export async function loadPluginFiles(): Promise<ContentPlugin[]> {
     const relativeDir = join('..', '..', 'plugins');
     const plugins: ContentPlugin[] = [];
 
-    for await(const path of getFiles(pluginDir, { type: 'whitelist', list: ['.plugin.js', 'index.js'] })) {
+    for await (const path of getFiles(pluginDir, { type: 'whitelist', list: ['.plugin.js', 'index.js'] })) {
         const location = join(relativeDir, path.substring(pluginDir.length).replace('.js', ''));
 
         try {
             let pluginFile = require(location);
-            if(!pluginFile) {
+            if (!pluginFile) {
                 continue;
             }
 
-            if(pluginFile.default) {
+            if (pluginFile.default) {
                 pluginFile = pluginFile.default;
             }
 
             const plugin = pluginFile as ContentPlugin;
-            if(!plugin.pluginId) {
+            if (!plugin.pluginId) {
                 logger.error(`Error loading plugin: Plugin ID not provided for .plugin file at ${path}`);
                 continue;
             }
 
-            if(plugins.find(loadedPlugin => loadedPlugin.pluginId === plugin.pluginId)) {
+            if (plugins.find(loadedPlugin => loadedPlugin.pluginId === plugin.pluginId)) {
                 logger.error(`Error loading plugin: Duplicate plugin ID ${plugin.pluginId} at ${path}`);
                 continue;
             }
 
             plugins.push(plugin);
-        } catch(error) {
+        } catch (error) {
             logger.error(`Error loading plugin file at ${location}:`);
             logger.error(error);
         }

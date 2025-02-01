@@ -1,8 +1,8 @@
-import { itemOnItemActionHandler } from '@engine/action';
-import { RottenPotatoItem } from '@plugins/items/rotten-potato/helpers/rotten-potato-helpers';
+import type { itemOnItemActionHandler } from '@engine/action/pipe/item-on-item.action';
 import { findItem } from '@engine/config/config-handler';
+import { RottenPotatoItem } from '@plugins/items/rotten-potato/helpers/rotten-potato-helpers';
 
-const itemOnPotato: itemOnItemActionHandler = (details) => {
+const itemOnPotato: itemOnItemActionHandler = details => {
     const slotToDelete = details.usedItem.itemId === RottenPotatoItem.gameId ? details.usedWithSlot : details.usedSlot;
 
     const inventoryItem = details.player.inventory.items[slotToDelete];
@@ -15,7 +15,7 @@ const itemOnPotato: itemOnItemActionHandler = (details) => {
     const item = inventoryItem.itemId;
     const itemDetails = findItem(item);
     details.player.removeItem(slotToDelete);
-    details.player.sendLogMessage(`Whee... ${itemDetails?.name || 'Unknown item'} All gone!`, false)
+    details.player.sendLogMessage(`Whee... ${itemDetails?.name || 'Unknown item'} All gone!`, false);
 };
 
 export default itemOnPotato;

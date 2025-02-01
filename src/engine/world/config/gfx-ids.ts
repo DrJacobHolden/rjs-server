@@ -5,5 +5,5 @@ export const gfxIds = {
     homeTeleportCircleGlow: 803,
     homeTeleport: 804,
     levelUpFireworks: 199,
-    teleport: 111
+    teleport: 111,
 };

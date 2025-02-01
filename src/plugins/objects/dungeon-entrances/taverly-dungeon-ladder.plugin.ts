@@ -1,9 +1,8 @@
-import { objectInteractionActionHandler } from '@engine/action';
-import { objectIds } from '@engine/world/config/object-ids';
-import { World } from '@engine/world';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { animationIds } from '@engine/world/config/animation-ids';
+import { objectIds } from '@engine/world/config/object-ids';
 
-export const enterDungeon: objectInteractionActionHandler = (details) => {
+export const enterDungeon: objectInteractionActionHandler = details => {
     const loc = details.player.position.clone();
     loc.y += 6400;
     details.player.playAnimation(animationIds.climbLadder);
@@ -16,8 +15,7 @@ export const enterDungeon: objectInteractionActionHandler = (details) => {
     // }, World.TICK_LENGTH);
 };
 
-
-export const exitDungeon: objectInteractionActionHandler = (details) => {
+export const exitDungeon: objectInteractionActionHandler = details => {
     const loc = details.player.position.clone();
     loc.y -= 6400;
     details.player.playAnimation(animationIds.climbLadder);
@@ -30,23 +28,22 @@ export const exitDungeon: objectInteractionActionHandler = (details) => {
     // }, World.TICK_LENGTH);
 };
 
-
 export default {
     pluginId: 'rs:taverly_dungeon_ladder',
     hooks: [
         {
             type: 'object_interaction',
             objectIds: objectIds.ladders.taverlyDungeonOverworld,
-            options: [ 'climb-down' ],
+            options: ['climb-down'],
             walkTo: true,
-            handler: enterDungeon
+            handler: enterDungeon,
         },
         {
             type: 'object_interaction',
             objectIds: objectIds.ladders.taverlyDungeonUnderground,
-            options: [ 'climb-up' ],
+            options: ['climb-up'],
             walkTo: true,
-            handler: exitDungeon
-        }
-    ]
+            handler: exitDungeon,
+        },
+    ],
 };

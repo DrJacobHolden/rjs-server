@@ -1,7 +1,8 @@
-import { Subscription } from 'rxjs';
-import { Actor } from '@engine/world/actor';
-import { TaskBreakType, TaskConfig } from '../types';
+import type { Actor } from '@engine/world/actor/actor';
+import type { Subscription } from 'rxjs';
 import { Task } from '../task';
+import type { TaskConfig } from '../types';
+import { TaskBreakType } from '../types';
 
 /**
  * A task that is executed by an actor.
@@ -25,7 +26,7 @@ export abstract class ActorTask<TActor extends Actor = Actor> extends Task {
      */
     constructor(
         protected readonly actor: TActor,
-        config?: TaskConfig
+        config?: TaskConfig,
     ) {
         super(config);
 

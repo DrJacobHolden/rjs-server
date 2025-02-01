@@ -1,10 +1,10 @@
-import { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 import { widgets } from '@engine/config/config-handler';
 
-export const handler: itemInteractionActionHandler = (details) => {
+export const handler: itemInteractionActionHandler = details => {
     const { player, itemId, itemSlot, itemDetails } = details;
 
-    if(!itemDetails) {
+    if (!itemDetails) {
         // The item is not yet configured on the server.
         player.sendMessage(`Item ${itemId} is not yet configured on the server.`);
         return;
@@ -21,7 +21,7 @@ export default {
             widgets: widgets.inventory,
             options: 'equip',
             handler,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

@@ -1,7 +1,6 @@
-import { Player } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
 import { activeWorld } from '@engine/world';
-
+import type { Player } from '@engine/world/actor/player/player';
 
 const magicAttackPacket = (player: Player, packet: PacketData) => {
     const { buffer } = packet;
@@ -14,8 +13,10 @@ const magicAttackPacket = (player: Player, packet: PacketData) => {
     player.actionPipeline.call('magic_on_npc', npc, player, widgetId, widgetChildId);
 };
 
-export default [{
-    opcode: 253,
-    size: 6,
-    handler: magicAttackPacket
-}];
+export default [
+    {
+        opcode: 253,
+        size: 6,
+        handler: magicAttackPacket,
+    },
+];

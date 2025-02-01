@@ -1,11 +1,11 @@
-import { LandscapeObject, ObjectConfig } from '@runejs/filestore';
-import { Position } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import {
-    ActionHook, getActionHooks, advancedNumberHookFilter, questHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
-import { WalkToObjectPluginTask } from './task/walk-to-object-plugin-task';
-
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { advancedNumberHookFilter, questHookFilter } from '@engine/action/hook/hook-filters';
+import { WalkToObjectPluginTask } from '@engine/action/pipe/task/walk-to-object-plugin-task';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Position } from '@engine/world/position';
+import type { LandscapeObject, ObjectConfig } from '@runejs/filestore';
 
 /**
  * Defines an object action hook.
@@ -19,12 +19,10 @@ export interface ObjectInteractionActionHook extends ActionHook<ObjectInteractio
     walkTo: boolean;
 }
 
-
 /**
  * The object action hook handler function to be called when the hook's conditions are met.
  */
 export type objectInteractionActionHandler = (objectInteractionAction: ObjectInteractionAction) => void;
-
 
 /**
  * Details about an object action being performed.
@@ -44,7 +42,6 @@ export interface ObjectInteractionAction {
     option: string;
 }
 
-
 /**
  * The pipe that the game engine hands object actions off to.
  * @param player
@@ -54,25 +51,34 @@ export interface ObjectInteractionAction {
  * @param option
  * @param cacheOriginal
  */
-const objectInteractionActionPipe = (player: Player, landscapeObject: LandscapeObject, objectConfig: ObjectConfig,
-                                     position: Position, option: string, cacheOriginal: boolean): RunnableHooks<ObjectInteractionAction> | null => {
-    if(player.metadata.blockObjectInteractions) {
+const objectInteractionActionPipe = (
+    player: Player,
+    landscapeObject: LandscapeObject,
+    objectConfig: ObjectConfig,
+    position: Position,
+    option: string,
+    cacheOriginal: boolean,
+): RunnableHooks<ObjectInteractionAction> | null => {
+    if (player.metadata.blockObjectInteractions) {
         return null;
     }
 
     // Find all object action plugins that reference this location object
-    let matchingHooks = getActionHooks<ObjectInteractionActionHook>('object_interaction')
-        .filter(plugin => questHookFilter(player, plugin) &&
-            advancedNumberHookFilter(plugin.objectIds, landscapeObject.objectId, plugin.options, option));
+    let matchingHooks = getActionHooks<ObjectInteractionActionHook>('object_interaction').filter(
+        plugin =>
+            questHookFilter(player, plugin) && advancedNumberHookFilter(plugin.objectIds, landscapeObject.objectId, plugin.options, option),
+    );
     const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
 
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
-        player.outgoingPackets.chatboxMessage(`Unhandled object interaction: ${option} ${objectConfig.name} ` +
-            `(id-${landscapeObject.objectId}) @ ${position.x},${position.y},${position.level}`);
+    if (matchingHooks.length === 0) {
+        player.outgoingPackets.chatboxMessage(
+            `Unhandled object interaction: ${option} ${objectConfig.name} ` +
+                `(id-${landscapeObject.objectId}) @ ${position.x},${position.y},${position.level}`,
+        );
         return null;
     }
 
@@ -92,13 +98,12 @@ const objectInteractionActionPipe = (player: Player, landscapeObject: LandscapeO
             objectConfig,
             option,
             position,
-            cacheOriginal
-        }
-    }
+            cacheOriginal,
+        },
+    };
 };
-
 
 /**
  * Object action pipe definition.
  */
-export default [ 'object_interaction', objectInteractionActionPipe ] as ActionPipe;
+export default ['object_interaction', objectInteractionActionPipe] as ActionPipe;

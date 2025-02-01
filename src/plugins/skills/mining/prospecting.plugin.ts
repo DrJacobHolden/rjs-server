@@ -1,10 +1,9 @@
-import { objectInteractionActionHandler } from '@engine/action';
-import { soundIds } from '@engine/world/config/sound-ids';
-import { World } from '@engine/world';
-import { getAllOreIds, getOreFromRock } from '@engine/world/config/harvestable-object';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { findItem } from '@engine/config/config-handler';
+import { getAllOreIds, getOreFromRock } from '@engine/world/config/harvestable-object';
+import { soundIds } from '@engine/world/config/sound-ids';
 
-const action: objectInteractionActionHandler = (details) => {
+const action: objectInteractionActionHandler = details => {
     details.player.sendMessage('You examine the rock for ores.');
     details.player.face(details.position);
     const ore = getOreFromRock(details.object.objectId);
@@ -34,11 +33,13 @@ const action: objectInteractionActionHandler = (details) => {
 
 export default {
     pluginId: 'rs:prospecting',
-    hooks: [ {
-        type: 'object_interaction',
-        options: [ 'prospect' ],
-        objectIds: getAllOreIds(),
-        walkTo: true,
-        handler: action
-    } ]
+    hooks: [
+        {
+            type: 'object_interaction',
+            options: ['prospect'],
+            objectIds: getAllOreIds(),
+            walkTo: true,
+            handler: action,
+        },
+    ],
 };

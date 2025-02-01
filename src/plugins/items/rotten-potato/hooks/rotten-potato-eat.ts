@@ -1,4 +1,4 @@
-import { itemInteractionActionHandler } from '@engine/action';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 import { dialogue, execute } from '@engine/world/actor/dialogue';
 
 enum DialogueOption {
@@ -6,34 +6,30 @@ enum DialogueOption {
     WIPE_INVENTORY,
     SETUP_POH,
     TELEPORT_TO_PLAYER,
-    SPAWN_AGGRESSIVE_NPC
+    SPAWN_AGGRESSIVE_NPC,
 }
 
-const eatPotato: itemInteractionActionHandler = async (details) => {
-
+const eatPotato: itemInteractionActionHandler = async details => {
     let chosenOption: DialogueOption;
 
-    await dialogue([details.player], [
-        options => [
-            `Set all stats`, [
-                execute(() => chosenOption = DialogueOption.SET_ALL_STATS)
+    await dialogue(
+        [details.player],
+        [
+            options => [
+                `Set all stats`,
+                [execute(() => (chosenOption = DialogueOption.SET_ALL_STATS))],
+                `Wipe inventory`,
+                [execute(() => (chosenOption = DialogueOption.WIPE_INVENTORY))],
+                `Setup POH`,
+                [execute(() => (chosenOption = DialogueOption.SETUP_POH))],
+                `Teleport to player`,
+                [execute(() => (chosenOption = DialogueOption.TELEPORT_TO_PLAYER))],
+                `Spawn aggressive NPC`,
+                [execute(() => (chosenOption = DialogueOption.SPAWN_AGGRESSIVE_NPC))],
             ],
-            `Wipe inventory`, [
-                execute(() => chosenOption = DialogueOption.WIPE_INVENTORY)
-            ],
-            `Setup POH`, [
-                execute(() => chosenOption = DialogueOption.SETUP_POH)
-            ],
-            `Teleport to player`, [
-                execute(() => chosenOption = DialogueOption.TELEPORT_TO_PLAYER)
-            ],
-            `Spawn aggressive NPC`, [
-                execute(() => chosenOption = DialogueOption.SPAWN_AGGRESSIVE_NPC)
-            ],
-        ]
-    ]);
+        ],
+    );
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     switch (chosenOption!) {
         case DialogueOption.SET_ALL_STATS:
             break;
@@ -42,7 +38,6 @@ const eatPotato: itemInteractionActionHandler = async (details) => {
         default:
             break;
     }
-
 };
 
 export default eatPotato;

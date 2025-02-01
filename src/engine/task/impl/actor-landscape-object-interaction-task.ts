@@ -1,6 +1,7 @@
-import { LandscapeObject } from '@runejs/filestore';
-import { activeWorld, Position } from '@engine/world';
-import { Actor } from '@engine/world/actor';
+import { activeWorld } from '@engine/world';
+import type { Actor } from '@engine/world/actor/actor';
+import { Position } from '@engine/world/position';
+import type { LandscapeObject } from '@runejs/filestore';
 import { ActorWalkToTask } from './actor-walk-to-task';
 
 /**
@@ -21,18 +22,18 @@ export abstract class ActorLandscapeObjectInteractionTask<TActor extends Actor =
      * @param sizeX The size of the LandscapeObject in the X direction.
      * @param sizeY The size of the LandscapeObject in the Y direction.
      */
-    constructor (
+    constructor(
         actor: TActor,
         landscapeObject: LandscapeObject,
         // TODO (jkm) get size/orientation automatically from the object's info
         sizeX: number = 1,
-        sizeY: number = 1
+        sizeY: number = 1,
     ) {
         super(
             actor,
             landscapeObject,
             // TODO (jkm) atDestination must take orientation into account
-            Math.max(sizeX, sizeY)
+            Math.max(sizeX, sizeY),
         );
 
         if (!landscapeObject) {

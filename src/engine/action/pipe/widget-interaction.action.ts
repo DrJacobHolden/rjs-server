@@ -1,8 +1,8 @@
-import { Player } from '@engine/world/actor';
-import {
-    ActionHook, getActionHooks, advancedNumberHookFilter, questHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
-
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { advancedNumberHookFilter, questHookFilter } from '@engine/action/hook/hook-filters';
+import type { Player } from '@engine/world/actor/player/player';
 
 /**
  * Defines a widget action hook.
@@ -18,12 +18,10 @@ export interface WidgetInteractionActionHook extends ActionHook<WidgetInteractio
     cancelActions?: boolean;
 }
 
-
 /**
  * The widget action hook handler function to be called when the hook's conditions are met.
  */
 export type widgetInteractionActionHandler = (widgetInteractionAction: WidgetInteractionAction) => void;
-
 
 /**
  * Details about a widget action being performed.
@@ -39,7 +37,6 @@ export interface WidgetInteractionAction {
     optionId: number;
 }
 
-
 /**
  * The pipe that the game engine hands widget actions off to.
  * @param player The player performing the action.
@@ -47,33 +44,37 @@ export interface WidgetInteractionAction {
  * @param childId The ID of the widget child being interacted with.
  * @param optionId The widget context option chosen by the player.
  */
-const widgetActionPipe = (player: Player, widgetId: number, childId: number, optionId: number): RunnableHooks<WidgetInteractionAction> | null => {
-    const playerWidget = Object.values(player.interfaceState.widgetSlots)
-        .find((widget) => widget && widget.widgetId === widgetId);
+const widgetActionPipe = (
+    player: Player,
+    widgetId: number,
+    childId: number,
+    optionId: number,
+): RunnableHooks<WidgetInteractionAction> | null => {
+    const playerWidget = Object.values(player.interfaceState.widgetSlots).find(widget => widget && widget.widgetId === widgetId);
 
-    if(playerWidget?.fakeWidget) {
+    if (playerWidget?.fakeWidget) {
         widgetId = playerWidget.fakeWidget;
     }
 
     // Find all item on item action plugins that match this action
     let matchingHooks = getActionHooks<WidgetInteractionActionHook>('widget_interaction').filter(plugin => {
-        if(!plugin.widgetIds) {
+        if (!plugin.widgetIds) {
             return false;
         }
 
-        if(!questHookFilter(player, plugin)) {
+        if (!questHookFilter(player, plugin)) {
             return false;
         }
 
-        if(!advancedNumberHookFilter(plugin.widgetIds, widgetId)) {
+        if (!advancedNumberHookFilter(plugin.widgetIds, widgetId)) {
             return false;
         }
 
-        if(plugin.optionId !== undefined && plugin.optionId !== optionId) {
+        if (plugin.optionId !== undefined && plugin.optionId !== optionId) {
             return false;
         }
 
-        if(plugin.childIds !== undefined) {
+        if (plugin.childIds !== undefined) {
             return advancedNumberHookFilter(plugin.childIds, childId);
         }
         return true;
@@ -81,11 +82,11 @@ const widgetActionPipe = (player: Player, widgetId: number, childId: number, opt
 
     const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
 
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
+    if (matchingHooks.length === 0) {
         player.outgoingPackets.chatboxMessage(`Unhandled widget option: ${widgetId}, ${childId}:${optionId}`);
         return null;
     }
@@ -94,12 +95,11 @@ const widgetActionPipe = (player: Player, widgetId: number, childId: number, opt
 
     return {
         hooks: matchingHooks,
-        action
+        action,
     };
 };
-
 
 /**
  * Widget action pipe definition.
  */
-export default [ 'widget_interaction', widgetActionPipe ] as ActionPipe;
+export default ['widget_interaction', widgetActionPipe] as ActionPipe;

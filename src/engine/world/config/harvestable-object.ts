@@ -1,5 +1,5 @@
+import { randomBetween } from '@engine/util/num';
 import { objectIds } from '@engine/world/config/object-ids';
-import { randomBetween } from '@engine/util';
 
 export interface WeightedItem {
     itemConfigId: string;
@@ -17,98 +17,105 @@ export interface IHarvestable {
     break: number;
 }
 
-
 // Object maps work with key is mineable object, value is empty ore
-const CLAY_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.clay.map((tree) => [tree.default, tree.empty]),
-] as [number, number][]);
+const CLAY_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.default.clay.map(tree => [tree.default, tree.empty])] as [
+    number,
+    number,
+][]);
 
 const COPPER_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.copper.map((tree) => [tree.default, tree.empty]),
+    ...objectIds.default.copper.map(tree => [tree.default, tree.empty]),
 ] as [number, number][]);
 
-const TIN_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.tin.map((tree) => [tree.default, tree.empty]),
-] as [number, number][]);
+const TIN_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.default.tin.map(tree => [tree.default, tree.empty])] as [
+    number,
+    number,
+][]);
 
-const IRON_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.iron.map((tree) => [tree.default, tree.empty]),
-] as [number, number][]);
+const IRON_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.default.iron.map(tree => [tree.default, tree.empty])] as [
+    number,
+    number,
+][]);
 
-const COAL_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.coal.map((tree) => [tree.default, tree.empty]),
-] as [number, number][]);
+const COAL_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.default.coal.map(tree => [tree.default, tree.empty])] as [
+    number,
+    number,
+][]);
 
 const SILVER_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.silver.map((tree) => [tree.default, tree.empty]),
+    ...objectIds.default.silver.map(tree => [tree.default, tree.empty]),
 ] as [number, number][]);
 
-const GOLD_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.gold.map((tree) => [tree.default, tree.empty]),
-] as [number, number][]);
+const GOLD_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.default.gold.map(tree => [tree.default, tree.empty])] as [
+    number,
+    number,
+][]);
 
 const MITHRIL_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.mithril.map((tree) => [tree.default, tree.empty]),
+    ...objectIds.default.mithril.map(tree => [tree.default, tree.empty]),
 ] as [number, number][]);
 
-
 const ADAMANT_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.adamant.map((tree) => [tree.default, tree.empty]),
+    ...objectIds.default.adamant.map(tree => [tree.default, tree.empty]),
 ] as [number, number][]);
 
 const RUNITE_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.default.runite.map((tree) => [tree.default, tree.empty]),
+    ...objectIds.default.runite.map(tree => [tree.default, tree.empty]),
 ] as [number, number][]);
 
 const NORMAL_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.normal.map((tree) => [tree.default, tree.stump]),
-    ...objectIds.tree.dead.map((tree) => [tree.default, tree.stump]),
+    ...objectIds.tree.normal.map(tree => [tree.default, tree.stump]),
+    ...objectIds.tree.dead.map(tree => [tree.default, tree.stump]),
 ] as [number, number][]);
 
-const ACHEY_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.archey.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const ACHEY_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.archey.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const OAK_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.oak.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const OAK_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.oak.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
+const WILLOW_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.willow.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const WILLOW_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.willow.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const TEAK_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.teak.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
+const DRAMEN_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.dramen.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const TEAK_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.teak.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const MAPLE_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.maple.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const DRAMEN_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.dramen.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
-
-
-const MAPLE_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.maple.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
-
-
-const HOLLOW_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.hollow.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const HOLLOW_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.hollow.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
 const MAHOGANY_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.mahogany.map((tree) => [tree.default, tree.stump]),
+    ...objectIds.tree.mahogany.map(tree => [tree.default, tree.stump]),
 ] as [number, number][]);
 
+const YEW_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.yew.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
-const YEW_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.yew.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
-
-const MAGIC_OBJECTS: Map<number, number> = new Map<number, number>([
-    ...objectIds.tree.magic.map((tree) => [tree.default, tree.stump]),
-] as [number, number][]);
+const MAGIC_OBJECTS: Map<number, number> = new Map<number, number>([...objectIds.tree.magic.map(tree => [tree.default, tree.stump])] as [
+    number,
+    number,
+][]);
 
 export enum Ore {
     CLAY,
@@ -122,9 +129,8 @@ export enum Ore {
     ADAMANT,
     RUNITE,
     RUNE_ESS,
-    GEM
+    GEM,
 }
-
 
 export enum Tree {
     NORMAL,
@@ -139,7 +145,6 @@ export enum Tree {
     HOLLOW,
     DRAMEN,
 }
-
 
 export function selectWeightedItem(items: WeightedItem[]): string {
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
@@ -164,7 +169,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 5,
         respawnHigh: 10,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: COPPER_OBJECTS,
@@ -174,7 +179,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 10,
         respawnHigh: 20,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: TIN_OBJECTS,
@@ -184,7 +189,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 10,
         respawnHigh: 20,
         baseChance: 70,
-        break: 100
+        break: 100,
     },
     {
         objects: IRON_OBJECTS,
@@ -194,7 +199,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 9,
         respawnHigh: 9,
         baseChance: 0.0085,
-        break: 100
+        break: 100,
     },
     {
         objects: COAL_OBJECTS,
@@ -204,7 +209,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 20,
         respawnHigh: 30,
         baseChance: 50,
-        break: 100
+        break: 100,
     },
     {
         objects: SILVER_OBJECTS,
@@ -214,7 +219,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 30,
         respawnHigh: 40,
         baseChance: 40,
-        break: 100
+        break: 100,
     },
     {
         objects: GOLD_OBJECTS,
@@ -224,7 +229,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 50,
         respawnHigh: 70,
         baseChance: 30,
-        break: 100
+        break: 100,
     },
     {
         objects: MITHRIL_OBJECTS,
@@ -234,7 +239,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 90,
         respawnHigh: 120,
         baseChance: 20,
-        break: 100
+        break: 100,
     },
     {
         objects: ADAMANT_OBJECTS,
@@ -244,7 +249,7 @@ const Ores: IHarvestable[] = [
         respawnLow: 200,
         respawnHigh: 400,
         baseChance: 0,
-        break: 100
+        break: 100,
     },
     {
         objects: RUNITE_OBJECTS,
@@ -254,26 +259,26 @@ const Ores: IHarvestable[] = [
         respawnLow: 1200,
         respawnHigh: 1200,
         baseChance: -10,
-        break: 100
+        break: 100,
     },
     {
         objects: new Map<number, number>([[2111, 450]]),
         items: [
-            { itemConfigId: 'rs:uncut_opal', weight: 60 },      // 60/128
-            { itemConfigId: 'rs:uncut_jade', weight: 30 },      // 30/128
+            { itemConfigId: 'rs:uncut_opal', weight: 60 }, // 60/128
+            { itemConfigId: 'rs:uncut_jade', weight: 30 }, // 30/128
             { itemConfigId: 'rs:uncut_red_topaz', weight: 15 }, // 15/128
-            { itemConfigId: 'rs:uncut_sapphire', weight: 9 },   // 9/128
-            { itemConfigId: 'rs:uncut_emerald', weight: 5 },    // 5/128
-            { itemConfigId: 'rs:uncut_ruby', weight: 5 },       // 5/128
-            { itemConfigId: 'rs:uncut_diamond', weight: 4 }     // 4/128
+            { itemConfigId: 'rs:uncut_sapphire', weight: 9 }, // 9/128
+            { itemConfigId: 'rs:uncut_emerald', weight: 5 }, // 5/128
+            { itemConfigId: 'rs:uncut_ruby', weight: 5 }, // 5/128
+            { itemConfigId: 'rs:uncut_diamond', weight: 4 }, // 4/128
         ],
         level: 40,
         experience: 65.0,
         respawnLow: 200,
         respawnHigh: 400,
         baseChance: 28, // Base success chance at level 40
-        break: 100      // Always depletes after successful mining
-    }
+        break: 100, // Always depletes after successful mining
+    },
 ];
 
 export function getOre(ore: Ore): IHarvestable {

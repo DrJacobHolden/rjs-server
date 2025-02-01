@@ -1,17 +1,18 @@
-import { ButtonAction, ButtonActionHook, TaskExecutor } from '@engine/action';
-import { Player } from '@engine/world/actor/player/player';
-import { Position } from '@engine/world/position';
+import type { TaskExecutor } from '@engine/action/hook/task';
+import type { ButtonAction, ButtonActionHook } from '@engine/action/pipe/button.action';
+import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
+import { widgets } from '@engine/config/config-handler';
+import { activeWorld } from '@engine/world';
+import type { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
 import { animationIds } from '@engine/world/config/animation-ids';
-import { soundIds } from '@engine/world/config/sound-ids';
 import { gfxIds } from '@engine/world/config/gfx-ids';
 import { itemIds } from '@engine/world/config/item-ids';
-import { Item } from '@engine/world/items/item';
-import { widgets } from '@engine/config/config-handler';
-import { TravelLocation } from '@engine/world/config';
-import { activeWorld } from '@engine/world';
-import { Skill } from '@engine/world/actor/skills';
+import { soundIds } from '@engine/world/config/sound-ids';
+import type { TravelLocation } from '@engine/world/config/travel-locations';
+import type { Item } from '@engine/world/items/item';
+import { Position } from '@engine/world/position';
 import { openHouse } from '@plugins/skills/construction/house';
-import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
 
 enum Teleports {
     Home = 591,
@@ -23,7 +24,7 @@ enum Teleports {
     Ardougne = 388,
     Watchtower = 389,
     Trollheim = 492,
-    Ape_atoll = 569
+    Ape_atoll = 569,
 }
 
 /**
@@ -79,7 +80,7 @@ const MagicCosts: Record<number, MagicCost> = {
         [itemIds.runes.water]: 2,
         [itemIds.banana]: 1,
     },
-}
+};
 
 /**
  * Mapping of the various teleport locations. Some are usable directly from
@@ -95,7 +96,7 @@ const TeleportLocations: Record<number, Position> = {
     [Teleports.Watchtower]: new Position(2934, 4714, 2),
     [Teleports.Trollheim]: (activeWorld.travelLocations.find('Trollheim') as TravelLocation).position,
     [Teleports.Ape_atoll]: new Position(2798, 2798, 1),
-}
+};
 
 const TeleportXP: Record<number, number> = {
     [Teleports.Varrock]: 35,
@@ -107,7 +108,7 @@ const TeleportXP: Record<number, number> = {
     [Teleports.Watchtower]: 68,
     [Teleports.Trollheim]: 68,
     [Teleports.Ape_atoll]: 74,
-}
+};
 
 const buttonIds: number[] = [
     Teleports.Home,
@@ -123,14 +124,22 @@ const buttonIds: number[] = [
 ];
 
 function queueTeleport(player: Player, pos: Position) {
-    player.enqueueBaseTask(new QueueableTask([], player, () => {
-        player.teleport(pos);
-        player.metadata.castingStationarySpell = false;
-        return {
-            callbackResult: false,
-            shouldContinueLooping: false,
-        }
-    }, null, null))
+    player.enqueueBaseTask(
+        new QueueableTask(
+            [],
+            player,
+            () => {
+                player.teleport(pos);
+                player.metadata.castingStationarySpell = false;
+                return {
+                    callbackResult: false,
+                    shouldContinueLooping: false,
+                };
+            },
+            null,
+            null,
+        ),
+    );
 }
 
 /**
@@ -162,7 +171,7 @@ function homeTeleport(player: Player, elapsedTicks: number): boolean {
         player.playAnimation(animationIds.homeTeleport);
         player.playGraphics({ id: gfxIds.homeTeleport, delay: 0, height: 0 });
     } else if (elapsedTicks === 22) {
-        queueTeleport(player, TeleportLocations[Teleports.Home])
+        queueTeleport(player, TeleportLocations[Teleports.Home]);
         return true;
     }
 
@@ -233,7 +242,7 @@ function expenseMagic(player: Player, cost: MagicCost): boolean {
         const newItem: Item = {
             amount: player.inventory.amount(itemId) - cost[requiredItemId],
             itemId: itemId,
-        }
+        };
 
         if (newItem.amount < 0) {
             return false;
@@ -245,7 +254,7 @@ function expenseMagic(player: Player, cost: MagicCost): boolean {
 
     for (let i = 0; i < indexesToUpdate.length; i++) {
         if (itemsToUpdate[indexesToUpdate[i]].amount === 0) {
-            player.inventory.remove(indexesToUpdate[i])
+            player.inventory.remove(indexesToUpdate[i]);
         } else {
             player.inventory.set(indexesToUpdate[i], itemsToUpdate[indexesToUpdate[i]]);
         }
@@ -256,7 +265,7 @@ function expenseMagic(player: Player, cost: MagicCost): boolean {
 
 function genericTeleport(player: Player, elapsedTicks: number, target: Position, teleportId?: number): boolean {
     if (elapsedTicks === 0) {
-        player.playAnimation(animationIds.teleport)
+        player.playAnimation(animationIds.teleport);
         player.outgoingPackets.playSound(soundIds.teleport, 10);
         player.playGraphics({ id: gfxIds.teleport, delay: 0, height: 100 });
     } else if (elapsedTicks === 3) {
@@ -266,20 +275,28 @@ function genericTeleport(player: Player, elapsedTicks: number, target: Position,
                 break;
             }
             default: {
-                queueTeleport(player, target)
+                queueTeleport(player, target);
 
                 // warning: undefined xp values cause the xp to reset to 0,
                 // so make sure to always assert that it's defined
                 if (teleportId && TeleportXP[teleportId]) {
-                    player.enqueueBaseTask(new QueueableTask([], player, () => {
-                        player.skills.addExp(Skill.MAGIC, TeleportXP[teleportId])
-                        return { callbackResult: false, shouldContinueLooping: false };
-                    }, null, null));
+                    player.enqueueBaseTask(
+                        new QueueableTask(
+                            [],
+                            player,
+                            () => {
+                                player.skills.addExp(Skill.MAGIC, TeleportXP[teleportId]);
+                                return { callbackResult: false, shouldContinueLooping: false };
+                            },
+                            null,
+                            null,
+                        ),
+                    );
                 }
                 break;
             }
         }
-        player.playAnimation(animationIds.reset)
+        player.playAnimation(animationIds.reset);
         return true;
     }
 
@@ -346,8 +363,8 @@ export default {
             buttonIds: buttonIds,
             task: {
                 activate,
-                interval: 1
-            }
-        } as ButtonActionHook
-    ]
+                interval: 1,
+            },
+        } as ButtonActionHook,
+    ],
 };

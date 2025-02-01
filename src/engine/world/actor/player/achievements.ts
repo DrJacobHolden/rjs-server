@@ -1,14 +1,14 @@
-import { Player } from '@engine/world/actor/player/player';
-import { serverConfig } from '@server/game/game-server';
+import type { Player } from '@engine/world/actor/player/player';
 import { gfxIds } from '@engine/world/config/gfx-ids';
+import { serverConfig } from '@server/game/game-server';
 
 export const achievementSeries = {
     lumbridge: {
-        name: 'Lumbridge'
+        name: 'Lumbridge',
     },
     varrock: {
-        name: 'Varrock'
-    }
+        name: 'Varrock',
+    },
 };
 
 export enum AchievementSeries {
@@ -30,36 +30,37 @@ export const Achievements: { [key: string]: Achievement } = {
         name: 'Welcome!',
         description: 'Talk to Hans.',
         longDescription: `Speak with Hans in the Lumbridge Castle's courtyard.`,
-        series: AchievementSeries.LUMBRIDGE
+        series: AchievementSeries.LUMBRIDGE,
     },
     BURY_BONES: {
         id: 'bury-bones',
         name: 'Grave Digger',
         description: 'Bury the bones of the dead.',
         longDescription: `Bury the remains of a deceased enemy.`,
-        series: AchievementSeries.LUMBRIDGE
-    }
+        series: AchievementSeries.LUMBRIDGE,
+    },
 };
 
 export function giveAchievement(achievement: Achievement, player: Player): boolean {
-    if(!serverConfig.giveAchievements) {
+    if (!serverConfig.giveAchievements) {
         return false;
     }
 
-    if(hasAchievement(achievement, player)) {
+    if (hasAchievement(achievement, player)) {
         return false;
     }
 
     player.achievements.push(achievement.id);
     player.playGraphics({ id: gfxIds.levelUpFireworks, delay: 0, height: 125 });
-    player.sendMessage(`<col=ffff00><shad>You've completed an Achievement in the ` +
-        `${ achievementSeries[achievement.series].name } series!</shad></col>`);
-    player.sendMessage(`<col=255>${ achievement.name }</col> - <i>${ achievement.description }</i>`);
+    player.sendMessage(
+        `<col=ffff00><shad>You've completed an Achievement in the ` + `${achievementSeries[achievement.series].name} series!</shad></col>`,
+    );
+    player.sendMessage(`<col=255>${achievement.name}</col> - <i>${achievement.description}</i>`);
     return true;
 }
 
 export function hasAchievement(achievement: Achievement, player: Player): boolean {
-    if(!player.achievements || player.achievements.length === 0) {
+    if (!player.achievements || player.achievements.length === 0) {
         return false;
     }
 

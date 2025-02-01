@@ -1,13 +1,13 @@
-import { commandActionHandler } from '@engine/action';
-import { openBankInterface } from '@plugins/objects/bank/bank.plugin';
-import { getActionHooks } from '@engine/action/hook';
-import { ObjectInteractionActionHook } from '@engine/action';
+import { getActionHooks } from '@engine/action/hook/action-hook';
 import { advancedNumberHookFilter } from '@engine/action/hook/hook-filters';
+import type { ObjectInteractionActionHook } from '@engine/action/pipe/object-interaction.action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { objectIds } from '@engine/world/config/object-ids';
 
-const action: commandActionHandler = (details) => {
-    const interactionActions = getActionHooks<ObjectInteractionActionHook>('object_interaction')
-        .filter(plugin => advancedNumberHookFilter(plugin.objectIds, objectIds.bankBooth, plugin.options, 'use-quickly'));
+const action: commandActionHandler = details => {
+    const interactionActions = getActionHooks<ObjectInteractionActionHook>('object_interaction').filter(plugin =>
+        advancedNumberHookFilter(plugin.objectIds, objectIds.bankBooth, plugin.options, 'use-quickly'),
+    );
     interactionActions.forEach(plugin => {
         if (!plugin.handler) {
             return;
@@ -21,13 +21,13 @@ const action: commandActionHandler = (details) => {
                 x: details.player.position.x,
                 y: details.player.position.y,
                 orientation: 0,
-                type: 0
+                type: 0,
             },
             option: 'use-quickly',
             position: details.player.position,
             objectConfig: undefined as any,
-            cacheOriginal: undefined as any
-        })
+            cacheOriginal: undefined as any,
+        });
     });
 };
 
@@ -36,8 +36,8 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'bank' ],
-            handler: action
-        }
-    ]
+            commands: ['bank'],
+            handler: action,
+        },
+    ],
 };

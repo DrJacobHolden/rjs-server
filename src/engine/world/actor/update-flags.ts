@@ -1,5 +1,5 @@
-import { Position } from '../position';
-import { Actor } from './actor';
+import type { Position } from '../position';
+import type { Actor } from './actor';
 
 /**
  * A specific chat message.
@@ -31,7 +31,7 @@ export interface Animation {
 export enum DamageType {
     NO_DAMAGE = 0,
     DAMAGE = 1,
-    POISON = 2
+    POISON = 2,
 }
 
 /**
@@ -45,15 +45,14 @@ export interface Damage {
 }
 
 /**
- * Various player updating flags.
+ * Various actor updating flags.
  */
 export class UpdateFlags {
-
     private _mapRegionUpdateRequired: boolean;
     private _appearanceUpdateRequired: boolean;
     private _chatMessages: ChatMessage[];
     private _facePosition: Position | null;
-    private _faceActor: Actor | null;
+    private _faceActor: Actor | 'CLEAR' | null;
     private _graphics: Graphic | null;
     private _animation: Animation | null;
     private _damage: Damage | null;
@@ -72,7 +71,7 @@ export class UpdateFlags {
         this._animation = null;
         this._damage = null;
 
-        if(this._chatMessages.length !== 0) {
+        if (this._chatMessages.length !== 0) {
             this._chatMessages.shift();
         }
     }
@@ -81,21 +80,33 @@ export class UpdateFlags {
         this.damage = {
             damageDealt: amount,
             damageType: type,
-            remainingHitpoints, maxHitpoints
+            remainingHitpoints,
+            maxHitpoints,
         };
     }
 
     public addChatMessage(chatMessage: ChatMessage): void {
-        if(this._chatMessages.length > 4) {
+        if (this._chatMessages.length > 4) {
             return;
         }
 
         this._chatMessages.push(chatMessage);
     }
 
+    /**
+     * Determines if any update is required. When false will short circuit
+     * the entire update process.
+     */
     public get updateBlockRequired(): boolean {
-        return this._appearanceUpdateRequired || this._chatMessages.length !== 0 || this._facePosition !== null ||
-            this._graphics !== null || (this._animation !== undefined && this._animation !== null) || (this._faceActor !== undefined && this._faceActor !== null) || this._damage !== null;
+        return (
+            this._appearanceUpdateRequired ||
+            this._chatMessages.length !== 0 ||
+            this._facePosition !== null ||
+            this._graphics !== null ||
+            this._animation !== null ||
+            this._faceActor !== null ||
+            this._damage !== null
+        );
     }
 
     public get mapRegionUpdateRequired(): boolean {
@@ -130,11 +141,11 @@ export class UpdateFlags {
         this._facePosition = value;
     }
 
-    public get faceActor(): Actor | null {
+    public get faceActor(): Actor | 'CLEAR' | null {
         return this._faceActor;
     }
 
-    public set faceActor(value: Actor | null) {
+    public set faceActor(value: Actor | 'CLEAR' | null) {
         this._faceActor = value;
     }
 

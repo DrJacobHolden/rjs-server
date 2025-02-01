@@ -1,4 +1,4 @@
-import { Item }from '@engine/world/items/item';
+import type { Item } from '@engine/world/items/item';
 export interface Fletchable {
     item: Item;
     level: number;

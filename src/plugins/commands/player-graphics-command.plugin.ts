@@ -1,6 +1,6 @@
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
-const action: commandActionHandler = (details) => {
+const action: commandActionHandler = details => {
     const { player, args } = details;
 
     const graphicsId: number = args.graphicsId as number;
@@ -14,19 +14,19 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'gfx', 'graphics' ],
+            commands: ['gfx', 'graphics'],
             args: [
                 {
                     name: 'graphicsId',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'height',
                     type: 'number',
-                    defaultValue: 120
-                }
+                    defaultValue: 120,
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

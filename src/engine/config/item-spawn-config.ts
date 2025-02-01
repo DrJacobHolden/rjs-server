@@ -1,7 +1,6 @@
 import { Position } from '@engine/world/position';
 import { loadConfigurationFiles } from '@runejs/common/fs';
 
-
 export interface ItemSpawnConfiguration {
     item: string;
     amount?: number;
@@ -14,7 +13,6 @@ export interface ItemSpawnConfiguration {
 }
 
 export class ItemSpawn {
-
     public itemKey: string;
     public amount: number = 1;
     public spawnPosition: Position;
@@ -26,21 +24,20 @@ export class ItemSpawn {
         this.itemKey = itemKey;
         this.spawnPosition = position;
     }
-
 }
 
 export function translateItemSpawnConfig(config: ItemSpawnConfiguration): ItemSpawn {
     const spawn = new ItemSpawn(config.item, new Position(config.spawn_x, config.spawn_y, config.spawn_level || 0));
-    if(config.amount !== undefined) {
+    if (config.amount !== undefined) {
         spawn.amount = config.amount;
     }
-    if(config.instance !== undefined) {
+    if (config.instance !== undefined) {
         spawn.instance = config.instance;
     }
-    if(config.respawn !== undefined) {
+    if (config.respawn !== undefined) {
         spawn.respawn = config.respawn;
     }
-    if(config.metadata !== undefined) {
+    if (config.metadata !== undefined) {
         spawn.metadata = config.metadata;
     }
 

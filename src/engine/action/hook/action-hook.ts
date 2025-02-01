@@ -1,7 +1,7 @@
-import { QuestKey } from '@engine/config';
-import { ActionStrength, ActionType, HookTask } from '@engine/action';
-import { actionHookMap } from '@engine/plugins';
-
+import type { ActionStrength, ActionType } from '@engine/action/action-pipeline';
+import type { HookTask } from '@engine/action/hook/task';
+import type { QuestKey } from '@engine/config/quest-config';
+import { actionHookMap } from '@engine/plugins/loader';
 
 /**
  * Defines a quest requirement for an action hook.
@@ -11,7 +11,6 @@ export interface QuestRequirement {
     stage?: QuestKey;
     stages?: number[];
 }
-
 
 /**
  * Defines a generic extensible game content action hook.
@@ -33,7 +32,6 @@ export interface ActionHook<A = any, H = any> {
     task?: HookTask<A>;
 }
 
-
 /**
  * Fetches the list of all discovered action hooks of the specified type.
  * @param actionType The Action Type to find the hook for.
@@ -41,13 +39,12 @@ export interface ActionHook<A = any, H = any> {
  */
 export const getActionHooks = <T extends ActionHook>(actionType: ActionType, filter?: (actionHook: T) => boolean): T[] => {
     const hooks = actionHookMap[actionType] as T[];
-    if(!hooks || hooks.length === 0) {
+    if (!hooks || hooks.length === 0) {
         return [];
     }
 
     return filter ? hooks.filter(filter) : hooks;
-}
-
+};
 
 /**
  * A sorter function that action hooks can be run through.
@@ -55,5 +52,5 @@ export const getActionHooks = <T extends ActionHook>(actionType: ActionType, fil
  * @param actionHooks The list of hooks to sort.
  */
 export function sortActionHooks<T = any>(actionHooks: ActionHook<T>[]): ActionHook<T>[] {
-    return actionHooks.sort(actionHook => actionHook.questRequirement !== undefined ? -1 : 1);
+    return actionHooks.sort(actionHook => (actionHook.questRequirement !== undefined ? -1 : 1));
 }

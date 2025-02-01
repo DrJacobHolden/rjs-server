@@ -1,16 +1,16 @@
-import { itemInteractionActionHandler } from '@engine/action';
-import { soundIds } from '@engine/world/config/sound-ids';
-import { itemIds } from '@engine/world/config/item-ids';
-import { getItemFromContainer } from '@engine/world/items/item-container';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 import { widgets } from '@engine/config/config-handler';
+import { itemIds } from '@engine/world/config/item-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
+import { getItemFromContainer } from '@engine/world/items/item-container';
 
-export const handler: itemInteractionActionHandler = (details) => {
+export const handler: itemInteractionActionHandler = details => {
     const { player, itemId, itemSlot } = details;
 
     const inventory = player.inventory;
     const item = getItemFromContainer(itemId, itemSlot, inventory);
 
-    if(!item) {
+    if (!item) {
         // The specified item was not found in the specified slot.
         return;
     }
@@ -37,9 +37,9 @@ export default {
             type: 'item_interaction',
             widgets: widgets.inventory,
             options: 'empty',
-            itemIds: [ itemIds.bucketOfMilk, itemIds.bucketOfWater, itemIds.jugOfWater ],
+            itemIds: [itemIds.bucketOfMilk, itemIds.bucketOfWater, itemIds.jugOfWater],
             handler,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

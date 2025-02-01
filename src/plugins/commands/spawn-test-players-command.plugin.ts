@@ -1,15 +1,13 @@
-import { Position } from '@engine/world/position';
-import { Player } from '@engine/world/actor/player/player';
-import { World } from '@engine/world';
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { activeWorld } from '@engine/world';
-import { Isaac } from '@engine/net';
-
+import { Player } from '@engine/world/actor/player/player';
+import { Position } from '@engine/world/position';
+import { World } from '@engine/world/world';
 
 const handler: commandActionHandler = ({ player, args }) => {
     const playerCount = args.playerCount as number;
 
-    if(playerCount > World.MAX_PLAYERS - 1) {
+    if (playerCount > World.MAX_PLAYERS - 1) {
         player.sendMessage(`Error: Max player count is ${World.MAX_PLAYERS - 1}.`);
         return;
     }
@@ -22,20 +20,20 @@ const handler: commandActionHandler = ({ player, args }) => {
     const spawnChunk = activeWorld.chunkManager.getChunkForWorldPosition(new Position(x, y, 0));
 
     const worldSlotsRemaining = activeWorld.playerSlotsRemaining() - 1;
-    if(worldSlotsRemaining <= 0) {
+    if (worldSlotsRemaining <= 0) {
         player.sendMessage(`Error: The game world is full.`);
         return;
     }
 
     const playerSpawnCount = playerCount > worldSlotsRemaining ? worldSlotsRemaining : playerCount;
 
-    if(playerSpawnCount < playerCount) {
+    if (playerSpawnCount < playerCount) {
         player.sendMessage(`Warning: There was only room for ${playerSpawnCount}/${playerCount} player spawns.`);
     }
 
     // TODO (JameskmongeR) what's the difference between this and `generateFakePlayers`
 
-    for(let i = 0; i < playerSpawnCount; i++) {
+    for (let i = 0; i < playerSpawnCount; i++) {
         // TODO (Jameskmonger) we should be able to create a player without a connection, and without passing nulls in
         const testPlayer = new Player(null as any, null as any, null as any, i, `test${i}`, 'abs', true);
         activeWorld.registerPlayer(testPlayer);
@@ -43,7 +41,7 @@ const handler: commandActionHandler = ({ player, args }) => {
 
         xOffset++;
 
-        if(xOffset > 20) {
+        if (xOffset > 20) {
             xOffset = 0;
             yOffset--;
         }
@@ -51,7 +49,7 @@ const handler: commandActionHandler = ({ player, args }) => {
         testPlayer.position = new Position(x + xOffset, y + yOffset, 0);
         const newChunk = activeWorld.chunkManager.getChunkForWorldPosition(testPlayer.position);
 
-        if(!spawnChunk.equals(newChunk)) {
+        if (!spawnChunk.equals(newChunk)) {
             spawnChunk.removePlayer(testPlayer);
             newChunk.addPlayer(testPlayer);
         }
@@ -60,20 +58,19 @@ const handler: commandActionHandler = ({ player, args }) => {
     }
 };
 
-
 export default {
     pluginId: 'rs:spawn_test_players_command',
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'spawn_players', 'spawnplayers' ],
+            commands: ['spawn_players', 'spawnplayers'],
             args: [
                 {
                     name: 'playerCount',
-                    type: 'number'
-                }
+                    type: 'number',
+                },
             ],
-            handler
-        }
-    ]
+            handler,
+        },
+    ],
 };

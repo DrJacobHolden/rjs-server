@@ -1,7 +1,7 @@
-import { Subject, Subscription } from 'rxjs';
-import { Chunk } from '@engine/world/map';
-import { Position } from '@engine/world/position';
-import { LandscapeObject } from '@runejs/filestore';
+import type { Chunk } from '@engine/world/map/chunk';
+import type { Position } from '@engine/world/position';
+import type { LandscapeObject } from '@runejs/filestore';
+import type { Subject, Subscription } from 'rxjs';
 
 /**
  * The definition of the metadata directly available on a {@link Player}.
@@ -113,5 +113,4 @@ export type PlayerMetadata = {
      * before the teleport animation finishes (it takes a few ticks).
      */
     castingStationarySpell: boolean;
-
 };

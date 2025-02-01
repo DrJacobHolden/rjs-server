@@ -1,7 +1,8 @@
-import { ActorTask } from '@engine/task/impl';
 import { widgets } from '@engine/config/config-handler';
-import { Player, Skill } from '@engine/world/actor';
-import { Smithable } from './forging-types';
+import { ActorTask } from '@engine/task/impl/actor-task';
+import type { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
+import type { Smithable } from './forging-types';
 
 /**
  * A task that handles the forging of an item.
@@ -14,7 +15,11 @@ export class ForgingTask extends ActorTask<Player> {
     private elapsedTicks = 0;
     private amountForged = 0;
 
-    constructor(player: Player, private readonly smithable: Smithable, private readonly amount: number) {
+    constructor(
+        player: Player,
+        private readonly smithable: Smithable,
+        private readonly amount: number,
+    ) {
         super(player);
     }
 
@@ -50,7 +55,7 @@ export class ForgingTask extends ActorTask<Player> {
         // Add item to inventory
         this.actor.inventory.add({
             itemId: this.smithable.item.itemId,
-            amount: this.smithable.item.amount
+            amount: this.smithable.item.amount,
         });
 
         this.actor.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, this.actor.inventory);
@@ -64,6 +69,6 @@ export class ForgingTask extends ActorTask<Player> {
      * @returns {boolean} True if the player has the required materials, false otherwise.
      */
     private hasMaterials() {
-        return this.smithable.ingredient.amount <= this.actor.inventory.findAll(this.smithable.ingredient.itemId).length
+        return this.smithable.ingredient.amount <= this.actor.inventory.findAll(this.smithable.ingredient.itemId).length;
     }
 }

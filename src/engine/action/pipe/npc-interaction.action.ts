@@ -1,10 +1,11 @@
-import { Player, Npc } from '@engine/world/actor';
-import { Position } from '@engine/world';
-import {
-    ActionHook, getActionHooks, stringHookFilter, questHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
-import { WalkToActorPluginTask } from './task/walk-to-actor-plugin-task';
-
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { questHookFilter, stringHookFilter } from '@engine/action/hook/hook-filters';
+import { WalkToActorPluginTask } from '@engine/action/pipe/task/walk-to-actor-plugin-task';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Position } from '@engine/world/position';
 
 /**
  * Defines an npc action hook.
@@ -18,12 +19,10 @@ export interface NpcInteractionActionHook extends ActionHook<NpcInteractionActio
     walkTo: boolean;
 }
 
-
 /**
  * The npc action hook handler function to be called when the hook's conditions are met.
  */
 export type npcInteractionActionHandler = (npcInteractionAction: NpcInteractionAction) => void;
-
 
 /**
  * Details about an npc action being performed.
@@ -39,7 +38,6 @@ export interface NpcInteractionAction {
     option: string;
 }
 
-
 /**
  * The pipe that the game engine hands npc actions off to.
  * @param player
@@ -47,27 +45,35 @@ export interface NpcInteractionAction {
  * @param position
  * @param option
  */
-const npcInteractionActionPipe = (player: Player, npc: Npc, position: Position, option: string): RunnableHooks<NpcInteractionAction> | null => {
-    if(player.busy) {
+const npcInteractionActionPipe = (
+    player: Player,
+    npc: Npc,
+    position: Position,
+    option: string,
+): RunnableHooks<NpcInteractionAction> | null => {
+    if (player.busy) {
         return null;
     }
 
     const morphedNpc = player.getMorphedNpcDetails(npc);
 
     // Find all NPC action plugins that reference this NPC
-    let matchingHooks = getActionHooks<NpcInteractionActionHook>('npc_interaction')
-        .filter(plugin => questHookFilter(player, plugin) &&
+    let matchingHooks = getActionHooks<NpcInteractionActionHook>('npc_interaction').filter(
+        plugin =>
+            questHookFilter(player, plugin) &&
             (!plugin.npcs || stringHookFilter(plugin.npcs, morphedNpc?.key || npc.key)) &&
-            (!plugin.options || stringHookFilter(plugin.options, option)));
+            (!plugin.options || stringHookFilter(plugin.options, option)),
+    );
     const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
 
-
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
-        player.outgoingPackets.chatboxMessage(`Unhandled NPC interaction: ${option} ${morphedNpc?.key || npc.key} (id-${morphedNpc?.gameId || npc.id}) @ ${position.x},${position.y},${position.level}`);
+    if (matchingHooks.length === 0) {
+        player.outgoingPackets.chatboxMessage(
+            `Unhandled NPC interaction: ${option} ${morphedNpc?.key || npc.key} (id-${morphedNpc?.gameId || npc.id}) @ ${position.x},${position.y},${position.level}`,
+        );
         if (morphedNpc) {
             player.outgoingPackets.chatboxMessage(`Note: (id-${morphedNpc.gameId}) is a morphed NPC. The parent NPC is (id-${npc.id}).`);
         }
@@ -86,13 +92,15 @@ const npcInteractionActionPipe = (player: Player, npc: Npc, position: Position, 
     return {
         hooks: matchingHooks,
         action: {
-            player, npc, position, option
-        }
-    }
+            player,
+            npc,
+            position,
+            option,
+        },
+    };
 };
-
 
 /**
  * Npc action pipe definition.
  */
-export default [ 'npc_interaction', npcInteractionActionPipe ] as ActionPipe;
+export default ['npc_interaction', npcInteractionActionPipe] as ActionPipe;

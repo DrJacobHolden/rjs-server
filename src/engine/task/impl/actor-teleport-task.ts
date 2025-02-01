@@ -1,6 +1,6 @@
-import { Position } from '@engine/world';
-import { Actor } from '@engine/world/actor';
 import { ActorTask } from '@engine/task/impl/actor-task';
+import type { Actor } from '@engine/world/actor/actor';
+import type { Position } from '@engine/world/position';
 
 /**
  * A task for an actor to teleport to a new position.
@@ -14,13 +14,10 @@ export class ActorTeleportTask<TActor extends Actor = Actor> extends ActorTask<T
      * @param actor The actor executing this task.
      * @param newPosition The position to teleport the actor to.
      */
-    constructor (
-        actor: TActor,
-        newPosition: Position
-    ) {
+    constructor(actor: TActor, newPosition: Position) {
         super(actor, {
             repeat: false,
-            immediate: false
+            immediate: false,
         });
         this._newPosition = newPosition;
     }

@@ -1,8 +1,10 @@
-import { randomBetween } from '@engine/util';
-import { Position, WorldItem } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { objectIds, itemIds } from '@engine/world/config';
-import { LandscapeObject } from '@runejs/filestore';
+import { randomBetween } from '@engine/util/num';
+import type { Player } from '@engine/world/actor/player/player';
+import { itemIds } from '@engine/world/config/item-ids';
+import { objectIds } from '@engine/world/config/object-ids';
+import type { WorldItem } from '@engine/world/items/world-item';
+import type { Position } from '@engine/world/position';
+import type { LandscapeObject } from '@runejs/filestore';
 
 const fireDurationTicks = (): number => {
     return randomBetween(100, 200); // 1-2 minutes
@@ -21,15 +23,14 @@ const fireDurationTicks = (): number => {
  * @author jameskmonger
  */
 export const canLightFireAtCurrentPosition = (player: Player): boolean => {
-    const existingFire = player.instance.getTileModifications(player.position).mods.spawnedObjects.find(o => (
-        o.x === player.position.x
-        && o.y === player.position.y
-        && o.level === player.position.level
-        && o.type === 10
-    ))
+    const existingFire = player.instance
+        .getTileModifications(player.position)
+        .mods.spawnedObjects.find(
+            o => o.x === player.position.x && o.y === player.position.y && o.level === player.position.level && o.type === 10,
+        );
 
     return existingFire === undefined;
-}
+};
 
 /**
  * Light a fire at the specified position.
@@ -52,16 +53,16 @@ export const lightFire = (player: Player, position: Position, worldItemLog: Worl
         y: position.y,
         level: position.level,
         type: 10,
-        orientation: 0
+        orientation: 0,
     };
 
     player.playAnimation(null);
     player.sendMessage('The fire catches and the logs begin to burn.');
     player.skills.firemaking.addExp(burnExp);
 
-    if(!player.walkingQueue.moveIfAble(-1, 0)) {
-        if(!player.walkingQueue.moveIfAble(1, 0)) {
-            if(!player.walkingQueue.moveIfAble(0, -1)) {
+    if (!player.walkingQueue.moveIfAble(-1, 0)) {
+        if (!player.walkingQueue.moveIfAble(1, 0)) {
+            if (!player.walkingQueue.moveIfAble(0, -1)) {
                 player.walkingQueue.moveIfAble(0, 1);
             }
         }
