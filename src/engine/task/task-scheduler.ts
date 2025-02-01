@@ -23,7 +23,7 @@ export class TaskScheduler {
      */
     public tick(): void {
         // Add any pending tasks to the running list
-        while(this.pendingTasks.isNotEmpty) {
+        while (this.pendingTasks.isNotEmpty) {
             const task = this.pendingTasks.dequeue();
 
             if (!task || !task.isActive) {
@@ -34,7 +34,7 @@ export class TaskScheduler {
         }
 
         // Use an iterator so that we can remove tasks from the list while iterating
-        for(const [index, task] of this.runningTasks.entries()) {
+        for (const [index, task] of this.runningTasks.entries()) {
             if (!task) {
                 continue;
             }
@@ -63,7 +63,7 @@ export class TaskScheduler {
         // if the task can't stack with others of a similar type, we need to stop them
         if (task.stackType === TaskStackType.NEVER) {
             // Use an iterator so that we can remove tasks from the list while iterating
-            for(const [index, otherTask] of this.runningTasks.entries()) {
+            for (const [index, otherTask] of this.runningTasks.entries()) {
                 if (!otherTask) {
                     continue;
                 }
@@ -74,7 +74,7 @@ export class TaskScheduler {
                 }
             }
 
-            for(const otherTask of this.pendingTasks.items) {
+            for (const otherTask of this.pendingTasks.items) {
                 if (!otherTask) {
                     continue;
                 }

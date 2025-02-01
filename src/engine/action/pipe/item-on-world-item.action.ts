@@ -1,4 +1,4 @@
-import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
 import type { ActionHook } from '@engine/action/hook/action-hook';
 import { getActionHooks } from '@engine/action/hook/action-hook';
 import { questHookFilter } from '@engine/action/hook/hook-filters';
@@ -15,15 +15,13 @@ export interface ItemOnWorldItemActionHook extends ActionHook<ItemOnWorldItemAct
     /**
      * The item pairs being used. Both items are optional so that you can specify a single item, a pair of items, or neither.
      */
-    items: { item?: number, worldItem?: number }[];
+    items: { item?: number; worldItem?: number }[];
 }
-
 
 /**
  * The item-on-world-item action hook handler function to be called when the hook's conditions are met.
  */
 export type itemOnWorldItemActionHandler = (itemOnWorldItemAction: ItemOnWorldItemAction) => void;
-
 
 /**
  * Details about an item-on-world-item action being performed.
@@ -73,25 +71,28 @@ export interface ItemOnWorldItemAction {
  */
 const itemOnWorldItemActionPipe = (
     player: Player,
-    usedItem: Item, usedWithItem: WorldItem,
-    usedWidgetId: number, usedContainerId: number, usedSlot: number
+    usedItem: Item,
+    usedWithItem: WorldItem,
+    usedWidgetId: number,
+    usedContainerId: number,
+    usedSlot: number,
 ): RunnableHooks<ItemOnWorldItemAction> | null => {
-    if(player.busy) {
+    if (player.busy) {
         return null;
     }
 
     // Find all item on item action plugins that match this action
     let matchingHooks = getActionHooks<ItemOnWorldItemActionHook>('item_on_world_item', plugin => {
-        if(questHookFilter(player, plugin)) {
+        if (questHookFilter(player, plugin)) {
             const used = usedItem.itemId;
             const usedWith = usedWithItem.itemId;
 
-            return (plugin.items.some(({ item, worldItem }) => {
+            return plugin.items.some(({ item, worldItem }) => {
                 const itemMatch = item === undefined || item === used;
                 const worldItemMatch = worldItem === undefined || worldItem === usedWith;
 
                 return itemMatch && worldItemMatch;
-            }));
+            });
         }
 
         return false;
@@ -99,13 +100,12 @@ const itemOnWorldItemActionPipe = (
 
     const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
 
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
-        player.outgoingPackets.chatboxMessage(
-            `Unhandled item on world item interaction: ${usedItem.itemId} on ${usedWithItem.itemId}`);
+    if (matchingHooks.length === 0) {
+        player.outgoingPackets.chatboxMessage(`Unhandled item on world item interaction: ${usedItem.itemId} on ${usedWithItem.itemId}`);
         return null;
     }
 
@@ -113,14 +113,16 @@ const itemOnWorldItemActionPipe = (
         hooks: matchingHooks,
         action: {
             player,
-            usedItem, usedWithItem,
-            usedWidgetId, usedContainerId, usedSlot
-        }
-    }
+            usedItem,
+            usedWithItem,
+            usedWidgetId,
+            usedContainerId,
+            usedSlot,
+        },
+    };
 };
-
 
 /**
  * Item-on-world-item action pipe definition.
  */
-export default [ 'item_on_world_item', itemOnWorldItemActionPipe ] as ActionPipe;
+export default ['item_on_world_item', itemOnWorldItemActionPipe] as ActionPipe;

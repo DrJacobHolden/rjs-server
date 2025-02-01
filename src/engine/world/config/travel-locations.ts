@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
-import { JSON_SCHEMA, load } from 'js-yaml';
 import { Position } from '@engine/world/position';
+import { JSON_SCHEMA, load } from 'js-yaml';
 
 interface RawTravelLocation {
     name: string;
@@ -15,10 +15,10 @@ export interface TravelLocation {
 }
 
 const readLocations = (): TravelLocation[] => {
-    const locationData = load(
-        readFileSync('data/config/travel-locations-data.yaml', 'utf8'),
-        { schema: JSON_SCHEMA }) as RawTravelLocation[];
-    return locationData.map((location) => {
+    const locationData = load(readFileSync('data/config/travel-locations-data.yaml', 'utf8'), {
+        schema: JSON_SCHEMA,
+    }) as RawTravelLocation[];
+    return locationData.map(location => {
         return {
             name: location.name,
             key: location.name.toLowerCase(),
@@ -30,11 +30,11 @@ const readLocations = (): TravelLocation[] => {
 export class TravelLocations {
     public readonly locations: TravelLocation[];
 
-    public constructor () {
+    public constructor() {
         this.locations = readLocations();
     }
 
-    public find (search: string): TravelLocation | null {
+    public find(search: string): TravelLocation | null {
         search = search.toLowerCase().trim();
         for (const location of this.locations) {
             if (location.key.indexOf(search) >= 0) {

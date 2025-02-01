@@ -1,47 +1,47 @@
-import { Position } from '@engine/world/position';
-import { WNES } from '@engine/world/direction';
-import { logger } from '@runejs/common';
-import { action as doorAction } from '@plugins/objects/doors/door.plugin';
 import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { activeWorld } from '@engine/world';
+import { WNES } from '@engine/world/direction';
+import { Position } from '@engine/world/position';
+import { action as doorAction } from '@plugins/objects/doors/door.plugin';
+import { logger } from '@runejs/common';
 
 const doubleDoors = [
     {
-        closed: [ 1516, 1519 ],
-        open: [ 1517, 1520 ]
-    }
+        closed: [1516, 1519],
+        open: [1517, 1520],
+    },
 ];
 
 const closingDelta = {
-    'WEST': { x: 1, y: 0 },
-    'EAST': { x: -1, y: 0 },
-    'NORTH': { x: 0, y: -1 },
-    'SOUTH': { x: 0, y: 1 }
+    WEST: { x: 1, y: 0 },
+    EAST: { x: -1, y: 0 },
+    NORTH: { x: 0, y: -1 },
+    SOUTH: { x: 0, y: 1 },
 };
 
 const openingDelta = {
-    'LEFT': {
-        'WEST': { x: 0, y: 1 },
-        'EAST': { x: 0, y: -1 },
-        'NORTH': { x: 1, y: 0 },
-        'SOUTH': { x: -1, y: 0 }
+    LEFT: {
+        WEST: { x: 0, y: 1 },
+        EAST: { x: 0, y: -1 },
+        NORTH: { x: 1, y: 0 },
+        SOUTH: { x: -1, y: 0 },
     },
-    'RIGHT': {
-        'WEST': { x: 0, y: -1 },
-        'EAST': { x: 0, y: 1 },
-        'NORTH': { x: -1, y: 0 },
-        'SOUTH': { x: 1, y: 0 }
-    }
+    RIGHT: {
+        WEST: { x: 0, y: -1 },
+        EAST: { x: 0, y: 1 },
+        NORTH: { x: -1, y: 0 },
+        SOUTH: { x: 1, y: 0 },
+    },
 };
 
-const action: objectInteractionActionHandler = (details) => {
+const action: objectInteractionActionHandler = details => {
     const { player, object: door, position, cacheOriginal } = details;
     let doorConfig = doubleDoors.find(d => d.closed.indexOf(door.objectId) !== -1);
     let doorIds: number[];
     let opening = true;
-    if(!doorConfig) {
+    if (!doorConfig) {
         doorConfig = doubleDoors.find(d => d.open.indexOf(door.objectId) !== -1);
-        if(!doorConfig) {
+        if (!doorConfig) {
             return;
         }
 
@@ -59,7 +59,7 @@ const action: objectInteractionActionHandler = (details) => {
     let deltaY = 0;
     const otherDoorId = hinge === 'LEFT' ? rightDoorId : leftDoorId;
 
-    if(!opening) {
+    if (!opening) {
         deltaX += closingDelta[direction].x;
         deltaY += closingDelta[direction].y;
     } else {
@@ -67,7 +67,7 @@ const action: objectInteractionActionHandler = (details) => {
         deltaY += openingDelta[hinge][direction].y;
     }
 
-    if(!otherDoorId || (deltaX === 0 && deltaY === 0)) {
+    if (!otherDoorId || (deltaX === 0 && deltaY === 0)) {
         logger.error('Improperly handled double door at ' + door.x + ',' + door.y + ',' + door.level);
         return;
     }
@@ -75,7 +75,7 @@ const action: objectInteractionActionHandler = (details) => {
     const otherDoorPosition = new Position(door.x + deltaX, door.y + deltaY, door.level);
 
     const { object: otherDoor } = activeWorld.findObjectAtLocation(player, otherDoorId, otherDoorPosition);
-    if(!otherDoor) {
+    if (!otherDoor) {
         return;
     }
 
@@ -84,8 +84,9 @@ const action: objectInteractionActionHandler = (details) => {
         player,
         object: door,
         objectConfig: null as any,
-        position, cacheOriginal,
-        option: opening ? 'open' : 'close'
+        position,
+        cacheOriginal,
+        option: opening ? 'open' : 'close',
     });
     doorAction({
         player,
@@ -93,7 +94,7 @@ const action: objectInteractionActionHandler = (details) => {
         objectConfig: null as any,
         position: otherDoorPosition,
         cacheOriginal,
-        option: opening ? 'open' : 'close'
+        option: opening ? 'open' : 'close',
     });
 };
 
@@ -101,8 +102,11 @@ export default {
     pluginId: 'rs:double_doors',
     hooks: [
         {
-            type: 'object_interaction', objectIds: [ 1519, 1516, 1517, 1520 ],
-            options: [ 'open', 'close' ], walkTo: true, handler: action
-        }
-    ]
+            type: 'object_interaction',
+            objectIds: [1519, 1516, 1517, 1520],
+            options: ['open', 'close'],
+            walkTo: true,
+            handler: action,
+        },
+    ],
 };

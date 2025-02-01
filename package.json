@@ -17,10 +17,15 @@
         "update": "npm run start:update",
         "infra": "npm run start:infra",
         "standalone": "npm run start:standalone",
-        "lint": "eslint --ext .ts src",
-        "lint:fix": "eslint --ext .ts src --fix",
         "build": "rimraf dist && swc ./src -d dist --strip-leading-paths",
         "build:watch": "swc ./src -d dist -w --strip-leading-paths",
+        "lint": "biome lint",
+        "lint:fin": "biome lint --write --diagnostic-level=error --reporter=summary",
+        "lint:fix": "biome lint --write",
+        "format": "biome format",
+        "format:fin": "biome format --write --reporter=summary",
+        "format:fix": "biome format --write",
+        "fin": "npm run typecheck && npm run lint:fin && npm run format:fin && npm run test:fin",
         "test": "jest",
         "test:fin": "jest --silent --reporters=\"summary\"",
         "typecheck": "tsc -p ./ --noEmit"
@@ -29,13 +34,7 @@
         "type": "git",
         "url": "git+ssh://git@github.com/runejs/server.git"
     },
-    "keywords": [
-        "runejs",
-        "runescape",
-        "typescript",
-        "game server",
-        "game engine"
-    ],
+    "keywords": ["runejs", "runescape", "typescript", "game server", "game engine"],
     "author": "Tynarus",
     "license": "GPL-3.0",
     "bugs": {
@@ -57,7 +56,7 @@
         "uuid": "^11.0.5"
     },
     "devDependencies": {
-        "@runejs/eslint-config": "^1.1.0",
+        "@biomejs/biome": "1.9.4",
         "@swc/cli": "^0.6.0",
         "@swc/core": "^1.10.9",
         "@types/jest": "^29.5.14",
@@ -65,12 +64,8 @@
         "@types/lodash": "^4.17.14",
         "@types/node": "^22.10.8",
         "@types/uuid": "^10.0.0",
-        "@typescript-eslint/eslint-plugin": "^5.14.0",
-        "@typescript-eslint/parser": "^5.14.0",
         "chokidar": "^4.0.3",
         "concurrently": "^9.1.2",
-        "eslint": "^8.57.0",
-        "eslint-plugin-unused-imports": "^2.0.0",
         "jest": "^29.7.0",
         "nodemon": "^3.1.9",
         "rimraf": "^6.0.1",
@@ -78,16 +73,5 @@
         "ts-node": "^10.9.2",
         "tsconfig-paths": "^4.2.0",
         "typescript": "^5.7.3"
-    },
-    "eslintConfig": {
-        "extends": ["@runejs/eslint-config"],
-        "plugins": ["unused-imports"],
-        "rules": {
-            "unused-imports/no-unused-imports": "error",
-            "@typescript-eslint/consistent-type-imports": "error"
-        },
-        "parserOptions": {
-            "project": "./tsconfig.json"
-        }
     }
 }

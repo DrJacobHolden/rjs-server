@@ -30,7 +30,6 @@ export function rollBirdsNestType(): Item {
     return { itemId: item.gameId, amount: 1 };
 }
 
-
 export function rollGemType(): Item {
     const roll = randomBetween(0, 3);
     let itemConfigId;

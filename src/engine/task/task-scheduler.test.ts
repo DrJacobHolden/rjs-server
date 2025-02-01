@@ -11,7 +11,7 @@ describe('TaskScheduler', () => {
 
     describe('when enqueueing a task', () => {
         let executeMock: jest.Mock;
-        let task: Task
+        let task: Task;
         beforeEach(() => {
             ({ task, executeMock } = createMockTask());
         });
@@ -59,7 +59,7 @@ describe('TaskScheduler', () => {
         const stackGroup = 'foo';
 
         let firstExecuteMock: jest.Mock;
-        let firstTask: Task
+        let firstTask: Task;
         beforeEach(() => {
             ({ task: firstTask, executeMock: firstExecuteMock } = createMockTask(interval, stackType, stackGroup));
         });
@@ -90,7 +90,7 @@ describe('TaskScheduler', () => {
 
     describe('when clearing the scheduler', () => {
         let executeMock: jest.Mock;
-        let task: Task
+        let task: Task;
         beforeEach(() => {
             ({ task, executeMock } = createMockTask());
         });

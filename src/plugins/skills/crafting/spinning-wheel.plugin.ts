@@ -1,14 +1,14 @@
-import { soundIds } from '@engine/world/config/sound-ids';
-import { itemIds } from '@engine/world/config/item-ids';
-import { Skill } from '@engine/world/actor/skills';
-import { animationIds } from '@engine/world/config/animation-ids';
-import { objectIds } from '@engine/world/config/object-ids';
-import { findItem, widgets } from '@engine/config/config-handler';
-import { logger } from '@runejs/common';
 import type { ButtonAction, buttonActionHandler } from '@engine/action/pipe/button.action';
 import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import { findItem, widgets } from '@engine/config/config-handler';
 import { ActorTask } from '@engine/task/impl/actor-task';
 import type { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
+import { animationIds } from '@engine/world/config/animation-ids';
+import { itemIds } from '@engine/world/config/item-ids';
+import { objectIds } from '@engine/world/config/object-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
+import { logger } from '@runejs/common';
 
 interface Spinnable {
     input: number | number[];
@@ -26,27 +26,22 @@ interface SpinnableButton {
 const ballOfWool: Spinnable = { input: itemIds.wool, output: itemIds.ballOfWool, experience: 2.5, requiredLevel: 1 };
 const bowString: Spinnable = { input: itemIds.flax, output: itemIds.bowstring, experience: 15, requiredLevel: 10 };
 const rootsCbowString: Spinnable = {
-    input: [
-        itemIds.roots.oak,
-        itemIds.roots.willow,
-        itemIds.roots.maple,
-        itemIds.roots.yew
-    ],
+    input: [itemIds.roots.oak, itemIds.roots.willow, itemIds.roots.maple, itemIds.roots.yew],
     output: itemIds.crossbowString,
     experience: 15,
-    requiredLevel: 10
+    requiredLevel: 10,
 };
 const sinewCbowString: Spinnable = {
     input: itemIds.sinew,
     output: itemIds.crossbowString,
     experience: 15,
-    requiredLevel: 10
+    requiredLevel: 10,
 };
 const magicAmuletString: Spinnable = {
     input: itemIds.roots.magic,
     output: itemIds.magicString,
     experience: 30,
-    requiredLevel: 19
+    requiredLevel: 19,
 };
 const widgetButtonIds: Map<number, SpinnableButton> = new Map<number, SpinnableButton>([
     [100, { shouldTakeInput: false, count: 1, spinnable: ballOfWool }],
@@ -71,9 +66,9 @@ const widgetButtonIds: Map<number, SpinnableButton> = new Map<number, SpinnableB
     [111, { shouldTakeInput: true, count: 0, spinnable: sinewCbowString }],
 ]);
 
-export const openSpinningInterface: objectInteractionActionHandler = (details) => {
+export const openSpinningInterface: objectInteractionActionHandler = details => {
     details.player.interfaceState.openWidget(widgets.whatWouldYouLikeToSpin, {
-        slot: 'screen'
+        slot: 'screen',
     });
 };
 
@@ -111,11 +106,7 @@ class SpinProductTask extends ActorTask<Player> {
      */
     private currentItemIndex = 0;
 
-    constructor(
-        player: Player,
-        spinnable: Spinnable,
-        count: number,
-    ) {
+    constructor(player: Player, spinnable: Spinnable, count: number) {
         super(player);
         this.spinnable = spinnable;
         this.count = count;
@@ -140,9 +131,9 @@ class SpinProductTask extends ActorTask<Player> {
         if (!this.actor.hasItemInInventory(this.currentItem)) {
             let cancel = false;
             if (isArray) {
-                if (this.currentItemIndex < (<number[]> this.spinnable.input).length) {
+                if (this.currentItemIndex < (<number[]>this.spinnable.input).length) {
                     this.currentItemIndex++;
-                    this.currentItem = (<number[]> this.spinnable.input)[this.currentItemIndex];
+                    this.currentItem = (<number[]>this.spinnable.input)[this.currentItemIndex];
                 } else {
                     cancel = true;
                 }
@@ -179,7 +170,7 @@ const spinProduct: any = (details: ButtonAction, spinnable: Spinnable, count: nu
     details.player.enqueueTask(SpinProductTask, [spinnable, count]);
 };
 
-export const buttonClicked: buttonActionHandler = (details) => {
+export const buttonClicked: buttonActionHandler = details => {
     // Check if player might be spawning widget clientside
     if (!details.player.interfaceState.findWidget(459)) {
         return;
@@ -197,7 +188,10 @@ export const buttonClicked: buttonActionHandler = (details) => {
     if (!details.player.skills.hasLevel(Skill.CRAFTING, product.spinnable.requiredLevel)) {
         const outputName = findItem(product.spinnable.output)?.name || '';
 
-        details.player.sendMessage(`You need a crafting level of ${product.spinnable.requiredLevel} to craft ${outputName.toLowerCase()}.`, true);
+        details.player.sendMessage(
+            `You need a crafting level of ${product.spinnable.requiredLevel} to craft ${outputName.toLowerCase()}.`,
+            true,
+        );
         return;
     }
 
@@ -206,7 +200,7 @@ export const buttonClicked: buttonActionHandler = (details) => {
         spinProduct(details, product.spinnable, product.count);
     } else {
         // We should prepare for a number to be sent from the client
-        const numericInputSpinSub = details.player.numericInputEvent.subscribe((number) => {
+        const numericInputSpinSub = details.player.numericInputEvent.subscribe(number => {
             actionCancelledSpinSub?.unsubscribe();
             numericInputSpinSub?.unsubscribe();
             // When a number is recieved we can start crafting the product
@@ -221,8 +215,6 @@ export const buttonClicked: buttonActionHandler = (details) => {
         // Ask the player to enter how many they want to create
         details.player.outgoingPackets.showNumberInputDialogue();
     }
-
-
 };
 
 export default {
@@ -231,15 +223,15 @@ export default {
         {
             type: 'object_interaction',
             objectIds: objectIds.spinningWheel,
-            options: [ 'spin' ],
+            options: ['spin'],
             walkTo: true,
-            handler: openSpinningInterface
+            handler: openSpinningInterface,
         },
         {
             type: 'button',
             widgetId: widgets.whatWouldYouLikeToSpin,
             buttonIds: Array.from(widgetButtonIds.keys()),
-            handler: buttonClicked
-        }
-    ]
+            handler: buttonClicked,
+        },
+    ],
 };

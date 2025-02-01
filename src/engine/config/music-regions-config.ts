@@ -7,9 +7,7 @@ export interface MusicRegionsConfiguration {
     regionIds: number[];
 }
 
-
 export class MusicTrack {
-
     public songId: number;
     public songName: string;
     public musicTabButtonId: number;

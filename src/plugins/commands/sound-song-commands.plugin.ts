@@ -1,16 +1,16 @@
 import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
-const songAction: commandActionHandler = (details) => {
+const songAction: commandActionHandler = details => {
     const { player, args } = details;
     player.outgoingPackets.playSong(args.songId as number);
 };
 
-const soundAction: commandActionHandler = (details) => {
+const soundAction: commandActionHandler = details => {
     const { player, args } = details;
     player.playSound(args.soundId as number, args.volume as number);
 };
 
-const quickSongAction: commandActionHandler = (details) => {
+const quickSongAction: commandActionHandler = details => {
     const { player, args } = details;
     player.outgoingPackets.playQuickSong(args.songId as number, args.prevSongId as number);
 };
@@ -24,39 +24,41 @@ export default {
             args: [
                 {
                     name: 'songId',
-                    type: 'number'
-                }
+                    type: 'number',
+                },
             ],
-            handler: songAction
-        }, {
+            handler: songAction,
+        },
+        {
             type: 'player_command',
-            commands: [ 'sound', 'so' ],
+            commands: ['sound', 'so'],
             args: [
                 {
                     name: 'soundId',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'volume',
                     type: 'number',
-                    defaultValue: 10
-                }
+                    defaultValue: 10,
+                },
             ],
-            handler: soundAction
-        }, {
+            handler: soundAction,
+        },
+        {
             type: 'player_command',
             commands: 'quicksong',
             args: [
                 {
                     name: 'songId',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'prevSongId',
-                    type: 'number'
-                }
+                    type: 'number',
+                },
             ],
-            handler: quickSongAction
-        }
-    ]
+            handler: quickSongAction,
+        },
+    ],
 };

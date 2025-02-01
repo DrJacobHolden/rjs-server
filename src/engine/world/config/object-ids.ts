@@ -7,7 +7,7 @@ export const objectIds = {
     depositBox: 9398,
     shortCuts: {
         stile: 12982,
-        fenceNearKharidCows: 9300
+        fenceNearKharidCows: 9300,
     },
     ladders: {
         taverlyDungeonOverworld: 1759,
@@ -67,13 +67,11 @@ export const objectIds = {
             { default: 5903, stump: 1351 },
             { default: 5904, stump: 1351 },
         ],
-        archey: [
-            { default: 2023, stump: 3371 }
-        ],
+        archey: [{ default: 2023, stump: 3371 }],
         oak: [
             { default: 1281, stump: 1356 },
             // { default: 3037, stump: 1342 }, // Sigex: dark Oak tutorial island no stump
-            { default: 8467, stump: 0 } // Farming
+            { default: 8467, stump: 0 }, // Farming
         ],
         willow: [
             { default: 1308, stump: 7399 },
@@ -87,9 +85,7 @@ export const objectIds = {
             { default: 9036, stump: 9037 },
             { default: 15062, stump: 9037 }, // Sigex: questionable object, high value
         ],
-        dramen: [
-            { default: 1292, stump: -1 },
-        ],
+        dramen: [{ default: 1292, stump: -1 }],
         maple: [
             { default: 1307, stump: 7400 },
             { default: 4674, stump: 7400 },
@@ -99,9 +95,7 @@ export const objectIds = {
             { default: 2289, stump: 2310 },
             { default: 4060, stump: 4061 },
         ],
-        mahogany: [
-            { default: 9034, stump: 9035 },
-        ],
+        mahogany: [{ default: 9034, stump: 9035 }],
         yew: [
             { default: 1309, stump: 7402 },
             // { default: 8513, stump: 0 }, // Farming
@@ -116,7 +110,7 @@ export const objectIds = {
             { default: 2108, empty: 450 },
             { default: 2109, empty: 451 },
             { default: 14904, empty: 14896 },
-            { default: 14905, empty: 14897 }
+            { default: 14905, empty: 14897 },
         ],
         copper: [
             { default: 11960, empty: 11555 },
@@ -131,7 +125,7 @@ export const objectIds = {
             { default: 14907, empty: 14899 },
             { default: 14856, empty: 14832 },
             { default: 14857, empty: 14833 },
-            { default: 14858, empty: 14834 }
+            { default: 14858, empty: 14834 },
         ],
         tin: [
             { default: 11597, empty: 11555 },
@@ -143,7 +137,7 @@ export const objectIds = {
             { default: 2094, empty: 450 },
             { default: 2095, empty: 451 },
             { default: 14092, empty: 14894 },
-            { default: 14903, empty: 14895 }
+            { default: 14903, empty: 14895 },
         ],
         iron: [
             { default: 11954, empty: 11555 },
@@ -154,7 +148,7 @@ export const objectIds = {
             { default: 14900, empty: 14892 },
             { default: 14901, empty: 14893 },
             { default: 14913, empty: 14915 },
-            { default: 14914, empty: 14916 }
+            { default: 14914, empty: 14916 },
         ],
         coal: [
             { default: 11963, empty: 11555 },
@@ -167,21 +161,21 @@ export const objectIds = {
             { default: 2097, empty: 451 },
             { default: 14850, empty: 14832 },
             { default: 14851, empty: 14833 },
-            { default: 14852, empty: 14834 }
+            { default: 14852, empty: 14834 },
         ],
         silver: [
             { default: 11948, empty: 11555 },
             { default: 11949, empty: 11556 },
             { default: 11950, empty: 11557 },
             { default: 2100, empty: 450 },
-            { default: 2101, empty: 451 }
+            { default: 2101, empty: 451 },
         ],
         gold: [
             { default: 11951, empty: 11555 },
             { default: 11952, empty: 11556 },
             { default: 11953, empty: 11557 },
             { default: 2098, empty: 450 },
-            { default: 2099, empty: 451 }
+            { default: 2099, empty: 451 },
         ],
         mithril: [
             { default: 11945, empty: 11555 },
@@ -194,7 +188,7 @@ export const objectIds = {
             { default: 2103, empty: 451 },
             { default: 14853, empty: 14832 },
             { default: 14854, empty: 14833 },
-            { default: 14855, empty: 14834 }
+            { default: 14855, empty: 14834 },
         ],
         adamant: [
             { default: 11939, empty: 11552 },
@@ -204,14 +198,14 @@ export const objectIds = {
             { default: 2105, empty: 451 },
             { default: 14862, empty: 14832 },
             { default: 14863, empty: 14833 },
-            { default: 14864, empty: 14834 }
+            { default: 14864, empty: 14834 },
         ],
         runite: [
             { default: 2106, empty: 450 },
             { default: 2107, empty: 451 },
             { default: 14859, empty: 14832 },
             { default: 14860, empty: 14833 },
-            { default: 14861, empty: 14834 }
-        ]
-    }
+            { default: 14861, empty: 14834 },
+        ],
+    },
 };

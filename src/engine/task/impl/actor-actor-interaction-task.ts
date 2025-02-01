@@ -10,7 +10,10 @@ import { ActorWalkToTask } from './actor-walk-to-task';
  *
  * @author jameskmonger
  */
-export abstract class ActorActorInteractionTask<TActor extends Actor = Actor, TOtherActor extends Actor = Actor> extends ActorWalkToTask<TActor, () => Position> {
+export abstract class ActorActorInteractionTask<TActor extends Actor = Actor, TOtherActor extends Actor = Actor> extends ActorWalkToTask<
+    TActor,
+    () => Position
+> {
     private _other: TOtherActor;
 
     /**
@@ -19,18 +22,13 @@ export abstract class ActorActorInteractionTask<TActor extends Actor = Actor, TO
      * @param walkOnStart Whether to walk to the other actor on task start.
      *                    Defaults to `false` as the client generally inits a walk on interaction.
      */
-    constructor (
-        actor: TActor,
-        otherActor: TOtherActor,
-        walkOnStart = false
-    ) {
-
+    constructor(actor: TActor, otherActor: TOtherActor, walkOnStart = false) {
         super(
             actor,
             () => otherActor.position,
             // TODO (jkm) handle other actor size
             1,
-            walkOnStart
+            walkOnStart,
         );
 
         if (!otherActor) {

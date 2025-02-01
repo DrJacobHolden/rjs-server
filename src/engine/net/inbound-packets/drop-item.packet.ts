@@ -14,5 +14,5 @@ const dropItemPacket = (player: Player, packet: PacketData) => {
 export default {
     opcode: 29,
     size: 8,
-    handler: dropItemPacket
+    handler: dropItemPacket,
 };

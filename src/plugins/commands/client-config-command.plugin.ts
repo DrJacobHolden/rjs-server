@@ -1,6 +1,6 @@
 import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 
-const action: commandActionHandler = (details) => {
+const action: commandActionHandler = details => {
     const { player, args } = details;
 
     const configId = args.configId as number;
@@ -14,18 +14,18 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'config', 'conf' ],
+            commands: ['config', 'conf'],
             args: [
                 {
                     name: 'configId',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'configValue',
-                    type: 'number'
-                }
+                    type: 'number',
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

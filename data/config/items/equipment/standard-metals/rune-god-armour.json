@@ -119,7 +119,7 @@
                 "ranged": 80
             },
             "requirements": {
-                "quests" : {
+                "quests": {
                     "rs:dragon_slayer": "complete"
                 }
             }
@@ -229,7 +229,7 @@
                 "ranged": 80
             },
             "requirements": {
-                "quests" : {
+                "quests": {
                     "rs:dragon_slayer": "complete"
                 }
             }
@@ -339,7 +339,7 @@
                 "ranged": 80
             },
             "requirements": {
-                "quests" : {
+                "quests": {
                     "rs:dragon_slayer": "complete"
                 }
             }

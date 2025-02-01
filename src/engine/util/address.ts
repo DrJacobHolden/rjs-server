@@ -1,10 +1,10 @@
 export const addressToInt = (address: string): number => {
-    if(!address) {
+    if (!address) {
         return 0;
     }
 
     const parts = address.split('.');
-    if(!parts || parts.length !== 4) {
+    if (!parts || parts.length !== 4) {
         return 0;
     }
 

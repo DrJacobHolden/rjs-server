@@ -21,11 +21,11 @@ type ObjectActionHook<TAction extends ObjectAction> = ActionHook<TAction, (data:
 type ObjectActionData<TAction extends ObjectAction> = Omit<TAction, 'player' | 'object' | 'position'>;
 
 /**
-* This is a task to migrate old `walkTo` item interaction actions to the new task system.
-*
-* This is a first-pass implementation to allow for removal of the old action system.
-* It will be refactored in future to be more well suited to our plugin system.
-*/
+ * This is a task to migrate old `walkTo` item interaction actions to the new task system.
+ *
+ * This is a first-pass implementation to allow for removal of the old action system.
+ * It will be refactored in future to be more well suited to our plugin system.
+ */
 export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorLandscapeObjectInteractionTask<Player> {
     /**
      * The plugins to execute when the player arrives at the object.
@@ -72,7 +72,7 @@ export class WalkToObjectPluginTask<TAction extends ObjectAction> extends ActorL
                 player: this.actor,
                 object: landscapeObject,
                 position: landscapeObjectPosition,
-                ...this.data
+                ...this.data,
             } as TAction;
 
             plugin.handler(action);

@@ -1,10 +1,10 @@
 import { findItem } from '@engine/config/config-handler';
-import type { Smeltable } from './smelting-types';
 import { ActorTask } from '@engine/task/impl/actor-task';
 import type { Player } from '@engine/world/actor/player/player';
 import { Skill } from '@engine/world/actor/skills';
 import { animationIds } from '@engine/world/config/animation-ids';
 import { soundIds } from '@engine/world/config/sound-ids';
+import type { Smeltable } from './smelting-types';
 
 /**
  * A task that handles the smelting of an item.
@@ -15,9 +15,13 @@ import { soundIds } from '@engine/world/config/sound-ids';
  */
 export class SmeltingTask extends ActorTask<Player> {
     private elapsedTicks = 0;
-    private amountSmelted = 0
+    private amountSmelted = 0;
 
-    constructor(player: Player, private readonly smeltable: Smeltable, private readonly amount: number) {
+    constructor(
+        player: Player,
+        private readonly smeltable: Smeltable,
+        private readonly amount: number,
+    ) {
         super(player);
     }
 
@@ -55,7 +59,7 @@ export class SmeltingTask extends ActorTask<Player> {
             return;
         }
 
-        bar.ingredients.forEach((item) => {
+        bar.ingredients.forEach(item => {
             for (let i = 0; i < item.amount; i++) {
                 this.actor.removeFirstItem(item.itemId);
             }
@@ -74,7 +78,7 @@ export class SmeltingTask extends ActorTask<Player> {
      * @returns {boolean} True if the player has the required materials, false otherwise.
      */
     private hasMaterials() {
-        return this.smeltable.bar.ingredients.every((item) => {
+        return this.smeltable.bar.ingredients.every(item => {
             const itemIndex = this.actor.inventory.findIndex(item);
             if (itemIndex === -1 || this.actor.inventory.amountInStack(itemIndex) < item.amount) {
                 return false;

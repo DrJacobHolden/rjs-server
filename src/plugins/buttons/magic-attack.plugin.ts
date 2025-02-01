@@ -12,21 +12,16 @@ function attack_target(player: Player, elapsedTicks: number): boolean {
     return true;
 }
 
-const spells = ['Wind Strike','Confuse', 'Water Strike','unknown?', 'Earth Strike'];
+const spells = ['Wind Strike', 'Confuse', 'Water Strike', 'unknown?', 'Earth Strike'];
 export const activate = (task: TaskExecutor<MagicOnNPCAction>, elapsedTicks: number = 0) => {
-    const {
-        npc,
-        player,
-        widgetId,
-        buttonId
-    } = task.actionData;
+    const { npc, player, widgetId, buttonId } = task.actionData;
 
     const attackerX = player.position.x;
-    const attackerY = player.position.y
-    const victimX = npc.position.x
+    const attackerY = player.position.y;
+    const victimX = npc.position.x;
     const victimY = npc.position.y;
-    const offsetX = ((victimY - attackerY));
-    const offsetY = ((victimX - attackerX));
+    const offsetX = victimY - attackerY;
+    const offsetY = victimX - attackerX;
 
     player.walkingQueue.clear();
 
@@ -37,14 +32,13 @@ export const activate = (task: TaskExecutor<MagicOnNPCAction>, elapsedTicks: num
 
 export default {
     pluginId: 'rs:magic',
-    hooks:
-        {
-            type: 'magic_on_npc',
-            widgetId: 192,
-            buttonIds: buttonIds,
-            task: {
-                activate,
-                interval: 0
-            }
-        } as MagicOnNPCActionHook
+    hooks: {
+        type: 'magic_on_npc',
+        widgetId: 192,
+        buttonIds: buttonIds,
+        task: {
+            activate,
+            interval: 0,
+        },
+    } as MagicOnNPCActionHook,
 };

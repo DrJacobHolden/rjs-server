@@ -1,41 +1,39 @@
-import util from 'util';
 import fs from 'fs';
+import util from 'util';
 import { watch } from 'chokidar';
 import type { Observable } from 'rxjs';
 import { Subject } from 'rxjs';
 
-
 const readdir = util.promisify(fs.readdir);
 const stat = util.promisify(fs.stat);
-
 
 export async function getFiles(directory: string, blacklist: string[]);
 export async function getFiles(directory: string, whitelist: string[], useWhitelist: boolean);
 export async function* getFiles(directory: string, list: string[] = [], useWhitelist?: boolean): AsyncGenerator<string> {
     const files = await readdir(directory);
 
-    for(const file of files) {
+    for (const file of files) {
         const path = directory + '/' + file;
         const statistics = await stat(path);
 
-        if(statistics.isDirectory()) {
+        if (statistics.isDirectory()) {
             // (Jameskmonger) I set the default value of `true` here, not sure if it is correct.
             for await (const child of getFiles(path, list, useWhitelist || false)) {
                 yield child;
             }
         } else {
-            if(!useWhitelist) {
+            if (!useWhitelist) {
                 // blacklist
                 const invalid = list.some(item => file === item);
 
-                if(invalid) {
+                if (invalid) {
                     continue;
                 }
             } else {
                 // whitelist
                 const invalid = !list.some(item => file.endsWith(item));
 
-                if(invalid) {
+                if (invalid) {
                     continue;
                 }
             }
@@ -44,7 +42,6 @@ export async function* getFiles(directory: string, list: string[] = [], useWhite
         }
     }
 }
-
 
 export function watchSource(dir: string): Observable<void> {
     const subject = new Subject<void>();
@@ -58,13 +55,12 @@ export function watchSource(dir: string): Observable<void> {
     return subject.asObservable();
 }
 
-
 export function watchForChanges(dir: string, regex: RegExp): void {
     const watcher = watch(dir);
     watcher.on('ready', () => {
         watcher.on('all', () => {
-            Object.keys(require.cache).forEach((id) => {
-                if(regex.test(id)) {
+            Object.keys(require.cache).forEach(id => {
+                if (regex.test(id)) {
                     delete require.cache[id];
                 }
             });

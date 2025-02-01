@@ -1,8 +1,8 @@
-import { logger } from '@runejs/common';
+import { widgets } from '@engine/config/config-handler';
 import type { PacketData } from '@engine/net/inbound-packet-handler';
 import type { Player } from '@engine/world/actor/player/player';
-import { widgets } from '@engine/config/config-handler';
 import { Position } from '@engine/world/position';
+import { logger } from '@runejs/common';
 
 /**
  * Parses the item on world item packet and calls the `item_on_world_item` action pipeline.
@@ -28,21 +28,25 @@ const itemOnWorldItemPacket = (player: Player, packet: PacketData) => {
 
     const position = new Position(usedWithX, usedWithY, player.position.level);
 
-    if(usedWidgetId === widgets.inventory.widgetId && usedContainerId === widgets.inventory.containerId) {
+    if (usedWidgetId === widgets.inventory.widgetId && usedContainerId === widgets.inventory.containerId) {
         // TODO (James) we should use constants for these rather than magic numbers
-        if(usedSlot < 0 || usedSlot > 27) {
+        if (usedSlot < 0 || usedSlot > 27) {
             return;
         }
 
         const usedItem = player.inventory.items[usedSlot];
         const usedWithItem = player.instance.getTileModifications(position).mods.worldItems.find(p => p.itemId === usedWithItemId);
-        if(!usedItem || !usedWithItem) {
-            logger.warn(`Unhandled item on world item case (A) for ${usedSlot} (${usedItemId}) on ${usedWithItemId} (${usedWithX}, ${usedWithY}) by ${player.username}`);
+        if (!usedItem || !usedWithItem) {
+            logger.warn(
+                `Unhandled item on world item case (A) for ${usedSlot} (${usedItemId}) on ${usedWithItemId} (${usedWithX}, ${usedWithY}) by ${player.username}`,
+            );
             return;
         }
 
-        if(usedItem.itemId !== usedItemId || usedWithItem.itemId !== usedWithItemId) {
-            logger.warn(`Unhandled item on world item case (B) for ${usedItem.itemId}:${usedItemId} on ${usedWithItem.itemId}:${usedWithItemId} by ${player.username}`);
+        if (usedItem.itemId !== usedItemId || usedWithItem.itemId !== usedWithItemId) {
+            logger.warn(
+                `Unhandled item on world item case (B) for ${usedItem.itemId}:${usedItemId} on ${usedWithItem.itemId}:${usedWithItemId} by ${player.username}`,
+            );
             return;
         }
 
@@ -50,11 +54,10 @@ const itemOnWorldItemPacket = (player: Player, packet: PacketData) => {
     } else {
         logger.warn(`Unhandled item on world item case (C) using widgets ${usedWidgetId}:${usedContainerId} by ${player.username}`);
     }
-
 };
 
 export default {
     opcode: 172,
     size: 14,
-    handler: itemOnWorldItemPacket
+    handler: itemOnWorldItemPacket,
 };

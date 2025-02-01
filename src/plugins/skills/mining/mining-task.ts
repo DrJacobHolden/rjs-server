@@ -1,7 +1,3 @@
-import type { LandscapeObject } from '@runejs/filestore';
-import { checkForGemBoost } from '@engine/world/skill-util/glory-boost';
-import { rollGemType } from '@engine/world/skill-util/harvest-roll';
-import { canMine } from './chance';
 import { findItem } from '@engine/config/config-handler';
 import { equipmentIndices } from '@engine/config/item-config';
 import { ActorLandscapeObjectInteractionTask } from '@engine/task/impl/actor-landscape-object-interaction-task';
@@ -14,6 +10,10 @@ import type { HarvestTool } from '@engine/world/config/harvest-tool';
 import type { IHarvestable } from '@engine/world/config/harvestable-object';
 import { selectWeightedItem } from '@engine/world/config/harvestable-object';
 import { soundIds } from '@engine/world/config/sound-ids';
+import { checkForGemBoost } from '@engine/world/skill-util/glory-boost';
+import { rollGemType } from '@engine/world/skill-util/harvest-roll';
+import type { LandscapeObject } from '@runejs/filestore';
+import { canMine } from './chance';
 
 /**
  * A task that handles mining. It is a subclass of ActorLandscapeObjectInteractionTask, which means that it will
@@ -37,8 +37,12 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
      */
     private targetItemName: string;
 
-
-    constructor(player: Player, landscapeObject: LandscapeObject, private readonly ore: IHarvestable, private readonly tool: HarvestTool) {
+    constructor(
+        player: Player,
+        landscapeObject: LandscapeObject,
+        private readonly ore: IHarvestable,
+        private readonly tool: HarvestTool,
+    ) {
         super(player, landscapeObject);
 
         const itemConfigId = typeof ore.items === 'string' ? ore.items : selectWeightedItem(ore.items);
@@ -48,7 +52,7 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
             throw new Error(`Could not find item with ID ${itemConfigId}`);
         }
 
-        this.targetItemName = item.name.toLowerCase().replace(' ore', '')
+        this.targetItemName = item.name.toLowerCase().replace(' ore', '');
     }
 
     private isGemRock(): boolean {
@@ -104,17 +108,13 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         // Get tool level, and set it to 2 if the tool is an iron hatchet or iron pickaxe
         // TODO why is this set to 2? Was ported from the old code
         let toolLevel = this.tool.level - 1;
-        if(this.tool.itemId === 1349 || this.tool.itemId === 1267) {
+        if (this.tool.itemId === 1349 || this.tool.itemId === 1267) {
             toolLevel = 2;
         }
 
         // roll for success
-        const succeeds = canMine(
-            { ...this.ore, baseChance: this.getGemMiningChance() },
-            toolLevel,
-            this.actor.skills.mining.level
-        );
-        if(!succeeds) {
+        const succeeds = canMine({ ...this.ore, baseChance: this.getGemMiningChance() }, toolLevel, this.actor.skills.mining.level);
+        if (!succeeds) {
             return;
         }
 
@@ -124,9 +124,7 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
             this.actor.giveItem(rollGemType());
         } else {
             this.actor.sendMessage(`You manage to mine some ${this.targetItemName}.`);
-            const itemToGive = typeof this.ore.items === 'string' ?
-                this.ore.items :
-                selectWeightedItem(this.ore.items);
+            const itemToGive = typeof this.ore.items === 'string' ? this.ore.items : selectWeightedItem(this.ore.items);
             this.actor.giveItem(itemToGive);
             // TODO (Jameskmonger) handle Gem rocks and Pure essence rocks
             // if (itemToAdd === 1436 && details.player.skills.hasLevel(Skill.MINING, 30)) {
@@ -171,8 +169,7 @@ export class MiningTask extends ActorLandscapeObjectInteractionTask<Player> {
         }
 
         // Base chance scaling from 28 to 70 based on level
-        let chance = this.ore.baseChance +
-            (this.actor.skills.mining.level - this.ore.level) * (70 - 28) / (99 - 40);
+        let chance = this.ore.baseChance + ((this.actor.skills.mining.level - this.ore.level) * (70 - 28)) / (99 - 40);
 
         // Glory multiplies chance by 3 (from 28-70 to 84-210)
         if (this.hasChargedGlory()) {

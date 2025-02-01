@@ -1,7 +1,7 @@
+import type { buttonActionHandler } from '@engine/action/pipe/button.action';
+import { widgets } from '@engine/config/config-handler';
 import type { Player } from '@engine/world/actor/player/player';
 import { itemIds } from '@engine/world/config/item-ids';
-import { widgets } from '@engine/config/config-handler';
-import type { buttonActionHandler } from '@engine/action/pipe/button.action';
 
 interface Emote {
     animationId: number;
@@ -16,22 +16,37 @@ interface SkillcapeEmote extends Emote {
 
 const { skillCapes } = itemIds;
 
-export const skillCapeEmotes: SkillcapeEmote[]  = [
+export const skillCapeEmotes: SkillcapeEmote[] = [
     { animationId: 4959, name: 'Attack', itemIds: [skillCapes.attack.untrimmed, skillCapes.attack.trimmed], graphicId: 823 },
     { animationId: 4981, name: 'Strength', itemIds: [skillCapes.strength.untrimmed, skillCapes.strength.trimmed], graphicId: 828 },
     { animationId: 4961, name: 'Defence', itemIds: [skillCapes.defence.untrimmed, skillCapes.defence.trimmed], graphicId: 824 },
     { animationId: 4973, name: 'Ranged', itemIds: [skillCapes.ranged.untrimmed, skillCapes.ranged.trimmed], graphicId: 832 },
     { animationId: 4979, name: 'Prayer', itemIds: [skillCapes.prayer.untrimmed, skillCapes.prayer.trimmed], graphicId: 829 },
     { animationId: 4939, name: 'Magic', itemIds: [skillCapes.magic.untrimmed, skillCapes.magic.trimmed], graphicId: 813 },
-    { animationId: 4947, name: 'Runecrafting', itemIds: [skillCapes.runecrafting.untrimmed, skillCapes.runecrafting.trimmed], graphicId: 817 },
-    { animationId: 4971, name: 'Constitution', itemIds: [skillCapes.constitution.untrimmed, skillCapes.constitution.trimmed], graphicId: 833 },
+    {
+        animationId: 4947,
+        name: 'Runecrafting',
+        itemIds: [skillCapes.runecrafting.untrimmed, skillCapes.runecrafting.trimmed],
+        graphicId: 817,
+    },
+    {
+        animationId: 4971,
+        name: 'Constitution',
+        itemIds: [skillCapes.constitution.untrimmed, skillCapes.constitution.trimmed],
+        graphicId: 833,
+    },
     { animationId: 4977, name: 'Agility', itemIds: [skillCapes.agility.untrimmed, skillCapes.agility.trimmed], graphicId: 830 },
     { animationId: 4969, name: 'Herblore', itemIds: [skillCapes.herblore.untrimmed, skillCapes.herblore.trimmed], graphicId: 835 },
     { animationId: 4965, name: 'Thieving', itemIds: [skillCapes.thieving.untrimmed, skillCapes.thieving.trimmed], graphicId: 826 },
     { animationId: 4949, name: 'Crafting', itemIds: [skillCapes.crafting.untrimmed, skillCapes.crafting.trimmed], graphicId: 818 },
     { animationId: 4937, name: 'Fletching', itemIds: [skillCapes.fletching.untrimmed, skillCapes.fletching.trimmed], graphicId: 812 },
     { animationId: 4967, name: 'Slayer', itemIds: [skillCapes.slayer.untrimmed, skillCapes.slayer.trimmed], graphicId: 827 },
-    { animationId: 4953, name: 'Construction', itemIds: [skillCapes.construction.untrimmed, skillCapes.construction.trimmed], graphicId: 820 },
+    {
+        animationId: 4953,
+        name: 'Construction',
+        itemIds: [skillCapes.construction.untrimmed, skillCapes.construction.trimmed],
+        graphicId: 820,
+    },
     { animationId: 4941, name: 'Mining', itemIds: [skillCapes.mining.untrimmed, skillCapes.mining.trimmed], graphicId: 814 },
     { animationId: 4943, name: 'Smithing', itemIds: [skillCapes.smithing.untrimmed, skillCapes.smithing.trimmed], graphicId: 815 },
     { animationId: 4951, name: 'Fishing', itemIds: [skillCapes.fishing.untrimmed, skillCapes.fishing.trimmed], graphicId: 819 },
@@ -43,27 +58,27 @@ export const skillCapeEmotes: SkillcapeEmote[]  = [
 ];
 
 export const emotes: { [key: number]: Emote } = {
-    1:  { animationId: 855,  name: 'YES' },
-    2:  { animationId: 856,  name: 'NO' },
-    3:  { animationId: 858,  name: 'BOW' },
-    4:  { animationId: 859,  name: 'ANGRY' },
-    5:  { animationId: 857,  name: 'THINKING' },
-    6:  { animationId: 863,  name: 'WAVE' },
-    7:  { animationId: 2113, name: 'SHRUG' },
-    8:  { animationId: 862,  name: 'CHEER' },
-    9:  { animationId: 864,  name: 'BECKON' },
-    10: { animationId: 861,  name: 'LAUGH' },
+    1: { animationId: 855, name: 'YES' },
+    2: { animationId: 856, name: 'NO' },
+    3: { animationId: 858, name: 'BOW' },
+    4: { animationId: 859, name: 'ANGRY' },
+    5: { animationId: 857, name: 'THINKING' },
+    6: { animationId: 863, name: 'WAVE' },
+    7: { animationId: 2113, name: 'SHRUG' },
+    8: { animationId: 862, name: 'CHEER' },
+    9: { animationId: 864, name: 'BECKON' },
+    10: { animationId: 861, name: 'LAUGH' },
     11: { animationId: 2109, name: 'JUMP FOR JOY' },
     12: { animationId: 2111, name: 'YAWN' },
-    13: { animationId: 866,  name: 'DANCE' },
+    13: { animationId: 866, name: 'DANCE' },
     14: { animationId: 2106, name: 'JIG' },
     15: { animationId: 2107, name: 'SPIN' },
     16: { animationId: 2108, name: 'HEADBANG' },
-    17: { animationId: 860,  name: 'CRY' },
+    17: { animationId: 860, name: 'CRY' },
     18: { animationId: 1368, name: 'BLOW KISS' },
     19: { animationId: 2105, name: 'PANIC' },
     20: { animationId: 2110, name: 'RASPBERRY' },
-    21: { animationId: 865,  name: 'CLAP' },
+    21: { animationId: 865, name: 'CLAP' },
     22: { animationId: 2112, name: 'SALUTE' },
     23: { animationId: 2127, name: 'GOBLIN BOW', unlockable: true },
     24: { animationId: 2128, name: 'GOBLIN SALUTE', unlockable: true },
@@ -84,7 +99,7 @@ export const emotes: { [key: number]: Emote } = {
 
 export function unlockEmote(player: Player, emoteName: string): void {
     const unlockedEmotes: string[] = player.savedMetadata.unlockedEmotes || [];
-    if(unlockedEmotes.indexOf(emoteName) === -1) {
+    if (unlockedEmotes.indexOf(emoteName) === -1) {
         unlockedEmotes.push(emoteName);
         player.savedMetadata.unlockedEmotes = unlockedEmotes;
     }
@@ -95,7 +110,7 @@ export function lockEmote(player: Player, emoteName: string): void {
     const unlockedEmotes: string[] = player.savedMetadata.unlockedEmotes || [];
     const index = unlockedEmotes.indexOf(emoteName);
 
-    if(index !== -1) {
+    if (index !== -1) {
         unlockedEmotes.splice(index, 1);
         player.savedMetadata.unlockedEmotes = unlockedEmotes;
     }
@@ -110,35 +125,21 @@ export function unlockEmotes(player: Player): void {
 
     const unlockedEmotes: string[] = player.savedMetadata.unlockedEmotes || [];
 
-    for(const name of unlockedEmotes) {
-        if((name === 'GOBLIN BOW' || name === 'GOBLIN SALUTE') && goblinConfig === 0)
-            goblinConfig += 7;
-        if(name === 'FLAP')
-            sosConfig += 1;
-        if(name === 'FACEPALM')
-            sosConfig += 2;
-        if(name === 'IDEA')
-            sosConfig += 4;
-        if(name === 'STAMP')
-            sosConfig += 8;
-        if(name === 'GLASS WALL')
-            eventConfig += 1;
-        if(name === 'GLASS BOX')
-            eventConfig += 2;
-        if(name === 'CLIMB ROPE')
-            eventConfig += 4;
-        if(name === 'LEAN')
-            eventConfig += 8;
-        if(name === 'SCARED')
-            eventConfig += 16;
-        if(name === 'ZOMBIE DANCE')
-            eventConfig += 32;
-        if(name === 'ZOMBIE WALK')
-            eventConfig += 64;
-        if(name === 'RABBIT HOP')
-            eventConfig += 128;
-        if(name === 'SKILLCAPE')
-            eventConfig += 256;
+    for (const name of unlockedEmotes) {
+        if ((name === 'GOBLIN BOW' || name === 'GOBLIN SALUTE') && goblinConfig === 0) goblinConfig += 7;
+        if (name === 'FLAP') sosConfig += 1;
+        if (name === 'FACEPALM') sosConfig += 2;
+        if (name === 'IDEA') sosConfig += 4;
+        if (name === 'STAMP') sosConfig += 8;
+        if (name === 'GLASS WALL') eventConfig += 1;
+        if (name === 'GLASS BOX') eventConfig += 2;
+        if (name === 'CLIMB ROPE') eventConfig += 4;
+        if (name === 'LEAN') eventConfig += 8;
+        if (name === 'SCARED') eventConfig += 16;
+        if (name === 'ZOMBIE DANCE') eventConfig += 32;
+        if (name === 'ZOMBIE WALK') eventConfig += 64;
+        if (name === 'RABBIT HOP') eventConfig += 128;
+        if (name === 'SKILLCAPE') eventConfig += 256;
     }
 
     player.outgoingPackets.updateClientConfig(465, goblinConfig);
@@ -148,13 +149,12 @@ export function unlockEmotes(player: Player): void {
 
 const buttonIds = Object.keys(emotes).map(v => parseInt(v));
 
-
-export const handler: buttonActionHandler = (details) => {
+export const handler: buttonActionHandler = details => {
     const { player, buttonId } = details;
 
     const emote = emotes[buttonId];
 
-    if(emote.name === 'SKILLCAPE') {
+    if (emote.name === 'SKILLCAPE') {
         const equippedBackItem = player.getEquippedItem('back');
 
         if (equippedBackItem) {
@@ -166,14 +166,14 @@ export const handler: buttonActionHandler = (details) => {
                     player.playGraphics({ id: skillcapeEmote[0].graphicId, delay: 0, height: 0 });
                 }
             }
-        }  else {
+        } else {
             player.sendMessage(`You need to be wearing a skillcape in order to perform that emote.`, true);
         }
     } else {
-        if(emote.unlockable) {
+        if (emote.unlockable) {
             const unlockedEmotes: string[] = player.savedMetadata.unlockedEmotes || [];
 
-            if(unlockedEmotes.indexOf(emote.name) === -1) {
+            if (unlockedEmotes.indexOf(emote.name) === -1) {
                 player.sendMessage(`You have not unlocked this emote.`, true);
                 return;
             }
@@ -181,16 +181,13 @@ export const handler: buttonActionHandler = (details) => {
 
         player.playAnimation(emote.animationId);
 
-        if(emote.graphicId !== undefined) {
+        if (emote.graphicId !== undefined) {
             player.playGraphics({ id: emote.graphicId, height: 0 });
         }
     }
 };
 
-
 export default {
     pluginId: 'rs:player_emotes',
-    hooks: [
-        { type: 'button', widgetId: widgets.emotesTab, buttonIds, handler }
-    ]
+    hooks: [{ type: 'button', widgetId: widgets.emotesTab, buttonIds, handler }],
 };

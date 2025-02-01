@@ -10,11 +10,11 @@ const characterDesignPacket = (player: Player, packet: PacketData) => {
     const models = new Array(7);
     const colors = new Array(5);
 
-    for(let i = 0; i < models.length; i++) {
+    for (let i = 0; i < models.length; i++) {
         models[i] = buffer.get('byte');
     }
 
-    for(let i = 0; i < colors.length; i++) {
+    for (let i = 0; i < colors.length; i++) {
         colors[i] = buffer.get('byte');
     }
 
@@ -31,7 +31,7 @@ const characterDesignPacket = (player: Player, packet: PacketData) => {
         torsoColor: colors[1],
         legColor: colors[2],
         feetColor: colors[3],
-        skinColor: colors[4]
+        skinColor: colors[4],
     };
 
     player.updateFlags.appearanceUpdateRequired = true;
@@ -41,5 +41,5 @@ const characterDesignPacket = (player: Player, packet: PacketData) => {
 export default {
     opcode: 231,
     size: 13,
-    handler: characterDesignPacket
+    handler: characterDesignPacket,
 };

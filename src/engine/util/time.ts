@@ -4,7 +4,7 @@ export const rsTime = (date: Date): number => {
 };
 
 export const daysSinceLastLogin = (lastLogin: Date): number => {
-    if(!lastLogin) {
+    if (!lastLogin) {
         return -1;
     }
 

@@ -2,24 +2,24 @@
     "rs:ardougne_baker": {
         "variations": [
             {
-              "suffix": 0,
-              "game_id": 571
+                "suffix": 0,
+                "game_id": 571
             },
             {
-              "suffix": 1,
-              "game_id": 571
+                "suffix": 1,
+                "game_id": 571
             }
         ]
     },
     "rs:knight": {
         "variations": [
             {
-              "suffix": 0,
-              "game_id": 23
+                "suffix": 0,
+                "game_id": 23
             },
             {
-              "suffix": 1,
-              "game_id": 26
+                "suffix": 1,
+                "game_id": 26
             }
         ]
     },

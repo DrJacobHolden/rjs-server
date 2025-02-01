@@ -1,22 +1,26 @@
 import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
-import type { Player } from '@engine/world/actor/player/player';
-import { logger } from '@runejs/common';
-import { Position } from '@engine/world/position';
 import { activeWorld } from '@engine/world';
+import type { Player } from '@engine/world/actor/player/player';
+import { Position } from '@engine/world/position';
+import { logger } from '@runejs/common';
 
-
-
-const debugMapRegion = (player: Player, mapRegionX: number, mapRegionY: number,
-                        worldX: number, worldY: number, level: number = -1): void => {
+const debugMapRegion = (
+    player: Player,
+    mapRegionX: number,
+    mapRegionY: number,
+    worldX: number,
+    worldY: number,
+    level: number = -1,
+): void => {
     const key = `${mapRegionX},${mapRegionY}`;
     player.sendMessage(`Region ${key} - ${activeWorld.chunkManager.getRegionIdForWorldPosition(player.position)}`);
 
-    if(!activeWorld.chunkManager.regionMap.has(key)) {
+    if (!activeWorld.chunkManager.regionMap.has(key)) {
         player.sendMessage(`Map region not loaded.`);
         return;
     }
 
-    if(level === -1) {
+    if (level === -1) {
         level = player.position.level;
     }
 
@@ -24,25 +28,24 @@ const debugMapRegion = (player: Player, mapRegionX: number, mapRegionY: number,
 
     if (!region) {
         player.sendMessage(`Map region not loaded.`);
-        logger.error(`Map region not loaded. ${key}`)
+        logger.error(`Map region not loaded. ${key}`);
         return;
     }
 
     let debug: string = `\nRegion ${key},${level}\n\n`;
-    for(let y = 63; y >= 0; y--) {
+    for (let y = 63; y >= 0; y--) {
         const line = new Array(64).fill('?');
-        for(let x = 0; x < 64; x++) {
+        for (let x = 0; x < 64; x++) {
             const tileWorldX = worldX + x;
             const tileWorldY = worldY + y;
-            if(tileWorldX === player.position.x && tileWorldY === player.position.y) {
+            if (tileWorldX === player.position.x && tileWorldY === player.position.y) {
                 line[x] = '@';
-            } else if(region.mapFile?.tileSettings) {
-                const tileSettings = activeWorld.chunkManager
-                    .getTile(new Position(tileWorldX, tileWorldY, level)).settings;
+            } else if (region.mapFile?.tileSettings) {
+                const tileSettings = activeWorld.chunkManager.getTile(new Position(tileWorldX, tileWorldY, level)).settings;
 
-                if(!tileSettings) {
+                if (!tileSettings) {
                     line[x] = '.';
-                } else if(tileSettings > 9) {
+                } else if (tileSettings > 9) {
                     line[x] = 'x';
                 } else {
                     line[x] = tileSettings + '';
@@ -63,7 +66,7 @@ const regionDebugHandler: commandActionHandler = ({ player, args }) => {
     const worldX = (mapRegionX & 0xff) * 64;
     const worldY = mapRegionY * 64;
 
-    debugMapRegion(player, mapRegionX, mapRegionY, worldX, worldY, args?.level as number || -1);
+    debugMapRegion(player, mapRegionX, mapRegionY, worldX, worldY, (args?.level as number) || -1);
 };
 
 const tileDebugHandler: commandActionHandler = ({ player }) => {
@@ -81,11 +84,14 @@ const tileDebugHandler: commandActionHandler = ({ player }) => {
     const worldX = (mapRegionX & 0xff) * 64;
     const worldY = mapRegionY * 64;
 
-    player.sendMessage([
-        `Tile ${player.position.key} settings: ${tile.settings}`,
-        `Local Pos: ${player.position.x - worldX},${player.position.y - worldY}`,
-        `Tile@0=(${tile0.settings}), Tile@1=(${tile1.settings}), Tile@2=(${tile2.settings}), Tile@3=(${tile3.settings})`
-    ], { console: true });
+    player.sendMessage(
+        [
+            `Tile ${player.position.key} settings: ${tile.settings}`,
+            `Local Pos: ${player.position.x - worldX},${player.position.y - worldY}`,
+            `Tile@0=(${tile0.settings}), Tile@1=(${tile1.settings}), Tile@2=(${tile2.settings}), Tile@3=(${tile3.settings})`,
+        ],
+        { console: true },
+    );
 };
 
 export default {
@@ -93,24 +99,20 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [
-                'regioninfo', 'region', 'myregion', 'regiondebug', 'region_info', 'my_region', 'region_debug'
-            ],
+            commands: ['regioninfo', 'region', 'myregion', 'regiondebug', 'region_info', 'my_region', 'region_debug'],
             args: [
                 {
                     name: 'level',
                     type: 'number',
-                    defaultValue: -1
-                }
+                    defaultValue: -1,
+                },
             ],
-            handler: regionDebugHandler
+            handler: regionDebugHandler,
         },
         {
             type: 'player_command',
-            commands: [
-                'tileinfo', 'tile', 'mytile', 'tiledebug', 'tile_info', 'my_tile', 'tile_debug'
-            ],
-            handler: tileDebugHandler
-        }
-    ]
+            commands: ['tileinfo', 'tile', 'mytile', 'tiledebug', 'tile_info', 'my_tile', 'tile_debug'],
+            handler: tileDebugHandler,
+        },
+    ],
 };

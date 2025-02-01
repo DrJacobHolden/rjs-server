@@ -1,14 +1,14 @@
-import { itemIds } from '@engine/world/config/item-ids';
-import { animationIds } from '@engine/world/config/animation-ids';
-import { soundIds } from '@engine/world/config/sound-ids';
-import { findItem } from '@engine/config/config-handler';
-import { logger } from '@runejs/common';
 import type { itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
+import { findItem } from '@engine/config/config-handler';
+import { animationIds } from '@engine/world/config/animation-ids';
+import { itemIds } from '@engine/world/config/item-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
+import { logger } from '@runejs/common';
 
 const FountainIds: number[] = [879];
 const SinkIds: number[] = [14878, 873];
 const WellIds: number[] = [878];
-export const handler: itemOnObjectActionHandler = (details) => {
+export const handler: itemOnObjectActionHandler = details => {
     const { player, objectConfig, item } = details;
     const itemDef = findItem(item.itemId);
 
@@ -34,14 +34,12 @@ export const handler: itemOnObjectActionHandler = (details) => {
             break;
     }
 
-
     const objectName = details.objectConfig.name || '';
     if (!objectName) {
         logger.warn(`Fill container object ${details.object.objectId} has no name.`);
     }
 
     player.sendMessage(`You fill the ${itemDef.name.toLowerCase()} from the ${objectName.toLowerCase()}.`);
-
 };
 
 export default {
@@ -49,10 +47,10 @@ export default {
     hooks: [
         {
             type: 'item_on_object',
-            objectIds: [ ...FountainIds, ...WellIds, ...SinkIds ],
-            itemIds: [ itemIds.bucket, itemIds.jug ],
+            objectIds: [...FountainIds, ...WellIds, ...SinkIds],
+            itemIds: [itemIds.bucket, itemIds.jug],
             walkTo: true,
-            handler
-        }
-    ]
+            handler,
+        },
+    ],
 };

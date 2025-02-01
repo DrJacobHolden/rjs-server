@@ -19,7 +19,6 @@ import { loadXteaRegionFiles } from '@runejs/filestore';
 import { filestore } from '@server/game/game-server';
 import _ from 'lodash';
 
-
 export let itemMap: { [key: string]: ItemDetails };
 export let itemGroupMap: Record<string, Record<string, boolean>>;
 export let itemIdMap: { [key: number]: string };
@@ -64,10 +63,11 @@ export async function loadGameConfigurations(): Promise<void> {
 
     objectMap = {};
 
-    logger.info(`Loaded ${musicRegions.length} music regions, ${Object.keys(itemMap).length} items, ${itemSpawns.length} item spawns, ` +
-        `${Object.keys(npcMap).length} npcs, ${npcSpawns.length} npc spawns, and ${Object.keys(shopMap).length} shops.`);
+    logger.info(
+        `Loaded ${musicRegions.length} music regions, ${Object.keys(itemMap).length} items, ${itemSpawns.length} item spawns, ` +
+            `${Object.keys(npcMap).length} npcs, ${npcSpawns.length} npc spawns, and ${Object.keys(shopMap).length} shops.`,
+    );
 }
-
 
 /**
  * find all items in all select groups
@@ -75,12 +75,13 @@ export async function loadGameConfigurations(): Promise<void> {
  * @return itemsKeys array of itemkeys in all select groups
  */
 export const findItemTagsInGroups = (groupKeys: string[]): string[] => {
-    return Object.keys(groupKeys.reduce<Record<string, boolean>>((all, groupKey)=> {
-        const items = itemGroupMap[groupKey] || {};
-        return { ...all, ...items };
-    }, {}));
-}
-
+    return Object.keys(
+        groupKeys.reduce<Record<string, boolean>>((all, groupKey) => {
+            const items = itemGroupMap[groupKey] || {};
+            return { ...all, ...items };
+        }, {}),
+    );
+};
 
 /**
  * find all items which are shared by all the groups, and discard items not in all groups
@@ -88,57 +89,56 @@ export const findItemTagsInGroups = (groupKeys: string[]): string[] => {
  * @return itemKeys of items shared by all groups
  */
 export const findItemTagsInGroupFilter = (groupKeys: string[]): string[] => {
-    if(!groupKeys || groupKeys.length === 0) {
+    if (!groupKeys || groupKeys.length === 0) {
         return [];
     }
     let collection: Record<string, boolean> | undefined = undefined;
-    groupKeys.forEach((groupKey) => {
-        if(!collection) {
+    groupKeys.forEach(groupKey => {
+        if (!collection) {
             collection = { ...(itemGroupMap[groupKey] || {}) };
             return;
         }
         const current = itemGroupMap[groupKey] || {};
 
-        Object.keys(collection).forEach((existingItemKey) => {
-            if(!(existingItemKey in current) && collection) {
+        Object.keys(collection).forEach(existingItemKey => {
+            if (!(existingItemKey in current) && collection) {
                 delete collection[existingItemKey];
             }
         });
     });
 
     return Object.keys(collection || {});
-}
-
+};
 
 export const findItem = (itemKey: number | string): ItemDetails | null => {
-    if(!itemKey) {
+    if (!itemKey) {
         return null;
     }
 
     let gameId: number | null = null;
-    if(typeof itemKey === 'number') {
+    if (typeof itemKey === 'number') {
         gameId = itemKey;
         itemKey = itemIdMap[gameId];
 
-        if(!itemKey) {
+        if (!itemKey) {
             logger.warn(`Item ${gameId} is not yet registered on the server.`);
         }
     }
 
     let item;
 
-    if(itemKey) {
+    if (itemKey) {
         item = itemMap[itemKey];
-        if(!item) {
+        if (!item) {
             // Try fetching variation with suffix 0
-            item = itemMap[`${itemKey}:0`]
+            item = itemMap[`${itemKey}:0`];
         }
-        if(item?.gameId) {
+        if (item?.gameId) {
             gameId = item.gameId;
         }
     }
 
-    if(gameId) {
+    if (gameId) {
         const cacheItem = filestore.configStore.itemStore.getItem(gameId);
         item = _.merge(item, cacheItem);
     }
@@ -146,22 +146,21 @@ export const findItem = (itemKey: number | string): ItemDetails | null => {
     return item ? new ItemDetails(item) : null;
 };
 
-
 export const findNpc = (inputKey: number | string): NpcDetails => {
-    if(!inputKey) {
+    if (!inputKey) {
         throw new Error('No NPC was provided to findNpc.');
     }
 
     // Pathway for finding an NPC by its game id
-    if(typeof inputKey === 'number') {
+    if (typeof inputKey === 'number') {
         const gameId = inputKey;
         const npcKey = npcIdMap[gameId];
 
         // If we can't find a config in the project for this NPC - we fallback
         // to the cache which is the basic info loaded by `fileserver`.
-        if(!npcKey) {
+        if (!npcKey) {
             const cacheNpc = filestore.configStore.npcStore.getNpc(gameId);
-            if(cacheNpc) {
+            if (cacheNpc) {
                 return cacheNpc;
             } else {
                 logger.warn(`NPC ${gameId} is not yet configured on the server and a matching cache NPC was not found.`);
@@ -172,25 +171,25 @@ export const findNpc = (inputKey: number | string): NpcDetails => {
 
     // Otherwise we got a string identifier for the npcs
     let npc = npcMap[inputKey];
-    if(!npc) {
+    if (!npc) {
         // Try fetching variation with suffix 0
-        npc = npcMap[`${npc}:0`]
+        npc = npcMap[`${npc}:0`];
     }
 
-    if(!npc) {
+    if (!npc) {
         logger.warn(`NPC ${inputKey} is not yet configured on the server and a matching cache NPC was not provided.`);
         throw new Error(`NPC ${inputKey} is not yet configured on the server and a matching cache NPC was not provided.`);
     }
 
-    if(npc.extends) {
+    if (npc.extends) {
         let extensions = npc.extends;
-        if(typeof extensions === 'string') {
-            extensions = [ extensions ];
+        if (typeof extensions === 'string') {
+            extensions = [extensions];
         }
 
         extensions.forEach(extKey => {
             const extensionNpc = npcPresetMap[extKey];
-            if(extensionNpc) {
+            if (extensionNpc) {
                 npc = _.merge(npc, translateNpcServerConfig(undefined, extensionNpc));
             }
         });
@@ -199,11 +198,10 @@ export const findNpc = (inputKey: number | string): NpcDetails => {
     return npc;
 };
 
-
 export const findObject = (objectId: number): ObjectConfig | null => {
-    if(!objectMap[objectId]) {
+    if (!objectMap[objectId]) {
         const object = filestore.objectStore.getObject(objectId);
-        if(!object) {
+        if (!object) {
             return null;
         }
 
@@ -214,15 +212,13 @@ export const findObject = (objectId: number): ObjectConfig | null => {
     }
 };
 
-
 export const findShop = (shopKey: string): Shop | null => {
-    if(!shopKey) {
+    if (!shopKey) {
         return null;
     }
 
     return shopMap[shopKey] || null;
 };
-
 
 export const findQuest = (questId: string): Quest | null => {
     const questKey = Object.keys(questMap).find(quest => quest.toLocaleLowerCase() === questId.toLocaleLowerCase());

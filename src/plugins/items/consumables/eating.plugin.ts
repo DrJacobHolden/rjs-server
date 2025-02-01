@@ -1,38 +1,37 @@
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 import { findItem, widgets } from '@engine/config/config-handler';
+import { randomBetween } from '@engine/util/num';
 import type { SkillName } from '@engine/world/actor/skills';
 import { animationIds } from '@engine/world/config/animation-ids';
 import { soundIds } from '@engine/world/config/sound-ids';
-import { randomBetween } from '@engine/util/num';
-import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 
-
-export const action: itemInteractionActionHandler = (details) => {
+export const action: itemInteractionActionHandler = details => {
     const { player, itemId, itemSlot, itemDetails } = details;
-    if(!itemDetails.consumable) {
+    if (!itemDetails.consumable) {
         player.sendMessage('Item is not registered as consumable!');
         return;
     }
-    if(!itemDetails.metadata.consume_effects) {
+    if (!itemDetails.metadata.consume_effects) {
         player.sendMessage('Item is missing consume effects!');
         return;
     }
-    if(!itemDetails.metadata.consume_effects.clock) {
+    if (!itemDetails.metadata.consume_effects.clock) {
         player.sendMessage('Item is missing clock!');
         return;
     }
-    if(itemDetails.metadata.consume_effects.special){
+    if (itemDetails.metadata.consume_effects.special) {
         player.sendMessage('Cannot handle special foods yet!');
         return;
     }
-    const clock = 'clock_'+itemDetails.metadata.consume_effects.clock;
+    const clock = 'clock_' + itemDetails.metadata.consume_effects.clock;
     // Check if player recently ate
-    if(player.metadata[clock]){
+    if (player.metadata[clock]) {
         return;
     }
 
     const inventoryItem = player.inventory.items[itemSlot];
 
-    if(!inventoryItem || inventoryItem.itemId !== itemId){
+    if (!inventoryItem || inventoryItem.itemId !== itemId) {
         return;
     }
 
@@ -40,14 +39,13 @@ export const action: itemInteractionActionHandler = (details) => {
         ? findItem(itemDetails.metadata.consume_effects.replaced_by)
         : null;
 
-    if(replacementItemDetails) {
+    if (replacementItemDetails) {
         player.inventory.items[itemSlot] = { itemId: replacementItemDetails.gameId, amount: 1 };
     } else {
         player.inventory.items[itemSlot] = null;
     }
     player.playSound(soundIds.eat);
-    player.playAnimation(animationIds.eat)
-
+    player.playAnimation(animationIds.eat);
 
     details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, details.player.inventory);
 
@@ -60,44 +58,40 @@ export const action: itemInteractionActionHandler = (details) => {
     //     player.metadata[clock] = false;
     // }, World.TICK_LENGTH * 3);
 
-    if(itemDetails.metadata.consume_effects.energy) {
+    if (itemDetails.metadata.consume_effects.energy) {
         // TODO: Give player run energy
     }
-    if(itemDetails.metadata.consume_effects.skills) {
+    if (itemDetails.metadata.consume_effects.skills) {
         const skillModifiers = itemDetails.metadata.consume_effects.skills;
         for (const sk in skillModifiers) {
             const skill: SkillName = sk as SkillName;
             let value;
-            if (Array.isArray(skillModifiers[skill])){
+            if (Array.isArray(skillModifiers[skill])) {
                 value = randomBetween(skillModifiers[skill][0], skillModifiers[skill][1]);
             } else {
                 value = skillModifiers[skill];
             }
-            const playerSkill  = player.skills[skill];
+            const playerSkill = player.skills[skill];
             const maxLevel = playerSkill.levelForExp;
             const currentLevel = playerSkill.level || playerSkill.levelForExp;
 
-            if(skill === 'hitpoints') {
+            if (skill === 'hitpoints') {
                 let newHealth: number = currentLevel + value;
-                if(newHealth > maxLevel) {
+                if (newHealth > maxLevel) {
                     newHealth = maxLevel;
                 }
                 playerSkill.level = newHealth;
-                player.sendMessage(`You eat the ${itemDetails.name}, and it restores ${newHealth - currentLevel} health.`)
+                player.sendMessage(`You eat the ${itemDetails.name}, and it restores ${newHealth - currentLevel} health.`);
             } else {
-                let newLevel: number =  currentLevel + value;
-                if(newLevel > maxLevel + value) {
+                let newLevel: number = currentLevel + value;
+                if (newLevel > maxLevel + value) {
                     newLevel = maxLevel + value;
                 }
                 playerSkill.level = newLevel;
             }
             player.outgoingPackets.updateSkill(player.skills.getSkillId(skill), playerSkill.level, playerSkill.exp);
-
         }
     }
-
-
-
 };
 
 export default {
@@ -108,7 +102,7 @@ export default {
             widgets: widgets.inventory,
             options: 'eat',
             handler: action,
-            cancelOtherActions: true
-        }
-    ]
+            cancelOtherActions: true,
+        },
+    ],
 };

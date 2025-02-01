@@ -3,23 +3,20 @@ import { createConnection } from 'net';
 
 import { logger } from '@runejs/common';
 import { ByteBuffer } from '@runejs/common';
-import { parseServerConfig, SocketServer } from '@runejs/common/net';
+import { SocketServer, parseServerConfig } from '@runejs/common/net';
 import { LoginResponseCode } from '@runejs/login-server';
 
-import { activeWorld } from '@engine/world';
-import { GameServerConnection } from '@server/game/game-server-connection';
-import type { GameServerConfig } from '@server/game/game-server-config';
 import { Isaac } from '@engine/net/isaac';
+import { activeWorld } from '@engine/world';
 import { Player } from '@engine/world/actor/player/player';
-
+import type { GameServerConfig } from '@server/game/game-server-config';
+import { GameServerConnection } from '@server/game/game-server-connection';
 
 const serverConfig = parseServerConfig<GameServerConfig>();
 
 export type ServerType = 'game_server' | 'login_server' | 'update_server';
 
-
 export class GatewayServer extends SocketServer {
-
     private serverType: ServerType;
     private gameServerConnection: GameServerConnection;
     private loginServerSocket: Socket;
@@ -31,7 +28,7 @@ export class GatewayServer extends SocketServer {
     }
 
     public initialHandshake(buffer: ByteBuffer): boolean {
-        if(this.serverType) {
+        if (this.serverType) {
             this.decodeMessage(buffer);
             return true;
         }
@@ -42,11 +39,11 @@ export class GatewayServer extends SocketServer {
 
         const packetId = buffer.get('byte', 'u');
 
-        if(packetId === 15) {
+        if (packetId === 15) {
             this.serverType = 'update_server';
             this.updateServerSocket = createConnection({
                 host: serverConfig.updateServerHost,
-                port: serverConfig.updateServerPort
+                port: serverConfig.updateServerPort,
             });
             this.updateServerSocket.on('data', data => this.clientSocket.write(data));
             this.updateServerSocket.on('end', () => {
@@ -54,15 +51,15 @@ export class GatewayServer extends SocketServer {
             });
             this.updateServerSocket.on('error', () => {
                 logger.error(`Update server error.`);
-            })
+            });
             this.updateServerSocket.setNoDelay(true);
             this.updateServerSocket.setKeepAlive(true);
             this.updateServerSocket.setTimeout(30000);
-        } else if(packetId === 14) {
+        } else if (packetId === 14) {
             this.serverType = 'login_server';
             this.loginServerSocket = createConnection({
                 host: serverConfig.loginServerHost,
-                port: serverConfig.loginServerPort
+                port: serverConfig.loginServerPort,
             });
             this.loginServerSocket.on('data', data => {
                 this.parseLoginServerResponse(new ByteBuffer(data));
@@ -86,9 +83,9 @@ export class GatewayServer extends SocketServer {
     }
 
     public decodeMessage(buffer: ByteBuffer): void | Promise<void> {
-        if(this.serverType === 'login_server') {
+        if (this.serverType === 'login_server') {
             this.loginServerSocket.write(buffer);
-        } else if(this.serverType === 'update_server') {
+        } else if (this.serverType === 'update_server') {
             this.updateServerSocket.write(buffer);
         } else {
             this.gameServerConnection?.decodeMessage(buffer);
@@ -102,18 +99,18 @@ export class GatewayServer extends SocketServer {
     }
 
     private async parseLoginServerResponse(buffer: ByteBuffer): Promise<void> {
-        if(!this.serverKey) {
+        if (!this.serverKey) {
             // Login handshake response
             const handshakeResponseCode = buffer.get('byte');
 
-            if(handshakeResponseCode === 0) {
+            if (handshakeResponseCode === 0) {
                 this.serverKey = BigInt(buffer.get('long'));
             }
         } else {
             // Login response
             const loginResponseCode = buffer.get('byte');
 
-            if(loginResponseCode === LoginResponseCode.SUCCESS) {
+            if (loginResponseCode === LoginResponseCode.SUCCESS) {
                 try {
                     const clientKey1 = buffer.get('int');
                     const clientKey2 = buffer.get('int');
@@ -122,18 +119,17 @@ export class GatewayServer extends SocketServer {
                     const passwordHash = buffer.getString();
                     const lowDetail = buffer.get('byte') === 1;
 
-                    if(activeWorld.playerOnline(username)) {
+                    if (activeWorld.playerOnline(username)) {
                         // Player is already logged in!
                         // @TODO move to login server
                         buffer = new ByteBuffer(1);
                         buffer.put(LoginResponseCode.ALREADY_LOGGED_IN);
                     } else {
                         this.serverType = 'game_server';
-                        await this.createPlayer([ clientKey1, clientKey2 ],
-                            gameClientId, username, passwordHash, lowDetail ? 'low' : 'high');
+                        await this.createPlayer([clientKey1, clientKey2], gameClientId, username, passwordHash, lowDetail ? 'low' : 'high');
                         return;
                     }
-                } catch(e) {
+                } catch (e) {
                     this.gameServerConnection?.closeSocket();
                     logger.error(e);
                 }
@@ -144,28 +140,29 @@ export class GatewayServer extends SocketServer {
         this.clientSocket.write(buffer);
     }
 
-    private async createPlayer(clientKeys: [ number, number ],
-                               gameClientId: number,
-                               username: string,
-                               passwordHash: string,
-                               detail: 'high' | 'low'): Promise<void> {
+    private async createPlayer(
+        clientKeys: [number, number],
+        gameClientId: number,
+        username: string,
+        passwordHash: string,
+        detail: 'high' | 'low',
+    ): Promise<void> {
         const sessionKey: number[] = [
             Number(clientKeys[0]),
             Number(clientKeys[1]),
             Number(this.serverKey >> BigInt(32)),
-            Number(this.serverKey)
+            Number(this.serverKey),
         ];
 
         const inCipher = new Isaac(sessionKey);
 
-        for(let i = 0; i < 4; i++) {
+        for (let i = 0; i < 4; i++) {
             sessionKey[i] += 50;
         }
 
         const outCipher = new Isaac(sessionKey);
 
-        const player = new Player(this.clientSocket, inCipher, outCipher, gameClientId,
-            username, passwordHash, detail === 'low');
+        const player = new Player(this.clientSocket, inCipher, outCipher, gameClientId, username, passwordHash, detail === 'low');
 
         this.gameServerConnection = new GameServerConnection(this.clientSocket, player);
 
@@ -182,5 +179,4 @@ export class GatewayServer extends SocketServer {
 
         await player.init();
     }
-
 }

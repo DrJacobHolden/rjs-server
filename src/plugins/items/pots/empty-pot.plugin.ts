@@ -1,10 +1,10 @@
-import { soundIds } from '@engine/world/config/sound-ids';
-import { itemIds } from '@engine/world/config/item-ids';
-import { getItemFromContainer } from '@engine/world/items/item-container';
-import { widgets } from '@engine/config/config-handler';
 import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
+import { widgets } from '@engine/config/config-handler';
+import { itemIds } from '@engine/world/config/item-ids';
+import { soundIds } from '@engine/world/config/sound-ids';
+import { getItemFromContainer } from '@engine/world/items/item-container';
 
-export const action: itemInteractionActionHandler = (details) => {
+export const action: itemInteractionActionHandler = details => {
     const { player, itemId, itemSlot } = details;
 
     const inventory = player.inventory;
@@ -27,9 +27,9 @@ export default {
             type: 'item_interaction',
             widgets: widgets.inventory,
             options: 'empty',
-            itemIds: [ itemIds.potOfFlour ],
+            itemIds: [itemIds.potOfFlour],
             handler: action,
-            cancelOtherActions: false
-        }
-    ]
+            cancelOtherActions: false,
+        },
+    ],
 };

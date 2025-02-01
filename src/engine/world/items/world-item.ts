@@ -1,7 +1,6 @@
-import type { Position } from '@engine/world/position';
 import type { Player } from '@engine/world/actor/player/player';
 import type { WorldInstance } from '@engine/world/instances';
-
+import type { Position } from '@engine/world/position';
 
 export type WorldItem = {
     itemId: number;
@@ -12,4 +11,4 @@ export type WorldItem = {
     respawns?: number;
     removed?: boolean;
     instance: WorldInstance;
-}
+};

@@ -1,11 +1,11 @@
-import { Position } from '@engine/world/position';
-import { directionData, WNES } from '@engine/world/direction';
-import { logger } from '@runejs/common';
-import type { ModifiedLandscapeObject } from '@engine/world/map/landscape-object';
 import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
-import { soundIds } from '@engine/world/config/sound-ids';
-import type { Chunk } from '@engine/world/map/chunk';
 import { activeWorld } from '@engine/world';
+import { soundIds } from '@engine/world/config/sound-ids';
+import { WNES, directionData } from '@engine/world/direction';
+import type { Chunk } from '@engine/world/map/chunk';
+import type { ModifiedLandscapeObject } from '@engine/world/map/landscape-object';
+import { Position } from '@engine/world/position';
+import { logger } from '@runejs/common';
 
 const gates = [
     {
@@ -13,23 +13,23 @@ const gates = [
         mainOpen: 1552,
         hinge: 'LEFT',
         secondary: 1553,
-        secondaryOpen: 1556
+        secondaryOpen: 1556,
     },
     {
         main: 12986,
         mainOpen: 12988,
         hinge: 'LEFT',
         secondary: 12987,
-        secondaryOpen: 12989
-    }
+        secondaryOpen: 12989,
+    },
 ];
 
 // @TODO clean up this disgusting code
-const action: objectInteractionActionHandler = (details) => {
+const action: objectInteractionActionHandler = details => {
     const { player, cacheOriginal } = details;
     let { object: gate, position } = details;
 
-    if((gate as ModifiedLandscapeObject).metadata) {
+    if ((gate as ModifiedLandscapeObject).metadata) {
         const metadata = (gate as ModifiedLandscapeObject).metadata;
 
         if (!metadata) {
@@ -50,15 +50,14 @@ const action: objectInteractionActionHandler = (details) => {
         let hingeChunk: Chunk;
         let gateSecondPosition: Position | null = null;
 
-        if(!details) {
+        if (!details) {
             details = gates.find(g => g.secondary === gate.objectId);
 
-            if(!details) {
+            if (!details) {
                 logger.error(`Could not find gate details for gate with id ${gate.objectId} on second pass.`);
                 player.sendMessage('Oops, something went wrong. Please report this to a developer.');
                 return;
             }
-
 
             secondGate = gate;
             gateSecondPosition = position;
@@ -68,8 +67,8 @@ const action: objectInteractionActionHandler = (details) => {
             let deltaX = 0;
             let deltaY = 0;
 
-            if(hinge === 'LEFT') {
-                switch(direction) {
+            if (hinge === 'LEFT') {
+                switch (direction) {
                     case 'WEST':
                         deltaY--;
                         break;
@@ -83,8 +82,8 @@ const action: objectInteractionActionHandler = (details) => {
                         deltaX++;
                         break;
                 }
-            } else if(hinge === 'RIGHT') {
-                switch(direction) {
+            } else if (hinge === 'RIGHT') {
+                switch (direction) {
                     case 'WEST':
                         deltaY++;
                         break;
@@ -113,7 +112,6 @@ const action: objectInteractionActionHandler = (details) => {
                 logger.error('Could not find main gate for secondary gate at ' + gate.x + ',' + gate.y + ',' + gate.level);
                 player.sendMessage('Oops, something went wrong. Please report this to a developer.');
             }
-
         } else {
             hinge = details.hinge;
         }
@@ -123,8 +121,8 @@ const action: objectInteractionActionHandler = (details) => {
         let newX = 0;
         let newY = 0;
 
-        if(hinge === 'LEFT') {
-            switch(direction) {
+        if (hinge === 'LEFT') {
+            switch (direction) {
                 case 'WEST':
                     deltaY++;
                     newX--;
@@ -142,8 +140,8 @@ const action: objectInteractionActionHandler = (details) => {
                     newY--;
                     break;
             }
-        } else if(hinge === 'RIGHT') {
-            switch(direction) {
+        } else if (hinge === 'RIGHT') {
+            switch (direction) {
                 case 'WEST':
                     deltaY--;
                     newX++;
@@ -164,26 +162,26 @@ const action: objectInteractionActionHandler = (details) => {
         }
 
         const leftHingeDirections: { [key: string]: string } = {
-            'NORTH': 'WEST',
-            'SOUTH': 'EAST',
-            'WEST': 'SOUTH',
-            'EAST': 'NORTH'
+            NORTH: 'WEST',
+            SOUTH: 'EAST',
+            WEST: 'SOUTH',
+            EAST: 'NORTH',
         };
         const rightHingeDirections: { [key: string]: string } = {
-            'NORTH': 'EAST',
-            'SOUTH': 'WEST',
-            'WEST': 'NORTH',
-            'EAST': 'SOUTH'
+            NORTH: 'EAST',
+            SOUTH: 'WEST',
+            WEST: 'NORTH',
+            EAST: 'SOUTH',
         };
 
-        if(deltaX === 0 && deltaY === 0) {
+        if (deltaX === 0 && deltaY === 0) {
             logger.error('Improperly handled gate at ' + gate.x + ',' + gate.y + ',' + gate.level);
             return;
         }
 
         const newDirection = hinge === 'LEFT' ? leftHingeDirections[direction] : rightHingeDirections[direction];
 
-        if(!clickedSecondary) {
+        if (!clickedSecondary) {
             gateSecondPosition = new Position(gate.x + deltaX, gate.y + deltaY, gate.level);
         }
 
@@ -195,7 +193,7 @@ const action: objectInteractionActionHandler = (details) => {
 
         const gateSecondChunk = activeWorld.chunkManager.getChunkForWorldPosition(gateSecondPosition);
 
-        if(!clickedSecondary) {
+        if (!clickedSecondary) {
             secondGate = gateSecondChunk.getFilestoreLandscapeObject(details.secondary, gateSecondPosition);
         }
 
@@ -208,7 +206,7 @@ const action: objectInteractionActionHandler = (details) => {
             y: newPosition.y,
             level: newPosition.level,
             type: gate.type,
-            orientation: directionData[newDirection].rotation
+            orientation: directionData[newDirection].rotation,
         } as ModifiedLandscapeObject;
         const newSecond = {
             objectId: details.secondaryOpen,
@@ -216,14 +214,14 @@ const action: objectInteractionActionHandler = (details) => {
             y: newSecondPosition.y,
             level: newSecondPosition.level,
             type: gate.type,
-            orientation: directionData[newDirection].rotation
+            orientation: directionData[newDirection].rotation,
         } as ModifiedLandscapeObject;
 
         const metadata = {
             second: JSON.parse(JSON.stringify(newSecond)),
             originalSecond: secondGate,
             main: JSON.parse(JSON.stringify(newHinge)),
-            originalMain: gate
+            originalMain: gate,
         };
 
         newHinge.metadata = metadata;
@@ -239,8 +237,11 @@ export default {
     pluginId: 'rs:gates',
     hooks: [
         {
-            type: 'object_interaction', objectIds: [ 1551, 1552, 1553, 1556, 12986, 12987, 12988, 12989 ],
-            options: [ 'open', 'close' ], walkTo: true, handler: action
-        }
-    ]
+            type: 'object_interaction',
+            objectIds: [1551, 1552, 1553, 1556, 12986, 12987, 12988, 12989],
+            options: ['open', 'close'],
+            walkTo: true,
+            handler: action,
+        },
+    ],
 };

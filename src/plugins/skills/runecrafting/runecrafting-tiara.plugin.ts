@@ -6,13 +6,12 @@ import type { equipmentChangeActionHandler } from '@engine/action/pipe/equipment
 import { getEntityByAttr, getEntityIds, tiaras } from '@plugins/skills/runecrafting/runecrafting-constants';
 import { logger } from '@runejs/common';
 
-
-const unequipTiara : equipmentChangeActionHandler = (details) => {
+const unequipTiara: equipmentChangeActionHandler = details => {
     const { player } = details;
     player.outgoingPackets.updateClientConfig(491, 0);
 };
 
-const equipTiara : equipmentChangeActionHandler = (details) => {
+const equipTiara: equipmentChangeActionHandler = details => {
     const { player, itemId } = details;
     const tiara = getEntityByAttr(tiaras, 'id', itemId);
 
@@ -24,9 +23,6 @@ const equipTiara : equipmentChangeActionHandler = (details) => {
     player.outgoingPackets.updateClientConfig(491, tiara.config);
 };
 
-
-
-
 export default {
     pluginId: 'rs:runecrafting_tiaras',
     hooks: [
@@ -34,12 +30,13 @@ export default {
             type: 'equipment_change',
             eventType: 'equip',
             itemIds: getEntityIds(tiaras, 'id'),
-            handler: equipTiara
-        }, {
+            handler: equipTiara,
+        },
+        {
             type: 'equipment_change',
             eventType: 'unequip',
             itemIds: getEntityIds(tiaras, 'id'),
-            handler: unequipTiara
-        }
-    ]
+            handler: unequipTiara,
+        },
+    ],
 };

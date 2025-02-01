@@ -1,17 +1,7 @@
-import { Subject } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
-import { WalkingQueue } from './walking-queue';
-import type { Animation, Graphic } from './update-flags';
-import { UpdateFlags } from './update-flags';
-import { Skills } from './skills';
-import { Pathfinding } from './pathfinding';
-import type { ActorMetadata } from './metadata';
-import { logger } from '@runejs/common';
-import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
-import { isNpc } from './util';
 import type { ActionCancelType } from '@engine/action/action-pipeline';
 import { ActionPipeline } from '@engine/action/action-pipeline';
-import type { OffensiveBonuses, DefensiveBonuses, SkillBonuses } from '@engine/config/item-config';
+import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
+import type { DefensiveBonuses, OffensiveBonuses, SkillBonuses } from '@engine/config/item-config';
 import type { Task } from '@engine/task/task';
 import { TaskScheduler } from '@engine/task/task-scheduler';
 import { activeWorld } from '@engine/world';
@@ -20,16 +10,23 @@ import type { WorldInstance } from '@engine/world/instances';
 import type { Item } from '@engine/world/items/item';
 import { ItemContainer } from '@engine/world/items/item-container';
 import { Position } from '@engine/world/position';
-
+import { logger } from '@runejs/common';
+import { Subject } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
+import type { ActorMetadata } from './metadata';
+import { Pathfinding } from './pathfinding';
+import { Skills } from './skills';
+import type { Animation, Graphic } from './update-flags';
+import { UpdateFlags } from './update-flags';
+import { isNpc } from './util';
+import { WalkingQueue } from './walking-queue';
 
 export type ActorType = 'player' | 'npc';
-
 
 /**
  * Handles an entity within the game world.
  */
 export abstract class Actor {
-
     public readonly type: ActorType;
     public readonly updateFlags: UpdateFlags = new UpdateFlags();
     public readonly skills: Skills = new Skills(this);
@@ -76,7 +73,7 @@ export abstract class Actor {
     private _walkDirection: number;
     private _runDirection: number;
     private _faceDirection: number;
-    private _bonuses: { offensive: OffensiveBonuses, defensive: DefensiveBonuses, skill: SkillBonuses };
+    private _bonuses: { offensive: OffensiveBonuses; defensive: DefensiveBonuses; skill: SkillBonuses };
 
     private readonly scheduler = new TaskScheduler();
 
@@ -99,12 +96,21 @@ export abstract class Actor {
      * If the task has a stack type of `NEVER`, other tasks in the same {@link TaskStackGroup} will be cancelled.
      */
     public enqueueTask(taskClass: new (actor: Actor) => Task, ...args: never[]): void;
-    public enqueueTask<T1, T2, T3, T4, T5, T6>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => Task, args: [ T1, T2, T3, T4, T5, T6 ]): void;
-    public enqueueTask<T1, T2, T3, T4, T5>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => Task, args: [ T1, T2, T3, T4, T5 ]): void;
-    public enqueueTask<T1, T2, T3, T4>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4) => Task, args: [ T1, T2, T3, T4 ]): void;
-    public enqueueTask<T1, T2, T3>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3) => Task, args: [ T1, T2, T3 ]): void;
-    public enqueueTask<T1, T2>(taskClass: new (actor: Actor, arg1: T1, arg2: T2) => Task, args: [ T1, T2 ]): void;
-    public enqueueTask<T1>(taskClass: new (actor: Actor, arg1: T1) => Task, args: [ T1 ]): void;
+    public enqueueTask<T1, T2, T3, T4, T5, T6>(
+        taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => Task,
+        args: [T1, T2, T3, T4, T5, T6],
+    ): void;
+    public enqueueTask<T1, T2, T3, T4, T5>(
+        taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => Task,
+        args: [T1, T2, T3, T4, T5],
+    ): void;
+    public enqueueTask<T1, T2, T3, T4>(
+        taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3, arg4: T4) => Task,
+        args: [T1, T2, T3, T4],
+    ): void;
+    public enqueueTask<T1, T2, T3>(taskClass: new (actor: Actor, arg1: T1, arg2: T2, arg3: T3) => Task, args: [T1, T2, T3]): void;
+    public enqueueTask<T1, T2>(taskClass: new (actor: Actor, arg1: T1, arg2: T2) => Task, args: [T1, T2]): void;
+    public enqueueTask<T1>(taskClass: new (actor: Actor, arg1: T1) => Task, args: [T1]): void;
     public enqueueTask<T>(taskClass: new (actor: Actor, ...args: T[]) => Task, args: T[]): void {
         if (!this.active) {
             logger.warn(`Attempted to instantiate task for inactive actor`);
@@ -112,13 +118,9 @@ export abstract class Actor {
         }
 
         if (args) {
-            this.enqueueBaseTask(
-                new taskClass(this, ...args)
-            );
+            this.enqueueBaseTask(new taskClass(this, ...args));
         } else {
-            this.enqueueBaseTask(
-                new taskClass(this)
-            );
+            this.enqueueBaseTask(new taskClass(this));
         }
     }
 
@@ -152,57 +154,67 @@ export abstract class Actor {
     public clearBonuses(): void {
         this._bonuses = {
             offensive: {
-                speed: 0, stab: 0, slash: 0, crush: 0, magic: 0, ranged: 0
+                speed: 0,
+                stab: 0,
+                slash: 0,
+                crush: 0,
+                magic: 0,
+                ranged: 0,
             },
             defensive: {
-                stab: 0, slash: 0, crush: 0, magic: 0, ranged: 0
+                stab: 0,
+                slash: 0,
+                crush: 0,
+                magic: 0,
+                ranged: 0,
             },
             skill: {
-                strength: 0, prayer: 0
-            }
+                strength: 0,
+                prayer: 0,
+            },
         };
     }
 
     public moveBehind(target: Actor): boolean {
-        if(this.position.level !== target.position.level) {
+        if (this.position.level !== target.position.level) {
             return false;
         }
 
         const distance = Math.floor(this.position.distanceBetween(target.position));
-        if(distance > 16) {
+        if (distance > 16) {
             this.clearFaceActor();
             return false;
         }
 
         let ignoreDestination = true;
         let desiredPosition = target.position;
-        if(target.lastMovementPosition) {
+        if (target.lastMovementPosition) {
             desiredPosition = target.lastMovementPosition;
             ignoreDestination = false;
         }
 
         this.pathfinding.walkTo(desiredPosition, {
             pathingSearchRadius: distance + 2,
-            ignoreDestination
+            ignoreDestination,
         });
 
         return true;
     }
 
     public moveTo(target: Actor): boolean {
-        if(this.position.level !== target.position.level) {
+        if (this.position.level !== target.position.level) {
             return false;
         }
 
         const distance = Math.floor(this.position.distanceBetween(target.position));
-        if(distance > 16) {
+        if (distance > 16) {
             this.clearFaceActor();
             return false;
         }
 
         this.pathfinding.walkTo(target.position, {
             pathingSearchRadius: distance + 2,
-            ignoreDestination: true
+            ignoreDestination: true,
         });
 
         return true;
@@ -214,20 +226,22 @@ export abstract class Actor {
 
         this.moveBehind(target);
         const subscription = target.walkingQueue.movementEvent.subscribe(() => {
-            if(!this.moveBehind(target)) {
+            if (!this.moveBehind(target)) {
                 // (Jameskmonger) actionsCancelled is deprecated, casting this to satisfy the typecheck for now
                 this.actionsCancelled.next(null as unknown as ActionCancelType);
             }
         });
 
-        this.actionsCancelled.pipe(
-            filter(type => type !== 'pathing-movement'),
-            take(1)
-        ).subscribe(() => {
-            subscription.unsubscribe();
-            this.face(null);
-            delete this.metadata.following;
-        });
+        this.actionsCancelled
+            .pipe(
+                filter(type => type !== 'pathing-movement'),
+                take(1),
+            )
+            .subscribe(() => {
+                subscription.unsubscribe();
+                this.face(null);
+                delete this.metadata.following;
+            });
     }
 
     public walkTo(target: Actor): boolean;
@@ -237,11 +251,11 @@ export abstract class Actor {
 
         const distance = Math.floor(this.position.distanceBetween(desiredPosition));
 
-        if(distance <= 1) {
+        if (distance <= 1) {
             return false;
         }
 
-        if(distance > 16) {
+        if (distance > 16) {
             this.clearFaceActor();
             this.metadata.faceActorClearedByWalking = true;
             return false;
@@ -249,34 +263,39 @@ export abstract class Actor {
 
         this.pathfinding.walkTo(desiredPosition, {
             pathingSearchRadius: distance + 2,
-            ignoreDestination: true
+            ignoreDestination: true,
         });
 
         return true;
     }
 
-    public face(face: Position | Actor | null, clearWalkingQueue: boolean = true, autoClear: boolean = true, clearedByWalking: boolean = true): void {
-        if(face === null) {
+    public face(
+        face: Position | Actor | null,
+        clearWalkingQueue: boolean = true,
+        autoClear: boolean = true,
+        clearedByWalking: boolean = true,
+    ): void {
+        if (face === null) {
             this.clearFaceActor();
             this.updateFlags.facePosition = null;
             return;
         }
 
-        if(face instanceof Position) {
+        if (face instanceof Position) {
             this.updateFlags.facePosition = face;
-        } else if(face instanceof Actor) {
+        } else if (face instanceof Actor) {
             this.updateFlags.faceActor = face;
             this.metadata.faceActor = face;
             this.metadata.faceActorClearedByWalking = clearedByWalking;
 
-            if(autoClear) {
+            if (autoClear) {
                 setTimeout(() => {
                     this.clearFaceActor();
                 }, 20000);
             }
         }
 
-        if(clearWalkingQueue) {
+        if (clearWalkingQueue) {
             this.walkingQueue.clear();
             this.walkingQueue.valid = false;
         }
@@ -290,7 +309,7 @@ export abstract class Actor {
     }
 
     public playAnimation(animation: number | Animation | null): void {
-        if(typeof animation === 'number') {
+        if (typeof animation === 'number') {
             animation = { id: animation, delay: 0 };
         }
 
@@ -302,7 +321,7 @@ export abstract class Actor {
     }
 
     public playGraphics(graphics: number | Graphic): void {
-        if(typeof graphics === 'number') {
+        if (typeof graphics === 'number') {
             graphics = { id: graphics, delay: 0, height: 120 };
         }
 
@@ -346,23 +365,31 @@ export abstract class Actor {
     }
 
     public initiateRandomMovement(): void {
-        this.enqueueBaseTask(new QueueableTask([], this, () => {
-            this.moveSomewhere();
-            return {
-                callbackResult: true,
-                shouldContinueLooping: true,
-            };
-        }, null, null))
+        this.enqueueBaseTask(
+            new QueueableTask(
+                [],
+                this,
+                () => {
+                    this.moveSomewhere();
+                    return {
+                        callbackResult: true,
+                        shouldContinueLooping: true,
+                    };
+                },
+                null,
+                null,
+            ),
+        );
     }
 
     public moveSomewhere(): void {
-        if(!this.canMove()) {
+        if (!this.canMove()) {
             return;
         }
 
-        if(isNpc(this)) {
+        if (isNpc(this)) {
             const nearbyPlayers = activeWorld.findNearbyPlayers(this.position, 24, this.instance.instanceId);
-            if(nearbyPlayers.length === 0) {
+            if (nearbyPlayers.length === 0) {
                 // No need for this actor to move if there are no players nearby to witness it, save some memory. :)
                 return;
             }
@@ -370,7 +397,7 @@ export abstract class Actor {
 
         const movementChance = Math.floor(Math.random() * 10);
 
-        if(movementChance < 7) {
+        if (movementChance < 7) {
             return;
         }
 
@@ -378,17 +405,17 @@ export abstract class Actor {
         let py = this.position.y;
         let movementAllowed = false;
 
-        while(!movementAllowed) {
+        while (!movementAllowed) {
             px = this.position.x;
             py = this.position.y;
 
             const moveXChance = Math.floor(Math.random() * 10);
 
-            if(moveXChance > 6) {
+            if (moveXChance > 6) {
                 const moveXAmount = Math.floor(Math.random() * 5);
                 const moveXMod = Math.floor(Math.random() * 2);
 
-                if(moveXMod === 0) {
+                if (moveXMod === 0) {
                     px -= moveXAmount;
                 } else {
                     px += moveXAmount;
@@ -397,11 +424,11 @@ export abstract class Actor {
 
             const moveYChance = Math.floor(Math.random() * 10);
 
-            if(moveYChance > 6) {
+            if (moveYChance > 6) {
                 const moveYAmount = Math.floor(Math.random() * 5);
                 const moveYMod = Math.floor(Math.random() * 2);
 
-                if(moveYMod === 0) {
+                if (moveYMod === 0) {
                     py -= moveYAmount;
                 } else {
                     py += moveYAmount;
@@ -410,14 +437,14 @@ export abstract class Actor {
 
             let valid = true;
 
-            if(!this.withinBounds(px, py)) {
+            if (!this.withinBounds(px, py)) {
                 valid = false;
             }
 
             movementAllowed = valid;
         }
 
-        if(px !== this.position.x || py !== this.position.y) {
+        if (px !== this.position.x || py !== this.position.y) {
             this.walkingQueue.clear();
             this.walkingQueue.valid = true;
             this.walkingQueue.add(px, py);
@@ -425,7 +452,7 @@ export abstract class Actor {
     }
 
     public forceMovement(direction: number, steps: number): void {
-        if(!this.canMove()) {
+        if (!this.canMove()) {
             return;
         }
 
@@ -433,29 +460,28 @@ export abstract class Actor {
         let py = this.position.y;
         let movementAllowed = false;
 
-        while(!movementAllowed) {
+        while (!movementAllowed) {
             px = this.position.x;
             py = this.position.y;
 
             const movementDirection = directionFromIndex(direction);
-            if(!movementDirection) {
+            if (!movementDirection) {
                 return;
             }
             let valid = true;
-            for(let step = 0; step < steps; step++) {
+            for (let step = 0; step < steps; step++) {
                 px += movementDirection.deltaX;
                 py += movementDirection.deltaY;
 
-                if(!this.withinBounds(px, py)) {
+                if (!this.withinBounds(px, py)) {
                     valid = false;
                 }
-
             }
 
             movementAllowed = valid;
         }
 
-        if(px !== this.position.x || py !== this.position.y) {
+        if (px !== this.position.x || py !== this.position.y) {
             this.walkingQueue.clear();
             this.walkingQueue.valid = true;
             this.walkingQueue.add(px, py);
@@ -493,7 +519,7 @@ export abstract class Actor {
     }
 
     public set position(value: Position) {
-        if(!this._position) {
+        if (!this._position) {
             this._lastMapRegionUpdatePosition = value;
         }
 
@@ -556,7 +582,7 @@ export abstract class Actor {
         this._instance = value;
     }
 
-    public get bonuses(): { offensive: OffensiveBonuses, defensive: DefensiveBonuses, skill: SkillBonuses } {
+    public get bonuses(): { offensive: OffensiveBonuses; defensive: DefensiveBonuses; skill: SkillBonuses } {
         return this._bonuses;
     }
 }

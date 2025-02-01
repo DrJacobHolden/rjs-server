@@ -1,8 +1,8 @@
 import type { itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
 import { itemIds } from '@engine/world/config/item-ids';
 
-export const action: itemOnObjectActionHandler = (details) => {
-    if ((details.player.savedMetadata['mill-grain'] && details.player.savedMetadata['mill-grain'] === 1)) {
+export const action: itemOnObjectActionHandler = details => {
+    if (details.player.savedMetadata['mill-grain'] && details.player.savedMetadata['mill-grain'] === 1) {
         details.player.sendMessage(`There is already grain in the hopper.`);
         return;
     }
@@ -27,10 +27,10 @@ export default {
     hooks: [
         {
             type: 'item_on_object',
-            objectIds: [ 2714, 2717 ],
-            itemIds: [ itemIds.grain ],
+            objectIds: [2714, 2717],
+            itemIds: [itemIds.grain],
             walkTo: true,
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

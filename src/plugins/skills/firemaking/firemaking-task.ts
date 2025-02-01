@@ -42,10 +42,7 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
      * @param player The player that is attempting to light the fire.
      * @param logWorldItem The world item that represents the log.
      */
-    constructor(
-        player: Player,
-        logWorldItem: WorldItem
-    ) {
+    constructor(player: Player, logWorldItem: WorldItem) {
         super(player, logWorldItem);
 
         const logInfo = FIREMAKING_LOGS.find(l => l.logItem.gameId === logWorldItem.itemId);
@@ -126,5 +123,5 @@ class FiremakingTask extends ActorWorldItemInteractionTask<Player> {
  * @param worldItemLog The WorldItem that represents the log.
  */
 export function runFiremakingTask(player: Player, worldItemLog: WorldItem) {
-    player.enqueueTask(FiremakingTask, [ worldItemLog ]);
+    player.enqueueTask(FiremakingTask, [worldItemLog]);
 }

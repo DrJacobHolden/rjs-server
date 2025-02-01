@@ -1,17 +1,15 @@
+import { findItem, widgets } from '@engine/config/config-handler';
+import type { ItemDetails } from '@engine/config/item-config';
+import type { WidgetClosedEvent } from '@engine/interface/interface-state';
+import type { Player } from '@engine/world/actor/player/player';
 import type { ContainerUpdateEvent } from '@engine/world/items/item-container';
 import { ItemContainer } from '@engine/world/items/item-container';
-import { findItem, widgets } from '@engine/config/config-handler';
 import { loadConfigurationFiles } from '@runejs/common/fs';
-import type { Player } from '@engine/world/actor/player/player';
-import type { ItemDetails } from '@engine/config/item-config';
 import type { Subscription } from 'rxjs';
-import type { WidgetClosedEvent } from '@engine/interface/interface-state';
 
-
-export type ShopStock = { itemKey: string, amount: number, restock?: number }[];
+export type ShopStock = { itemKey: string; amount: number; restock?: number }[];
 
 export class Shop {
-
     public readonly key: string;
     public readonly originalStock: ShopStock;
     public readonly container: ItemContainer;
@@ -25,7 +23,15 @@ export class Shop {
     private customers: Player[];
     private containerSubscription: Subscription;
 
-    public constructor(key: string, name: string, generalStore: boolean, stock: ShopStock, sellRate: number, buyRate: number, modifier: number) {
+    public constructor(
+        key: string,
+        name: string,
+        generalStore: boolean,
+        stock: ShopStock,
+        sellRate: number,
+        buyRate: number,
+        modifier: number,
+    ) {
         this.key = key;
         this.name = name;
         this.generalStore = generalStore;
@@ -70,7 +76,6 @@ export class Shop {
                 originalStockAmount = foundStock.amount;
             }
         } else {
-
             return -1; // Cannot buy from this shop
         }
 
@@ -78,16 +83,16 @@ export class Shop {
         if (itemStock === originalStockAmount) {
             finalAmount = Math.round(item.value * this.sellRate);
         } else if (itemStock > originalStockAmount) {
-            const overstockAmount = (itemStock - originalStockAmount);
+            const overstockAmount = itemStock - originalStockAmount;
             let shopSellRate = this.sellRate;
-            shopSellRate -= (this.rateModifier * overstockAmount);
+            shopSellRate -= this.rateModifier * overstockAmount;
             finalAmount = item.value * shopSellRate;
 
             finalAmount = Math.round(finalAmount);
         } else {
-            const understockAmount = (originalStockAmount - itemStock);
+            const understockAmount = originalStockAmount - itemStock;
             let shopSellRate = this.sellRate;
-            shopSellRate += (this.rateModifier * understockAmount);
+            shopSellRate += this.rateModifier * understockAmount;
             finalAmount = item.value * shopSellRate;
 
             finalAmount = Math.round(finalAmount);
@@ -107,7 +112,6 @@ export class Shop {
         let originalStockAmount: number = 0;
         const itemStock = this.container.amount(item.gameId);
 
-
         if (itemSoldHere) {
             originalStockAmount = this.originalStock.find(stock => stock && stock.itemKey === itemKey)?.amount || 0;
         } else if (!this.generalStore) {
@@ -119,16 +123,16 @@ export class Shop {
         if (itemStock === originalStockAmount) {
             finalAmount = Math.round(item.value * this.buyRate);
         } else if (itemStock > originalStockAmount) {
-            const overstockAmount = (itemStock - originalStockAmount);
+            const overstockAmount = itemStock - originalStockAmount;
             let shopBuyRate = this.buyRate;
-            shopBuyRate -= (this.rateModifier * overstockAmount);
+            shopBuyRate -= this.rateModifier * overstockAmount;
             finalAmount = item.value * shopBuyRate;
 
             finalAmount = Math.round(finalAmount);
         } else {
-            const understockAmount = (originalStockAmount - itemStock);
+            const understockAmount = originalStockAmount - itemStock;
             let shopBuyRate = this.buyRate;
-            shopBuyRate += (this.rateModifier * understockAmount);
+            shopBuyRate += this.rateModifier * understockAmount;
             finalAmount = item.value * shopBuyRate;
 
             finalAmount = Math.round(finalAmount);
@@ -156,11 +160,11 @@ export class Shop {
 
         player.interfaceState.openWidget(widgets.shop.widgetId, {
             slot: 'screen',
-            multi: true
+            multi: true,
         });
         player.interfaceState.openWidget(widgets.shopPlayerInventory.widgetId, {
             slot: 'tabarea',
-            multi: true
+            multi: true,
         });
         this.customers.push(player);
     }
@@ -180,7 +184,7 @@ export class Shop {
             delete player.metadata.lastOpenedShopKey;
             player.metadata.shopCloseListener?.unsubscribe();
         }
-        this.customers = this.customers.filter((c) => c !== player);
+        this.customers = this.customers.filter(c => c !== player);
     }
 }
 
@@ -194,8 +198,15 @@ export interface ShopConfiguration {
 }
 
 export function shopFactory(key: string, config: ShopConfiguration): Shop {
-    return new Shop(key, config.name, config.general_store || false, config.stock,
-        config.shop_sell_rate || 1.00, config.shop_buy_rate || 0.65, config.rate_modifier || 0.2);
+    return new Shop(
+        key,
+        config.name,
+        config.general_store || false,
+        config.stock,
+        config.shop_sell_rate || 1.0,
+        config.shop_buy_rate || 0.65,
+        config.rate_modifier || 0.2,
+    );
 }
 
 export async function loadShopConfigurations(path: string): Promise<{ [key: string]: Shop }> {

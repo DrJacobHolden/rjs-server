@@ -1,20 +1,19 @@
 import { ByteBuffer } from '@runejs/common';
 
-import type { UpdateFlags } from '@engine/world/actor/update-flags';
-import { Packet, PacketType } from '@engine/net/packet';
-import { stringToLong } from '@engine/util/strings';
 import { findItem, findNpc } from '@engine/config/config-handler';
 import type { EquipmentSlot, EquipmentType, ItemDetails } from '@engine/config/item-config';
-import { appendMovement, registerNewActors, SyncTask, syncTrackedActors } from './actor-sync';
-import type { Player } from '../player';
+import { Packet, PacketType } from '@engine/net/packet';
+import { stringToLong } from '@engine/util/strings';
 import { activeWorld } from '@engine/world';
+import type { UpdateFlags } from '@engine/world/actor/update-flags';
 import { isPlayer } from '@engine/world/actor/util';
+import type { Player } from '../player';
+import { SyncTask, appendMovement, registerNewActors, syncTrackedActors } from './actor-sync';
 
 /**
  * Handles the chonky player synchronization packet.
  */
 export class PlayerSyncTask extends SyncTask<void> {
-
     private readonly player: Player;
 
     public constructor(player: Player) {
@@ -30,7 +29,7 @@ export class PlayerSyncTask extends SyncTask<void> {
 
             const updateMaskData = new ByteBuffer(5000);
 
-            if(updateFlags.mapRegionUpdateRequired || this.player.metadata.teleporting) {
+            if (updateFlags.mapRegionUpdateRequired || this.player.metadata.teleporting) {
                 playerUpdatePacket.putBits(1, 1); // Update Required
                 playerUpdatePacket.putBits(2, 3); // Map Region changed (movement type - 0=nomove, 1=walk, 2=run, 3=mapchange
                 playerUpdatePacket.putBits(1, this.player.metadata.teleporting ? 1 : 0); // Whether or not the client should discard the current walking queue (1 if teleporting, 0 if not)
@@ -44,24 +43,31 @@ export class PlayerSyncTask extends SyncTask<void> {
 
             this.appendUpdateMaskData(this.player, updateMaskData, false);
 
-            let nearbyPlayers = activeWorld.playerTree.colliding({
-                x: this.player.position.x - 15,
-                y: this.player.position.y - 15,
-                width: 32,
-                height: 32
-            }).filter(collision => collision?.actor && collision.actor.instance === this.player.instance);
+            let nearbyPlayers = activeWorld.playerTree
+                .colliding({
+                    x: this.player.position.x - 15,
+                    y: this.player.position.y - 15,
+                    width: 32,
+                    height: 32,
+                })
+                .filter(collision => collision?.actor && collision.actor.instance === this.player.instance);
 
-            if(nearbyPlayers.length > 200) {
+            if (nearbyPlayers.length > 200) {
                 nearbyPlayers = activeWorld.playerTree.colliding({
                     x: this.player.position.x - 7,
                     y: this.player.position.y - 7,
                     width: 16,
-                    height: 16
+                    height: 16,
                 });
             }
 
-            this.player.trackedPlayers = syncTrackedActors(playerUpdatePacket, this.player.position,
-                actor => this.appendUpdateMaskData(actor as Player, updateMaskData), this.player.trackedPlayers, nearbyPlayers) as Player[];
+            this.player.trackedPlayers = syncTrackedActors(
+                playerUpdatePacket,
+                this.player.position,
+                actor => this.appendUpdateMaskData(actor as Player, updateMaskData),
+                this.player.trackedPlayers,
+                nearbyPlayers,
+            ) as Player[];
 
             registerNewActors(playerUpdatePacket, this.player, this.player.trackedPlayers, nearbyPlayers, actor => {
                 const newPlayer = actor as Player;
@@ -83,7 +89,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                 this.appendUpdateMaskData(newPlayer, updateMaskData, true);
             });
 
-            if(updateMaskData.writerIndex !== 0) {
+            if (updateMaskData.writerIndex !== 0) {
                 playerUpdatePacket.putBits(11, 2047);
                 playerUpdatePacket.closeBitBuffer();
 
@@ -101,35 +107,35 @@ export class PlayerSyncTask extends SyncTask<void> {
     private appendUpdateMaskData(player: Player, updateMaskData: ByteBuffer, forceUpdate?: boolean): void {
         const updateFlags = player.updateFlags;
 
-        if(!updateFlags.updateBlockRequired && !forceUpdate) {
+        if (!updateFlags.updateBlockRequired && !forceUpdate) {
             return;
         }
 
         let mask: number = 0;
 
-        if(updateFlags.damage !== null) {
+        if (updateFlags.damage !== null) {
             mask |= 0x100;
         }
-        if(updateFlags.appearanceUpdateRequired || forceUpdate) {
+        if (updateFlags.appearanceUpdateRequired || forceUpdate) {
             mask |= 0x20;
         }
-        if(updateFlags.chatMessages.length !== 0) {
+        if (updateFlags.chatMessages.length !== 0) {
             mask |= 0x8;
         }
         if (updateFlags.faceActor !== null) {
             mask |= 0x4;
         }
-        if(updateFlags.facePosition) {
+        if (updateFlags.facePosition) {
             mask |= 0x10;
         }
-        if(updateFlags.graphics) {
+        if (updateFlags.graphics) {
             mask |= 0x200;
         }
-        if(updateFlags.animation !== undefined && updateFlags.animation !== null) {
+        if (updateFlags.animation !== undefined && updateFlags.animation !== null) {
             mask |= 0x1;
         }
 
-        if(mask >= 0x100) {
+        if (mask >= 0x100) {
             mask |= 0x2;
             updateMaskData.put(mask & 0xff);
             updateMaskData.put(mask >> 8);
@@ -137,7 +143,7 @@ export class PlayerSyncTask extends SyncTask<void> {
             updateMaskData.put(mask);
         }
 
-        if(updateFlags.damage !== null) {
+        if (updateFlags.damage !== null) {
             const damage = updateFlags.damage;
             updateMaskData.put(damage.damageDealt);
             updateMaskData.put(damage.damageType.valueOf());
@@ -145,16 +151,16 @@ export class PlayerSyncTask extends SyncTask<void> {
             updateMaskData.put(damage.maxHitpoints);
         }
 
-        if(updateFlags.facePosition) {
+        if (updateFlags.facePosition) {
             const position = updateFlags.facePosition;
             updateMaskData.put(position.x * 2 + 1, 'SHORT');
             updateMaskData.put(position.y * 2 + 1, 'SHORT', 'LITTLE_ENDIAN');
         }
 
-        if(updateFlags.animation !== undefined && updateFlags.animation !== null) {
+        if (updateFlags.animation !== undefined && updateFlags.animation !== null) {
             const animation = updateFlags.animation;
 
-            if(animation === null || animation.id === -1) {
+            if (animation === null || animation.id === -1) {
                 // Reset animation
                 updateMaskData.put(-1, 'SHORT', 'LITTLE_ENDIAN');
                 updateMaskData.put(0, 'BYTE');
@@ -173,7 +179,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                 const actor = updateFlags.faceActor;
                 let worldIndex = actor.worldIndex;
 
-                if(isPlayer(actor)) {
+                if (isPlayer(actor)) {
                     // Client checks if index is less than 32768.
                     // If it is, it looks for an NPC.
                     // If it isn't, it looks for a player (subtracting 32768 to find the index).
@@ -184,36 +190,36 @@ export class PlayerSyncTask extends SyncTask<void> {
             }
         }
 
-        if(updateFlags.chatMessages.length !== 0) {
+        if (updateFlags.chatMessages.length !== 0) {
             const message = updateFlags.chatMessages[0];
 
             if (!message.data) {
                 throw new Error('Chat message data is undefined');
             }
 
-            updateMaskData.put(((message.color || 0 & 0xFF) << 8) + (message.effects || 0 & 0xFF), 'SHORT');
+            updateMaskData.put(((message.color || 0 & 0xff) << 8) + (message.effects || 0 & 0xff), 'SHORT');
             updateMaskData.put(player.rights.valueOf(), 'BYTE');
             updateMaskData.put(message.data.length, 'BYTE');
-            for(let i = 0; i < message.data.length; i++) {
+            for (let i = 0; i < message.data.length; i++) {
                 updateMaskData.put(message.data.readInt8(i), 'BYTE');
             }
         }
 
-        if(updateFlags.appearanceUpdateRequired || forceUpdate) {
+        if (updateFlags.appearanceUpdateRequired || forceUpdate) {
             const equipment = player.equipment;
             const appearanceData = new ByteBuffer(500);
             appearanceData.put(player.appearance.gender); // Gender
             appearanceData.put(-1); // Skull Icon
             appearanceData.put(-1); // Prayer Icon
 
-            if(player.savedMetadata.npcTransformation) {
+            if (player.savedMetadata.npcTransformation) {
                 appearanceData.put(65535, 'SHORT');
                 appearanceData.put(player.savedMetadata.npcTransformation, 'SHORT');
             } else {
-                for(let i = 0; i < 4; i++) {
+                for (let i = 0; i < 4; i++) {
                     const item = equipment.items[i];
 
-                    if(item) {
+                    if (item) {
                         appearanceData.put(0x200 + item.itemId, 'SHORT');
                     } else {
                         appearanceData.put(0);
@@ -222,7 +228,7 @@ export class PlayerSyncTask extends SyncTask<void> {
 
                 const torsoItem = player.getEquippedItem('torso');
                 let torsoItemData: ItemDetails | null = null;
-                if(torsoItem) {
+                if (torsoItem) {
                     torsoItemData = findItem(torsoItem.itemId);
                     appearanceData.put(0x200 + torsoItem.itemId, 'SHORT');
                 } else {
@@ -230,14 +236,18 @@ export class PlayerSyncTask extends SyncTask<void> {
                 }
 
                 const offHandItem = player.getEquippedItem('off_hand');
-                if(offHandItem) {
+                if (offHandItem) {
                     appearanceData.put(0x200 + offHandItem.itemId, 'SHORT');
                 } else {
                     appearanceData.put(0);
                 }
 
-                if(torsoItemData && torsoItemData.equipmentData && torsoItemData.equipmentData.equipmentType &&
-                    torsoItemData.equipmentData.equipmentType === 'full_top') {
+                if (
+                    torsoItemData &&
+                    torsoItemData.equipmentData &&
+                    torsoItemData.equipmentData.equipmentType &&
+                    torsoItemData.equipmentData.equipmentType === 'full_top'
+                ) {
                     appearanceData.put(0);
                 } else {
                     appearanceData.put(0x100 + player.appearance.arms, 'SHORT');
@@ -249,19 +259,19 @@ export class PlayerSyncTask extends SyncTask<void> {
                 let helmetType: EquipmentType | null = null;
                 let fullHelmet = false;
 
-                if(headItem) {
+                if (headItem) {
                     const headItemData = findItem(headItem.itemId);
 
-                    if(headItemData && headItemData.equipmentData && headItemData.equipmentData.equipmentType) {
+                    if (headItemData && headItemData.equipmentData && headItemData.equipmentData.equipmentType) {
                         helmetType = headItemData.equipmentData.equipmentType;
 
-                        if(helmetType === 'helmet') {
+                        if (helmetType === 'helmet') {
                             fullHelmet = true;
                         }
                     }
                 }
 
-                if(!headItem || helmetType === 'hat') {
+                if (!headItem || helmetType === 'hat') {
                     appearanceData.put(0x100 + player.appearance.head, 'SHORT');
                 } else {
                     appearanceData.put(0);
@@ -270,7 +280,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                 this.appendBasicAppearanceItem(appearanceData, player, player.appearance.hands, 'hands');
                 this.appendBasicAppearanceItem(appearanceData, player, player.appearance.feet, 'feet');
 
-                if(player.appearance.gender === 1 || fullHelmet) {
+                if (player.appearance.gender === 1 || fullHelmet) {
                     appearanceData.put(0);
                 } else {
                     appearanceData.put(0x100 + player.appearance.facialHair, 'SHORT');
@@ -295,7 +305,7 @@ export class PlayerSyncTask extends SyncTask<void> {
                 0x338, // run
             ];
 
-            if(player.savedMetadata.npcTransformation) {
+            if (player.savedMetadata.npcTransformation) {
                 const npc = findNpc(player.savedMetadata.npcTransformation);
                 animations = [
                     npc.animations?.stand || 0x328, // stand
@@ -320,20 +330,19 @@ export class PlayerSyncTask extends SyncTask<void> {
             updateMaskData.putBytes(appearanceData.flipWriter());
         }
 
-        if(updateFlags.graphics) {
+        if (updateFlags.graphics) {
             const delay = updateFlags.graphics.delay || 0;
             updateMaskData.put(updateFlags.graphics.id, 'SHORT', 'LITTLE_ENDIAN');
-            updateMaskData.put(updateFlags.graphics.height << 16 | delay & 0xffff, 'INT');
+            updateMaskData.put((updateFlags.graphics.height << 16) | (delay & 0xffff), 'INT');
         }
     }
 
     private appendBasicAppearanceItem(buffer: ByteBuffer, player: Player, appearanceInfo: number, equipmentSlot: EquipmentSlot): void {
         const item = player.getEquippedItem(equipmentSlot);
-        if(item) {
+        if (item) {
             buffer.put(0x200 + item.itemId, 'SHORT');
         } else {
             buffer.put(0x100 + appearanceInfo, 'SHORT');
         }
     }
-
 }

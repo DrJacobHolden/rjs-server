@@ -1,12 +1,12 @@
-import type { Item } from '@engine/world/items/item';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import type { PlayerQuest } from '@engine/config/quest-config';
+import { hasValueNotNull } from '@engine/util/data';
+import type { SkillValue } from '@engine/world/actor/skills';
+import type { Item } from '@engine/world/items/item';
+import { MusicPlayerLoopMode, MusicPlayerMode } from '@engine/world/sound/music';
 import { logger } from '@runejs/common';
 import type { Player } from './player';
-import type { SkillValue } from '@engine/world/actor/skills';
-import { hasValueNotNull } from '@engine/util/data';
-import type { PlayerQuest } from '@engine/config/quest-config';
-import { MusicPlayerMode, MusicPlayerLoopMode } from '@engine/world/sound/music';
 
 export interface Appearance {
     gender: number;
@@ -86,7 +86,7 @@ export const defaultAppearance = (): Appearance => {
         torsoColor: 0,
         legColor: 0,
         feetColor: 0,
-        skinColor: 0
+        skinColor: 0,
     } as Appearance;
 };
 
@@ -99,12 +99,12 @@ export const validateSettings = (player: Player): void => {
     const newSettings = new PlayerSettings();
     const newKeys = Object.keys(newSettings);
 
-    if(newKeys.length === existingKeys.length) {
+    if (newKeys.length === existingKeys.length) {
         return;
     }
 
     const missingKeys = newKeys.filter(key => existingKeys.indexOf(key) === -1);
-    for(const key of missingKeys) {
+    for (const key of missingKeys) {
         player.settings[key] = newSettings[key];
     }
 };
@@ -119,16 +119,16 @@ export function savePlayerData(player: Player): boolean {
         position: {
             x: player.position.x,
             y: player.position.y,
-            level: player.position.level > 3 ? 0 : player.position.level
+            level: player.position.level > 3 ? 0 : player.position.level,
         },
         lastLogin: {
             date: player.loginDate,
-            address: player.lastAddress
+            address: player.lastAddress,
         },
         rights: player.rights.valueOf(),
         appearance: player.appearance,
         inventory: player.inventory.items,
-        bank: player.bank.items.filter((item) => {
+        bank: player.bank.items.filter(item => {
             return hasValueNotNull(item);
         }),
         equipment: player.equipment.items,
@@ -139,13 +139,13 @@ export function savePlayerData(player: Player): boolean {
         musicTracks: player.musicTracks,
         achievements: player.achievements,
         friendsList: player.friendsList,
-        ignoreList: player.ignoreList
+        ignoreList: player.ignoreList,
     };
 
     try {
         writeFileSync(filePath, JSON.stringify(playerSave, null, 4));
         return true;
-    } catch(error) {
+    } catch (error) {
         logger.error(`Error saving player data for ${player.username}.`);
         return false;
     }
@@ -161,23 +161,23 @@ export function loadPlayerSave(username: string): PlayerSave | null {
     const fileName = username.toLowerCase() + '.json';
     const filePath = join('data/saves', fileName);
 
-    if(!existsSync(filePath)) {
+    if (!existsSync(filePath)) {
         return null;
     }
 
     const fileData = readFileSync(filePath, 'utf8');
 
-    if(!fileData) {
+    if (!fileData) {
         return null;
     }
 
     try {
         const playerSave = JSON.parse(fileData) as PlayerSave;
-        if(playerSave?.position?.level > 3) {
+        if (playerSave?.position?.level > 3) {
             playerSave.position.level = 0;
         }
         return playerSave;
-    } catch(error) {
+    } catch (error) {
         logger.error(`Malformed player save data for ${username}.`);
         return null;
     }

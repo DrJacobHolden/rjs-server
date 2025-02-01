@@ -78,32 +78,40 @@ const itemInteractionPacket = (player: Player, packet: PacketData) => {
     player.actionPipeline.call('item_interaction', player, itemId, slot, widgetId, containerId, option);
 };
 
-export default [{
-    opcode: 38,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 98,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 228,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 26,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 147,
-    size: 8,
-    handler: itemInteractionPacket
-},{
-    opcode: 240,
-    size: 8,
-    handler: itemInteractionPacket
-}, {
-    opcode: 102,
-    size: 8,
-    handler: itemInteractionPacket
-}];
+export default [
+    {
+        opcode: 38,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 98,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 228,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 26,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 147,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 240,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+    {
+        opcode: 102,
+        size: 8,
+        handler: itemInteractionPacket,
+    },
+];

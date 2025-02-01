@@ -1,5 +1,5 @@
-import type { Npc } from './npc';
 import type { Actor } from './actor';
+import type { Npc } from './npc';
 import type { Player } from './player/player';
 
 export const isPlayer = (actor: Actor): actor is Player => actor.type === 'player';

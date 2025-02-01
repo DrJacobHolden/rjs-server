@@ -1,9 +1,9 @@
-import type { commandActionHandler, PlayerCommandActionHook } from '@engine/action/pipe/player-command.action';
+import type { PlayerCommandActionHook, commandActionHandler } from '@engine/action/pipe/player-command.action';
 
-const action: commandActionHandler = (details) => {
+const action: commandActionHandler = details => {
     const { player, args } = details;
 
-    player.transformInto(details && details.args ? details.args['npcKey'] : null)
+    player.transformInto(details && details.args ? details.args['npcKey'] : null);
 };
 
 export default {
@@ -11,15 +11,15 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'transform' ],
+            commands: ['transform'],
             args: [
                 {
                     name: 'npcKey',
                     type: 'either',
-                    defaultValue: undefined
-                }
+                    defaultValue: undefined,
+                },
             ],
-            handler: action
-        } as PlayerCommandActionHook
-    ]
+            handler: action,
+        } as PlayerCommandActionHook,
+    ],
 };

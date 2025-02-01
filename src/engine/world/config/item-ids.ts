@@ -3,7 +3,7 @@ export const itemIds = {
         ratsTail: 300,
         burntMeat: 2146,
         eyeOfNewt: 221,
-        onion: 1957
+        onion: 1957,
     },
     coins: 995,
     bucket: 1925,
@@ -76,11 +76,11 @@ export const itemIds = {
         rune_pp: 5621,
         rune_s: 5627,
         rune_fire_u: 2540,
-        rune_fire_l: 2541
+        rune_fire_l: 2541,
     },
     essence: {
         pure: 7936,
-        rune: 1436
+        rune: 1436,
     },
     talismans: {
         air: 1438,
@@ -96,7 +96,7 @@ export const itemIds = {
         law: 1458,
         soul: 1460,
         nature: 1462,
-        elemental: 5516
+        elemental: 5516,
     },
     tiaras: {
         blank: 5525,
@@ -136,7 +136,7 @@ export const itemIds = {
         gold: 2357,
         mithril: 2359,
         adamantite: 2361,
-        runite: 2363
+        runite: 2363,
     },
     ores: {
         clay: 434,
@@ -149,7 +149,7 @@ export const itemIds = {
         gold: 444,
         mithril: 447,
         adamantite: 449,
-        runite: 451
+        runite: 451,
     },
     daggers: {
         bronze: 1205,
@@ -352,20 +352,20 @@ export const itemIds = {
         runite: 9431,
     },
     oilLanternFrames: {
-        steel: 4540
+        steel: 4540,
     },
     studs: {
-        steel: 2370
+        steel: 2370,
     },
     grappleTips: {
-        mithril: 9415
+        mithril: 9415,
     },
     roots: {
         oak: 6043,
         willow: 6047,
         maple: 6047,
         yew: 6049,
-        magic: 6051
+        magic: 6051,
     },
     logs: {
         normal: 1511,
@@ -373,12 +373,12 @@ export const itemIds = {
         oak: 1521,
         willow: 1519,
         teak: 6333,
-        dramenbranch:771,
+        dramenbranch: 771,
         maple: 1517,
         bark: 3239,
         mahogany: 6332,
         yew: 1515,
-        magic: 1513
+        magic: 1513,
     },
     bowunstrung: {
         woodshort: 50,
@@ -393,7 +393,7 @@ export const itemIds = {
         yewshort: 68,
         yewlong: 66,
         magicshort: 72,
-        magiclong: 70
+        magiclong: 70,
     },
     bowstrung: {
         woodshort: 841,
@@ -408,7 +408,7 @@ export const itemIds = {
         yewshort: 857,
         yewlong: 855,
         magicshort: 861,
-        magiclong: 859
+        magiclong: 859,
     },
     skillCapes: {
         attack: {
@@ -507,6 +507,6 @@ export const itemIds = {
         air: 1381,
         fire: 1387,
         water: 1383,
-        earth: 1385
-    }
+        earth: 1385,
+    },
 };

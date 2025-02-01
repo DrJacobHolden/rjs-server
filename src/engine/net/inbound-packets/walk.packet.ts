@@ -5,7 +5,7 @@ const walkPacket = (player: Player, packet: PacketData) => {
     const { buffer, packetSize, packetId } = packet;
 
     let size = packetSize;
-    if(packetId === 236) {
+    if (packetId === 236) {
         size -= 14;
     }
 
@@ -27,23 +27,27 @@ const walkPacket = (player: Player, packet: PacketData) => {
     walkingQueue.valid = true;
     walkingQueue.add(firstX, firstY);
 
-    for(let i = 0; i < totalSteps; i++) {
+    for (let i = 0; i < totalSteps; i++) {
         const x = buffer.get('byte');
         const y = buffer.get('byte');
         walkingQueue.add(x + firstX, y + firstY);
     }
 };
 
-export default [{
-    opcode: 73,
-    size: -1,
-    handler: walkPacket
-}, {
-    opcode: 236,
-    size: -1,
-    handler: walkPacket
-}, {
-    opcode: 89,
-    size: -1,
-    handler: walkPacket
-}];
+export default [
+    {
+        opcode: 73,
+        size: -1,
+        handler: walkPacket,
+    },
+    {
+        opcode: 236,
+        size: -1,
+        handler: walkPacket,
+    },
+    {
+        opcode: 89,
+        size: -1,
+        handler: walkPacket,
+    },
+];

@@ -1,4 +1,4 @@
-import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
 import type { ActionHook } from '@engine/action/hook/action-hook';
 import { getActionHooks } from '@engine/action/hook/action-hook';
 import type { Npc } from '@engine/world/actor/npc';
@@ -18,12 +18,10 @@ export interface PrayerActionHook extends ActionHook<PrayerAction, PrayerActionH
     cancelActions?: boolean;
 }
 
-
 /**
  * The button action hook handler function to be called when the hook's conditions are met.
  */
 export type PrayerActionHandler = (buttonAction: PrayerAction) => void | Promise<void>;
-
 
 /**
  * Details about a button action being performed.
@@ -39,7 +37,6 @@ export interface PrayerAction {
     buttonId: number;
 }
 
-
 /**
  * The pipe that the game engine hands button actions off to.
  * @param npc
@@ -47,7 +44,7 @@ export interface PrayerAction {
  * @param widgetId
  * @param buttonId
  */
-const prayerActionPipe = (npc:Npc, player: Player, widgetId: number, buttonId: number): RunnableHooks<PrayerAction> => {
+const prayerActionPipe = (npc: Npc, player: Player, widgetId: number, buttonId: number): RunnableHooks<PrayerAction> => {
     console.info(`You used prayer`);
 
     // Find all object action plugins that reference this location object
@@ -59,15 +56,12 @@ const prayerActionPipe = (npc:Npc, player: Player, widgetId: number, buttonId: n
             npc,
             player,
             widgetId,
-            buttonId
-        }
-    }
-
-
+            buttonId,
+        },
+    };
 };
-
 
 /**
  * Button action pipe definition.
  */
-export default [ 'prayer', prayerActionPipe ] as ActionPipe;
+export default ['prayer', prayerActionPipe] as ActionPipe;

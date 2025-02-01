@@ -5,35 +5,30 @@ import type { Player } from '@engine/world/actor/player/player';
 import type { Item } from '@engine/world/items/item';
 import { logger } from '@runejs/common';
 
-export const potatoOnPlayer: itemOnPlayerActionHandler = (details) => {
+export const potatoOnPlayer: itemOnPlayerActionHandler = details => {
     const widget = details.player.interfaceState.openWidget(widgets.bank.depositBoxWidget.widgetId, {
         slot: 'screen',
-        fakeWidget: 3100001
+        fakeWidget: 3100001,
     });
     widget.metadata['player'] = details.otherPlayer;
     details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.bank.depositBoxWidget, details.otherPlayer.inventory);
 
-
     details.player.modifyWidget(widgets.bank.depositBoxWidget.widgetId, {
         childId: widgets.bank.depositBoxWidget.titleText,
-        text: `${details.otherPlayer.username}'s Inventory`
-    })
-
-
-
+        text: `${details.otherPlayer.username}'s Inventory`,
+    });
 };
-export const potatoManipulatePlayerInventory: itemInteractionActionHandler = (details) => {
+export const potatoManipulatePlayerInventory: itemInteractionActionHandler = details => {
     const playerWidget = details.player.interfaceState.findWidget(widgets.bank.depositBoxWidget.widgetId);
 
-    if(!playerWidget) {
+    if (!playerWidget) {
         return;
     }
     const otherPlayer: Player = playerWidget.metadata['player'];
 
-    if(!otherPlayer) {
+    if (!otherPlayer) {
         return;
     }
-
 
     // If the item is a noted item, we need to de-note it
     const itemIdToAdd: number = details.itemId;
@@ -47,7 +42,7 @@ export const potatoManipulatePlayerInventory: itemInteractionActionHandler = (de
 
     const slotsWithItem = otherPlayer.inventory.findAll(details.itemId);
     let itemAmount = 0;
-    slotsWithItem.forEach((slot) => {
+    slotsWithItem.forEach(slot => {
         const item = otherPlayer.inventory.items[slot];
 
         if (!item) {
@@ -95,5 +90,4 @@ export const potatoManipulatePlayerInventory: itemInteractionActionHandler = (de
     details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.bank.depositBoxWidget, otherPlayer.inventory);
     details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, details.player.inventory);
     otherPlayer.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, otherPlayer.inventory);
-
 };

@@ -1,6 +1,6 @@
+import type { playerInitActionHandler } from '@engine/action/pipe/player-init.action';
 import { validateSettings } from '@engine/world/actor/player/player-data';
 import { widgetScripts } from '@engine/world/config/widget';
-import type { playerInitActionHandler } from '@engine/action/pipe/player-init.action';
 
 export const handler: playerInitActionHandler = ({ player }) => {
     validateSettings(player);
@@ -24,7 +24,5 @@ export const handler: playerInitActionHandler = ({ player }) => {
 
 export default {
     pluginId: 'rs:update_player_settings',
-    hooks: [
-        { type: 'player_init', handler }
-    ]
+    hooks: [{ type: 'player_init', handler }],
 };

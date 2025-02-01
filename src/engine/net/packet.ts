@@ -1,5 +1,5 @@
-import type { Isaac } from './isaac';
 import { ByteBuffer } from '@runejs/common';
+import type { Isaac } from './isaac';
 
 /**
  * The type of packet; Fixed, Dynamic Small (sized byte), or Dynamic Large (sized short)
@@ -7,14 +7,13 @@ import { ByteBuffer } from '@runejs/common';
 export enum PacketType {
     FIXED = 'FIXED',
     DYNAMIC_SMALL = 'DYNAMIC_SMALL',
-    DYNAMIC_LARGE = 'DYNAMIC_LARGE'
+    DYNAMIC_LARGE = 'DYNAMIC_LARGE',
 }
 
 /**
  * A single packet to be sent to the game client.
  */
 export class Packet extends ByteBuffer {
-
     private readonly _packetId: number;
     private readonly _type: PacketType = PacketType.FIXED;
 
@@ -28,7 +27,7 @@ export class Packet extends ByteBuffer {
         const packetSize = this.writerIndex;
         let bufferSize = packetSize + 1; // +1 for the packet id
 
-        if(this.type !== PacketType.FIXED) {
+        if (this.type !== PacketType.FIXED) {
             bufferSize += this.type === PacketType.DYNAMIC_SMALL ? 1 : 2;
         }
 
@@ -37,10 +36,10 @@ export class Packet extends ByteBuffer {
 
         let copyStart = 1;
 
-        if(this.type === PacketType.DYNAMIC_SMALL) {
+        if (this.type === PacketType.DYNAMIC_SMALL) {
             buffer.put(packetSize, 'BYTE');
             copyStart = 2;
-        } else if(this.type === PacketType.DYNAMIC_LARGE) {
+        } else if (this.type === PacketType.DYNAMIC_LARGE) {
             buffer.put(packetSize, 'SHORT');
             copyStart = 3;
         }

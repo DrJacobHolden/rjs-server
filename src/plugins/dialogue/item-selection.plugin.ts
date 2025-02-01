@@ -3,7 +3,7 @@ import type { widgetInteractionActionHandler } from '@engine/action/pipe/widget-
 /**
  * Handles an item selection dialogue choice.
  */
-export const action: widgetInteractionActionHandler = (details) => {
+export const action: widgetInteractionActionHandler = details => {
     const { player, widgetId, childId } = details;
     player.interfaceState.closeWidget('chatbox', widgetId, childId);
 };
@@ -13,9 +13,9 @@ export default {
     hooks: [
         {
             type: 'widget_interaction',
-            widgetIds: [ 303, 304, 305, 306, 307, 309 ],
+            widgetIds: [303, 304, 305, 306, 307, 309],
             handler: action,
-            cancelActions: false
-        }
-    ]
+            cancelActions: false,
+        },
+    ],
 };

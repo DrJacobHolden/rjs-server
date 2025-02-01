@@ -1,7 +1,7 @@
 import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { Position } from '@engine/world/position';
 
-const action: commandActionHandler = (details) => {
+const action: commandActionHandler = details => {
     const { player, args } = details;
 
     const x: number = args.x as number;
@@ -16,23 +16,23 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'path' ],
+            commands: ['path'],
             args: [
                 {
                     name: 'x',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'y',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'diameter',
                     type: 'number',
-                    defaultValue: 64
-                }
+                    defaultValue: 64,
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };
