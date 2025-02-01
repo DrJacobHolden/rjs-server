@@ -1,0 +1,78 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
+    "files": {
+        "ignoreUnknown": false,
+        "ignore": []
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 140
+    },
+    "organizeImports": {
+        "enabled": true
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "complexity": {
+                "recommended": true,
+                "noBannedTypes": "off",
+                "noForEach": "off",
+                "noStaticOnlyClass": "off",
+                "noUselessConstructor": "off",
+                "noUselessSwitchCase": "off",
+                "useLiteralKeys": "off",
+                "useOptionalChain": "off"
+            },
+            "correctness": {
+                "recommended": true,
+                "noSwitchDeclarations": "off"
+            },
+            "performance": {
+                "recommended": true,
+                "noAccumulatingSpread": "off",
+                "noDelete": "off"
+            },
+            "suspicious": {
+                "recommended": true,
+                "noAssignInExpressions": "off",
+                "noConfusingVoidType": "off",
+                "noDoubleEquals": "off",
+                "noDuplicateObjectKeys": "off",
+                "noExplicitAny": "off",
+                "noGlobalIsNan": "off",
+                "noImplicitAnyLet": "off",
+                "noSelfCompare": "off",
+                "noUnsafeDeclarationMerging": "off"
+            },
+            "style": {
+                "recommended": true,
+                "noInferrableTypes": "off",
+                "noNonNullAssertion": "off",
+                "noParameterAssign": "off",
+                "noUnusedTemplateLiteral": "off",
+                "noUselessElse": "off",
+                "useEnumInitializers": "off",
+                "useImportType": "off",
+                "useNodejsImportProtocol": "off",
+                "useNumberNamespace": "off",
+                "useSingleVarDeclarator": "off",
+                "useTemplate": "off"
+            }
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "arrowParentheses": "asNeeded"
+        }
+    }
+}

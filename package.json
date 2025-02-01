@@ -19,6 +19,10 @@
         "standalone": "npm run start:standalone",
         "build": "rimraf dist && swc ./src -d dist --strip-leading-paths",
         "build:watch": "swc ./src -d dist -w --strip-leading-paths",
+        "lint": "biome lint",
+        "lint:fix": "biome lint --write",
+        "format": "biome format",
+        "format:fix": "biome format --write",
         "test": "jest",
         "test:fin": "jest --silent --reporters=\"summary\"",
         "typecheck": "tsc -p ./ --noEmit"
@@ -55,6 +59,7 @@
         "uuid": "^11.0.5"
     },
     "devDependencies": {
+        "@biomejs/biome": "1.9.4",
         "@swc/cli": "^0.6.0",
         "@swc/core": "^1.10.9",
         "@types/jest": "^29.5.14",
