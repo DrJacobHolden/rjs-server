@@ -1,13 +1,14 @@
+import { MagicOnNPCAction } from '@engine/action/pipe/magic-on-npc.action';
 import { ContentPlugin } from '@engine/plugins/plugin.types';
-import { MagicOnNPCAction } from '@engine/action';
-import { CombatSpell, SPELLS_BY_ID } from '@plugins/combat/magic/config/normal-spells.constants';
-import { Npc, Player } from '@engine/world/actor';
+import { colors } from '@engine/util/colors';
+import { colorText } from '@engine/util/strings';
+import { Npc } from '@engine/world/actor/npc';
+import { Player } from '@engine/world/actor/player/player';
 import { QueueType } from '@engine/world/actor/tick-queue';
-import { colors, colorText } from '@engine/util';
+import { CombatSpell, SPELLS_BY_ID } from '@plugins/combat/magic/config/normal-spells.constants';
 
 const SPLASH_GFX = 85; // 339
 const CAST_ANIMATION = 711;
-
 
 async function initMagic(details: MagicOnNPCAction) {
     const { player, buttonId, npc } = details;
@@ -28,15 +29,11 @@ async function initMagic(details: MagicOnNPCAction) {
     }
 
     if (player.skills.magic.level < spell.level) {
-        player.sendMessage(
-            'You do not have a high enough magic level to cast this spell.',
-        );
+        player.sendMessage('You do not have a high enough magic level to cast this spell.');
         return;
     }
 
-
     const isInstant = !player.tickQueue.globalTimer.isActive();
-
 
     // TODO: do we still walk????
     player.face(npc, true, false, false);
@@ -54,12 +51,10 @@ async function initMagic(details: MagicOnNPCAction) {
     return castSpell(player, npc, spell);
 
     // wait for next attack
-
 }
 
-
 const castSpell = async (player: Player, npc: Npc, spell: CombatSpell) => {
-    console.log("I AM CASTING")
+    console.log('I AM CASTING');
     player.playAnimation({ id: CAST_ANIMATION, delay: 20 });
     player.playGraphics({ id: spell.startGfx, delay: 20, height: 100 });
     // calc damage
@@ -72,19 +67,8 @@ const castSpell = async (player: Player, npc: Npc, spell: CombatSpell) => {
     const offsetY = victimX - attackerX;
 
     //npc world index would be -1 for players
-    player.outgoingPackets.sendProjectile(
-        player.position,
-        offsetX,
-        offsetY,
-        spell.projectileGfx,
-        43,
-        31,
-        80,
-        npc.worldIndex + 1,
-        65,
-    );
+    player.outgoingPackets.sendProjectile(player.position, offsetX, offsetY, spell.projectileGfx, 43, 31, 80, npc.worldIndex + 1, 65);
     try {
-
         // player.delayManager.applyDelay(4);
         await player.requestTickDelay(4, { type: QueueType.NORMAL });
 
@@ -105,19 +89,19 @@ const castSpell = async (player: Player, npc: Npc, spell: CombatSpell) => {
     // splat
 
     // rerun
-}
+};
 
-export default <ContentPlugin>{
+export default (<ContentPlugin>{
     pluginId: 'rs:magic_normal-spells',
     hooks: {
         type: 'magic_on_npc',
         widgetId: 192,
-        buttonIds: Object.keys(SPELLS_BY_ID).map((i) => Number.parseInt(i)),
-        handler: async (details) => initMagic(details),
+        buttonIds: Object.keys(SPELLS_BY_ID).map(i => Number.parseInt(i)),
+        handler: async details => initMagic(details),
         walkTo: false,
         // task: {
         //     activate,
         //     interval: 1,
         // },
     },
-};
+});

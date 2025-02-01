@@ -2,13 +2,12 @@ export type CombatSpell = {
     name: string;
     level: number;
     baseExperience: number;
-    runes: { id: number, amount: number }[];
+    runes: { id: number; amount: number }[];
     startGfx: number;
     projectileGfx: number;
     endGfx: number;
     maxHit: number;
 };
-
 
 export const SPELLS_BY_ID: Record<number, CombatSpell> = {
     0: {

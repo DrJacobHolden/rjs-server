@@ -1,4 +1,5 @@
-import { ActionType, MagicOnNPCAction, ObjectInteractionAction } from '@engine/action/action-pipeline';
+import { ActionType } from '@engine/action/action-pipeline';
+import { MagicOnNPCAction } from '@engine/action/pipe/magic-on-npc.action';
 import { ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
 import { Quest } from '@engine/world/actor/player/quest';
 

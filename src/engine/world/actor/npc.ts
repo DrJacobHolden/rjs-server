@@ -4,6 +4,7 @@ import type { NpcCombatAnimations, NpcDetails } from '@engine/config/npc-config'
 import type { NpcSpawn } from '@engine/config/npc-spawn-config';
 import { activeWorld } from '@engine/world';
 import type { Player } from '@engine/world/actor/player/player';
+import { DamageType } from '@engine/world/actor/update-flags';
 import { isPlayer } from '@engine/world/actor/util';
 import { animationIds } from '@engine/world/config/animation-ids';
 import { soundIds } from '@engine/world/config/sound-ids';
@@ -73,7 +74,7 @@ export class Npc extends Actor {
         }
 
         if (typeof npcDetails === 'number') {
-            this.id = npcDetails
+            this.id = npcDetails;
             this.cacheDetails = findNpc(npcDetails);
         } else {
             this.id = npcDetails.gameId;
@@ -245,7 +246,7 @@ export class Npc extends Actor {
      * Whether or not the Npc can currently move.
      */
     public canMove(): boolean {
-        if(!super.canMove()) {
+        if (!super.canMove()) {
             return false;
         }
         if (this.metadata.following) {
