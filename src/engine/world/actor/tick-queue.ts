@@ -1,6 +1,7 @@
 import { Actor } from '@engine/world/actor/actor';
 import { Player } from '@engine/world/actor/player/player';
 import { ActionTimer } from '@engine/world/actor/timing/action-timer';
+import { isPlayer } from '@engine/world/actor/util';
 
 /**
  * Represents different queue types for tick tasks.
@@ -159,13 +160,13 @@ export class TickQueue {
             this.clearWeakTasks('Strong task present');
 
             // Force close modal interfaces immediately
-            if (this.actor instanceof Player) {
+            if (isPlayer(this.actor)) {
                 this.actor.interfaceState.closeAllSlots();
             }
         }
 
         // Handle SOFT tasks entering queue
-        if (type === QueueType.SOFT && this.actor instanceof Player) {
+        if (type === QueueType.SOFT && isPlayer(this.actor)) {
             // Force close modal interfaces immediately
             this.actor.interfaceState.closeAllSlots();
         }
@@ -227,7 +228,7 @@ export class TickQueue {
                 if (task.type === QueueType.SOFT || (!isDelayed && this.canProcessTask(task))) {
                     if (this.shouldCompleteTask(task)) {
                         // Handle modal interfaces for STRONG/SOFT tasks
-                        if (this.actor instanceof Player && (task.type === QueueType.STRONG || task.type === QueueType.SOFT)) {
+                        if (isPlayer(this.actor) && (task.type === QueueType.STRONG || task.type === QueueType.SOFT)) {
                             this.actor.interfaceState.closeAllSlots();
                         }
 
@@ -266,7 +267,7 @@ export class TickQueue {
         }
 
         // For players, handle modal interfaces
-        if (this.actor instanceof Player) {
+        if (isPlayer(this.actor)) {
             // NORMAL tasks skip if modal interface is open
             if (
                 task.type === QueueType.NORMAL
