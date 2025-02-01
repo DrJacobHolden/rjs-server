@@ -48,7 +48,6 @@ const moveItemActionPipe = (player: Player, fromSlot: number, toSlot: number,
     const matchingHooks = getActionHooks<MoveItemActionHook>('move_item')
         .filter(plugin => (
             (plugin.widgetId || plugin.widgetIds)
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             && numberHookFilter((plugin.widgetId || plugin.widgetIds)!, widget.widgetId)
         ));
 

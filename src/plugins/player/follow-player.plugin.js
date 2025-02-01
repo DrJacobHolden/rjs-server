@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-undef
 module.exports = {
     pluginId: 'rs:follow_player',
     hooks: [

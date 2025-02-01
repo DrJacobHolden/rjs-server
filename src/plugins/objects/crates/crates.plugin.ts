@@ -8,7 +8,6 @@ export const action: objectInteractionActionHandler = (details) => {
     details.player.playAnimation(827);
 
     const random = Math.floor(Math.random() * veggies.length);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const pickedItem = findItem(veggies[random])!;
 
     details.player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, details.player.inventory);

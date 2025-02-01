@@ -80,12 +80,9 @@ export function wrapText(text: string, maxWidth: number, font?: number | string)
                 break;
             case '>':
                 hidden = true;
-                // eslint-disable-next-line no-case-declarations
                 const currentTag = currentLine.substring(currentTagIndex, currentLine.length);
                 currentTagIndex = -1;
-                // eslint-disable-next-line no-case-declarations
                 const isClosing = currentTag.charAt(0) === '/';
-                // eslint-disable-next-line no-case-declarations
                 const type = getStylingType(currentTag);
                 if (type === TextDecoration.Decoration) {
                     if (!isClosing) {

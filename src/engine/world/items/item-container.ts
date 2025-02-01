@@ -173,7 +173,6 @@ export class ItemContainer {
             const newItem = {
                 itemId: item.itemId,
                 // using ! here because we know the item exists in the inventory
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 amount: this._items[existingItemIndex]!.amount += item.amount
             } as Item;
 
@@ -214,7 +213,6 @@ export class ItemContainer {
             const newItem = {
                 itemId: item.itemId,
                 // using ! here because we know the item exists in the inventory
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 amount: this._items[existingItemIndex]!.amount += item.amount
             } as Item;
 
@@ -340,7 +338,6 @@ export class ItemContainer {
         if(itemDefinition.stackable || everythingStacks || fromNote(item) > -1) {
             if(this.has(item.itemId)) {
                 // using ! here because we know that we have the item in the inventory
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const invItem = this.items[this.findIndex(item.itemId)]!;
                 return invItem.amount + item.amount <= 2147483647;
             }

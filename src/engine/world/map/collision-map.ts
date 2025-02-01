@@ -358,11 +358,9 @@ export class CollisionMap {
         }
 
         if(mark) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             this._adjacency[x][y] |= 0x200000;
         } else {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             this._adjacency[x][y] &= 0xdfffff;
         }
@@ -400,7 +398,6 @@ export class CollisionMap {
                 this._adjacency[x][y] = 0;
             }
 
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             this._adjacency[x][y] |= flag;
         }
@@ -430,7 +427,6 @@ export class CollisionMap {
                 this._adjacency[x][y] = 0;
             }
 
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             this._adjacency[x][y] &= 0xffffff - flag;
         }

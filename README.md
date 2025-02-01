@@ -48,4 +48,3 @@ Before running these commands, you must:
 * `npm run standalone` Launches all three servers concurrently without building
 * `npm run build:watch` Builds the application and watches for changes
 * `npm run build` Builds the application
-* `npm run lint` Runs the linter against the codebase to look for code style issues

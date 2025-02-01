@@ -45,7 +45,6 @@ export async function loadPlugins(): Promise<void> {
                     actionHookMap[action.type] = [];
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 actionHookMap[action.type]!.push(action);
             } else {
                 if(!actionHookMap['quest']) {

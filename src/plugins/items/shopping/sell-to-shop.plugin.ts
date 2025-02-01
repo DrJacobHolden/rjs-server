@@ -87,7 +87,6 @@ export const handler: itemInteractionActionHandler = (details) => {
             inventory.set(coinsIndex, { itemId: itemIds.coins, amount: sellPrice });
         } else {
             // TODO (Jameskmonger) consider being explicit to prevent dupes
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             inventory.items[coinsIndex]!.amount += sellPrice;
         }
     }

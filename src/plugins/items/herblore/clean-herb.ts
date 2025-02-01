@@ -17,7 +17,6 @@ interface IGrimyHerb {
  * (Jameskmonger) I have put ! after findItem() because we know the items exist.
  */
 const herbs: IGrimyHerb[] = [
-    /* eslint-disable @typescript-eslint/no-non-null-assertion */
     {
         grimy: findItem('rs:grimy_guam')!,
         clean: findItem('rs:herb_guam')!,
@@ -102,7 +101,6 @@ const herbs: IGrimyHerb[] = [
         level: 75,
         experience: 15
     },
-    /* eslint-enable @typescript-eslint/no-non-null-assertion */
 ]
 
 

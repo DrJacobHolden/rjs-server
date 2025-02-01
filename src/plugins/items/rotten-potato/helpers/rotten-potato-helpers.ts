@@ -9,7 +9,6 @@ import type { WidgetInteractionAction } from '@engine/action/pipe/widget-interac
  *
  * (Jameskmonger) I have put ! after findItem() because we know the item exists.
  */
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const RottenPotatoItem: ItemDetails = findItem('rs:rotten_potato')!;
 
 
