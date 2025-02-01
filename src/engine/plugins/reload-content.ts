@@ -1,10 +1,9 @@
 import { sep } from 'path';
-import { loadGameConfigurations } from '@engine/config';
-import { loadPackets } from '@engine/net';
 import { loadPlugins } from '@engine/plugins/loader';
 import { logger } from '@runejs/common';
-import { Player } from '@engine/world/actor';
-
+import type { Player } from '@engine/world/actor/player/player';
+import { loadGameConfigurations } from '@engine/config/config-handler';
+import { loadPackets } from '@engine/net/inbound-packet-handler';
 
 export const reloadContentCommands = [
     'plugins', 'reload', 'content', 'hotload', 'refresh', 'restart', 'r'

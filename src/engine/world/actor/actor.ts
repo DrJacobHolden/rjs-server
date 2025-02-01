@@ -1,22 +1,25 @@
 import { Subject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
-
-import { DefensiveBonuses, OffensiveBonuses, SkillBonuses } from '@engine/config';
-import { activeWorld, directionFromIndex, Position, WorldInstance } from '@engine/world';
-import { Item, ItemContainer } from '@engine/world/items';
-import { ActionCancelType, ActionPipeline } from '@engine/action';
-
 import { WalkingQueue } from './walking-queue';
-import { Animation, Graphic, UpdateFlags } from './update-flags';
+import type { Animation, Graphic } from './update-flags';
+import { UpdateFlags } from './update-flags';
 import { Skills } from './skills';
 import { Pathfinding } from './pathfinding';
-import { ActorMetadata } from './metadata';
-import { Task, TaskScheduler } from '@engine/task';
+import type { ActorMetadata } from './metadata';
 import { logger } from '@runejs/common';
-import { ObjectConfig } from '@runejs/filestore';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
-import { Npc } from '@engine/world/actor/npc';
-import { Player } from '@engine/world/actor/player';
+import { isNpc } from './util';
+import type { ActionCancelType } from '@engine/action/action-pipeline';
+import { ActionPipeline } from '@engine/action/action-pipeline';
+import type { OffensiveBonuses, DefensiveBonuses, SkillBonuses } from '@engine/config/item-config';
+import type { Task } from '@engine/task/task';
+import { TaskScheduler } from '@engine/task/task-scheduler';
+import { activeWorld } from '@engine/world';
+import { directionFromIndex } from '@engine/world/direction';
+import type { WorldInstance } from '@engine/world/instances';
+import type { Item } from '@engine/world/items/item';
+import { ItemContainer } from '@engine/world/items/item-container';
+import { Position } from '@engine/world/position';
 
 
 export type ActorType = 'player' | 'npc';
@@ -357,7 +360,7 @@ export abstract class Actor {
             return;
         }
 
-        if(this.isNpc()) {
+        if(isNpc(this)) {
             const nearbyPlayers = activeWorld.findNearbyPlayers(this.position, 24, this.instance.instanceId);
             if(nearbyPlayers.length === 0) {
                 // No need for this actor to move if there are no players nearby to witness it, save some memory. :)
@@ -483,14 +486,6 @@ export abstract class Actor {
 
     protected tick() {
         this.scheduler.tick();
-    }
-
-    public isPlayer(): this is Player {
-        return this.type === 'player';
-    }
-
-    public isNpc(): this is Npc {
-        return this.type === 'npc';
     }
 
     public get position(): Position {

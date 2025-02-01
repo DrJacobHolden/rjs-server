@@ -1,8 +1,8 @@
-import { buttonActionHandler } from '@engine/action';
-import { findMusicTrackByButtonId, findSongIdByRegionId, widgets } from '@engine/config';
-import { widgetScripts } from '@engine/world/config';
-import { MusicPlayerMode, MusicTabButtonIds } from '@engine/world/sound';
+import type { buttonActionHandler } from '@engine/action/pipe/button.action';
+import { findSongIdByRegionId, findMusicTrackByButtonId, widgets } from '@engine/config/config-handler';
 import { activeWorld } from '@engine/world';
+import { widgetScripts } from '@engine/world/config/widget';
+import { MusicTabButtonIds, MusicPlayerMode } from '@engine/world/sound/music';
 import { logger } from '@runejs/common';
 
 export const handler: buttonActionHandler = (details) => {

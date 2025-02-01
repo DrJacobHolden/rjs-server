@@ -1,11 +1,11 @@
-import { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
-import { Player } from '@engine/world/actor/player/player';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
+import type { Player } from '@engine/world/actor/player/player';
 import { dialogue, execute } from '@engine/world/actor/dialogue';
-import { getActionHooks } from '@engine/action/hook';
 import { advancedNumberHookFilter } from '@engine/action/hook/hook-filters';
-import { ObjectInteractionActionHook } from '@engine/action/pipe/object-interaction.action';
+import type { ObjectInteractionActionHook } from '@engine/action/pipe/object-interaction.action';
 import { objectIds } from '@engine/world/config/object-ids';
 import { openTravel } from '@plugins/items/rotten-potato/helpers/rotten-potato-travel';
+import { getActionHooks } from '@engine/action/hook/action-hook';
 
 
 function openBank(player: Player) {

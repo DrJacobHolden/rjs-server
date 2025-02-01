@@ -1,7 +1,5 @@
-import { ItemDetails } from '@engine/config/item-config';
-import { itemSelectionDialogue } from '@engine/world/actor/dialogue';
 import { itemIds } from '@engine/world/config/item-ids';
-import { Fletchable } from '@plugins/skills/fletching/fletching-types';
+import type { Fletchable } from '@plugins/skills/fletching/fletching-types';
 
 
 export const knifeId: number = itemIds.knife;
@@ -14,7 +12,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.woodshort, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['wood long', {
             level: 10,
@@ -22,7 +20,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.woodlong, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['oak short', {
             level: 20,
@@ -30,7 +28,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.oakshort, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['oak long', {
             level: 25,
@@ -38,7 +36,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.oaklong, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['comp ogre', {
             level: 30,
@@ -46,7 +44,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.compogre, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['willow short', {
             level: 35,
@@ -54,7 +52,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.willowshort, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['willow long', {
             level: 40,
@@ -62,7 +60,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.willowlong, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['maple short', {
             level: 50,
@@ -70,7 +68,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.mapleshort, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['maple long', {
             level: 55,
@@ -78,7 +76,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.maplelong, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['yew short', {
             level: 65,
@@ -86,7 +84,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.yewshort, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['yew long', {
             level: 70,
@@ -94,7 +92,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.yewlong, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['magic short', {
             level: 80,
@@ -102,7 +100,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.magicshort, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
         ['magic long', {
             level: 85,
@@ -110,7 +108,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             item: { itemId: itemIds.bowunstrung.magiclong, amount: 1 },
             ingredient: [
                 { itemId: itemIds.logs.normal, amount: 1 }
-            ] 
+            ]
         }],
     ])],
     ['bow', new Map<string, Fletchable>([
@@ -121,7 +119,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.woodshort, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['wood long', {
             level: 10,
@@ -130,7 +128,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.woodlong, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['oak short', {
             level: 20,
@@ -139,7 +137,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.oakshort, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['oak long', {
             level: 25,
@@ -148,7 +146,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.oaklong, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['comp ogre', {
             level: 30,
@@ -157,7 +155,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.compogre, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['willow short', {
             level: 35,
@@ -166,7 +164,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.willowshort, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['willow long', {
             level: 40,
@@ -175,7 +173,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.willowlong, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['maple short', {
             level: 50,
@@ -184,7 +182,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.mapleshort, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['maple long', {
             level: 55,
@@ -193,7 +191,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.maplelong, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['yew short', {
             level: 65,
@@ -202,7 +200,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.yewshort, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['yew long', {
             level: 70,
@@ -211,7 +209,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.yewlong, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['magic short', {
             level: 80,
@@ -220,7 +218,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.magicshort, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
         ['magic long', {
             level: 85,
@@ -229,7 +227,7 @@ export const fletchables : Map<string, Map<string, Fletchable>> = new Map<string
             ingredient: [
                 { itemId: itemIds.bowunstrung.magiclong, amount: 1 },
                 { itemId: itemIds.bowstring, amount: 1 }
-            ] 
+            ]
         }],
     ])]
 ])

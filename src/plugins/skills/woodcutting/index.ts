@@ -1,8 +1,6 @@
-import {
-    ObjectInteractionActionHook,
-} from '@engine/action';
 import { getTreeIds } from '@engine/world/config/harvestable-object';
 import { runWoodcuttingTask } from './woodcutting-task';
+import type { ObjectInteractionActionHook } from '@engine/action/pipe/object-interaction.action';
 
 /**
  * Woodcutting plugin

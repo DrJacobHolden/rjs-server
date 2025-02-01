@@ -1,8 +1,8 @@
+import type { ActionPipe } from '@engine/action/action-pipeline';
+import { ActionPipeline } from '@engine/action/action-pipeline';
+import { BUILD_DIR } from '@engine/config/directories';
+import { getFiles } from '@engine/util/files';
 import { logger } from '@runejs/common';
-
-import { ActionPipe, ActionPipeline } from '@engine/action';
-import { getFiles } from '@engine/util';
-import { BUILD_DIR } from '@engine/config';
 import { join } from 'path';
 
 

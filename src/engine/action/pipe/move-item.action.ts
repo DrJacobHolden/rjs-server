@@ -1,6 +1,8 @@
-import { Player } from '@engine/world/actor';
-import { ActionHook, getActionHooks, numberHookFilter, ActionPipe, RunnableHooks } from '@engine/action';
-
+import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { numberHookFilter } from '@engine/action/hook/hook-filters';
+import type { Player } from '@engine/world/actor/player/player';
 
 /**
  * Defines a move item action hook.

@@ -1,10 +1,10 @@
-import { npcInteractionActionHandler } from '@engine/action/pipe/npc-interaction.action';
-import { dialogue, DialogueTree, Emote, execute, goto } from '@engine/world/actor/dialogue';
+import type { npcInteractionActionHandler } from '@engine/action/pipe/npc-interaction.action';
+import { dialogue, Emote, execute, goto } from '@engine/world/actor/dialogue';
 import { itemIds } from '@engine/world/config/item-ids';
-import { QuestJournalHandler } from '@engine/config/quest-config';
-import { Player } from '@engine/world/actor/player/player';
+import type { QuestJournalHandler } from '@engine/config/quest-config';
+import type { Player } from '@engine/world/actor/player/player';
 import { Quest } from '@engine/world/actor/player/quest';
-import { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { Position } from '@engine/world/position';
 
 

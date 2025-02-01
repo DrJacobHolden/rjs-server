@@ -11,7 +11,7 @@ describe('action/hook hook filters', () => {
 
                 test('should return true', () => {
                     const result = advancedNumberHookFilter(expected, input)
-    
+
                     expect(result).toEqual(true)
                 })
             })
@@ -21,7 +21,7 @@ describe('action/hook hook filters', () => {
 
                 test('should return false', () => {
                     const result = advancedNumberHookFilter(expected, input)
-    
+
                     expect(result).toEqual(false)
                 })
             })

@@ -1,8 +1,10 @@
-import { randomBetween } from '@engine/util';
-import { Position, WorldItem } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { objectIds, itemIds } from '@engine/world/config';
-import { LandscapeObject } from '@runejs/filestore';
+import { randomBetween } from '@engine/util/num';
+import type { Player } from '@engine/world/actor/player/player';
+import { itemIds } from '@engine/world/config/item-ids';
+import { objectIds } from '@engine/world/config/object-ids';
+import type { WorldItem } from '@engine/world/items/world-item';
+import type { Position } from '@engine/world/position';
+import type { LandscapeObject } from '@runejs/filestore';
 
 const fireDurationTicks = (): number => {
     return randomBetween(100, 200); // 1-2 minutes

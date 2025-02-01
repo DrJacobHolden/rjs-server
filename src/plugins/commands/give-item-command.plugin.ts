@@ -1,7 +1,6 @@
-import { commandActionHandler } from '@engine/action';
-import { filestore } from '@server/game/game-server';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { itemIds } from '@engine/world/config/item-ids';
-import { findItem, itemIdMap } from '@engine/config/config-handler';
+import { findItem } from '@engine/config/config-handler';
 
 const action: commandActionHandler = (details) => {
     const { player, args } = details;

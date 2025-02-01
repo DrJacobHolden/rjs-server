@@ -1,8 +1,9 @@
-import { objectInteractionActionHandler } from '@engine/action';
 import { Skill } from '@engine/world/actor/skills';
 import { getAllOreIds, getOreFromRock } from '@engine/world/config/harvestable-object';
-import { getBestPickaxe, soundIds } from '@engine/world/config';
 import { MiningTask } from './mining-task';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import { getBestPickaxe } from '@engine/world/config/harvest-tool';
+import { soundIds } from '@engine/world/config/sound-ids';
 
 const action: objectInteractionActionHandler = (details) => {
     // Get the mining details for the target rock

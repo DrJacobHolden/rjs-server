@@ -1,7 +1,7 @@
+import type { npcInteractionActionHandler } from '@engine/action/pipe/npc-interaction.action';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player } from '@engine/world/actor/player/player';
 import { logger } from '@runejs/common';
-import { Npc, Player } from '@engine/world/actor';
-import { npcInteractionActionHandler } from '@engine/action';
-
 
 export type QuestKey = number | 'complete';
 

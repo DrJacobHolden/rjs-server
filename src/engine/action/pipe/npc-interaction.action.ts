@@ -1,10 +1,11 @@
-import { Player, Npc } from '@engine/world/actor';
-import { Position } from '@engine/world';
-import {
-    ActionHook, getActionHooks, stringHookFilter, questHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
-import { WalkToActorPluginTask } from './task/walk-to-actor-plugin-task';
-
+import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { questHookFilter, stringHookFilter } from '@engine/action/hook/hook-filters';
+import { WalkToActorPluginTask } from '@engine/action/pipe/task/walk-to-actor-plugin-task';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Position } from '@engine/world/position';
 
 /**
  * Defines an npc action hook.

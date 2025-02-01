@@ -1,9 +1,10 @@
-import { ActorTask } from '@engine/task/impl';
-import { Actor, Player } from '@engine/world/actor';
-import { ObjectInteractionAction } from '../object-interaction.action';
-import { ItemOnObjectAction } from '../item-on-object.action';
-import { ActionHook } from '@engine/action/hook';
-import { Task } from '@engine/task';
+import type { ObjectInteractionAction } from '../object-interaction.action';
+import type { ItemOnObjectAction } from '../item-on-object.action';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { ActorTask } from '@engine/task/impl/actor-task';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Actor } from '@engine/world/actor/actor';
+import type { Task } from '@engine/task/task';
 
 /**
  * The result of running a callback function will be recorded here so that the

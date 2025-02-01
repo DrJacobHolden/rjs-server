@@ -1,47 +1,48 @@
-import { AddressInfo, Socket } from 'net';
+import type { AddressInfo, Socket } from 'net';
 import { v4 } from 'uuid';
 import { Subject } from 'rxjs';
 import EventEmitter from 'events';
-
 import { logger } from '@runejs/common';
-
-import { filestore, serverConfig } from '@server/game';
-import {
-    findMusicTrack, findNpc, findSongIdByRegionId, musicRegions, equipmentIndex,
-    EquipmentSlot, getEquipmentSlot, ItemDetails, findItem, findQuest,
-    npcIdMap, widgets, NpcDetails, PlayerQuest, QuestKey, itemMap
-} from '@engine/config';
-import { daysSinceLastLogin, colors, hexToRgb, rgbTo16Bit,getVarbitMorphIndex } from '@engine/util';
-import { OutboundPacketHandler, Isaac } from '@engine/net';
-import { actionHookMap, questMap } from '@engine/plugins';
-
-import { Position, QuadtreeKey, TileModifications, activeWorld, WorldInstance } from '@engine/world';
-import { PlayerWidget, widgetScripts, itemIds, animationIds } from '@engine/world/config';
-import { ContainerUpdateEvent, getItemFromContainer, ItemContainer, Item } from '@engine/world/items';
-import { Chunk, ChunkUpdateItem } from '@engine/world/map';
-import { PlayerCommandActionHook, regionChangeActionFactory } from '@engine/action';
-import { MusicPlayerMode } from '@engine/world/sound';
-
 import { Actor } from '../actor';
-import {
-    Appearance,
-    defaultAppearance,
-    defaultSettings,
-    loadPlayerSave,
-    playerExists,
-    PlayerSave,
-    PlayerSettings,
-    savePlayerData
-} from './player-data';
-import { Cutscene } from './cutscenes';
-import { InterfaceState } from '@engine/interface';
-import { Quest } from './quest';
-import { SendMessageOptions } from './model';
-import { PlayerSyncTask, NpcSyncTask } from './sync';
+import type { Cutscene } from './cutscenes';
+import type { SendMessageOptions } from './model';
+import { PlayerSyncTask } from './sync/player-sync-task'
+import { NpcSyncTask } from './sync/npc-sync-task'
 import { dialogue } from '../dialogue';
-import { Npc } from '../npc';
-import { SkillName } from '../skills';
-import { PlayerMetadata } from './metadata';
+import type { Npc } from '../npc';
+import type { SkillName } from '../skills';
+import type { PlayerMetadata } from './metadata';
+import type { PlayerCommandActionHook } from '@engine/action/pipe/player-command.action';
+import { regionChangeActionFactory } from '@engine/action/pipe/region-change.action';
+import { widgets, findQuest, findMusicTrack, findItem, itemMap, npcIdMap, findNpc, findSongIdByRegionId, musicRegions } from '@engine/config/config-handler';
+import type { EquipmentSlot, ItemDetails } from '@engine/config/item-config';
+import { equipmentIndex, getEquipmentSlot } from '@engine/config/item-config';
+import type { NpcDetails } from '@engine/config/npc-config';
+import type { QuestKey } from '@engine/config/quest-config';
+import { PlayerQuest } from '@engine/config/quest-config';
+import { InterfaceState } from '@engine/interface/interface-state';
+import type { Isaac } from '@engine/net/isaac';
+import { OutboundPacketHandler } from '@engine/net/outbound-packet-handler';
+import { actionHookMap, questMap } from '@engine/plugins/loader';
+import { colors, hexToRgb, rgbTo16Bit } from '@engine/util/colors';
+import { daysSinceLastLogin } from '@engine/util/time';
+import { getVarbitMorphIndex } from '@engine/util/varbits';
+import { activeWorld } from '@engine/world';
+import { itemIds } from '@engine/world/config/item-ids';
+import type { PlayerWidget } from '@engine/world/config/widget';
+import { widgetScripts } from '@engine/world/config/widget';
+import type { TileModifications } from '@engine/world/instances';
+import { WorldInstance } from '@engine/world/instances';
+import type { Item } from '@engine/world/items/item';
+import type { ContainerUpdateEvent } from '@engine/world/items/item-container';
+import { ItemContainer, getItemFromContainer } from '@engine/world/items/item-container';
+import type { Chunk, ChunkUpdateItem } from '@engine/world/map/chunk';
+import { Position } from '@engine/world/position';
+import { MusicPlayerMode } from '@engine/world/sound/music';
+import type { QuadtreeKey } from '@engine/world/world';
+import { serverConfig, filestore } from '@server/game/game-server';
+import type { Appearance, PlayerSettings } from '@engine/world/actor/player/player-data';
+import { savePlayerData, playerExists, loadPlayerSave, defaultAppearance, defaultSettings } from '@engine/world/actor/player/player-data';
 
 
 export const playerOptions: { option: string, index: number, placement: 'TOP' | 'BOTTOM' }[] = [
@@ -1048,7 +1049,7 @@ export class Player extends Actor {
      * Transform's the player's appearance into the specified NPC.
      * @param npc The NPC to copy the appearance of, or null to reset.
      */
-    public transformInto(npc: Npc | NpcDetails | string | number | null): void {
+    public transformInto(npc: NpcDetails | string | number | null): void {
         if(!npc) {
             delete this.savedMetadata.npcTransformation;
             this.updateFlags.appearanceUpdateRequired = true;
@@ -1062,8 +1063,6 @@ export class Player extends Actor {
                 } else {
                     npc = parseInt(npc, 10);
                 }
-            } else if(npc instanceof Npc) {
-                npc = npc.id;
             } else {
                 npc = npc.gameId;
             }
@@ -1097,13 +1096,7 @@ export class Player extends Actor {
             return null;
         }
 
-        const npcDetails = findNpc(originalNpc.childrenIds[morphIndex]);
-        if (!npcDetails) {
-            logger.warn(`Fetched a morphed NPC, but it isn't yet registered on the server. (id-${originalNpc.id}) (morphedId-${originalNpc.childrenIds[morphIndex]})`);
-
-            return;
-        }
-        return npcDetails;
+        return findNpc(originalNpc.childrenIds[morphIndex]);
     }
 
     public equals(player: Player): boolean {

@@ -1,4 +1,4 @@
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { findItemTagsInGroups, findItemTagsInGroupFilter } from '@engine/config/config-handler';
 
 const selectGroups: commandActionHandler = ({ player, args, isConsole }) => {

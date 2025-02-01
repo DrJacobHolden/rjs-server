@@ -1,12 +1,9 @@
-import {
-    buttonActionHandler,
-    ButtonActionHook,
-    widgetInteractionActionHandler,
-    WidgetInteractionActionHook
-} from '@engine/action';
-import { Player } from '@engine/world/actor';
-import { widgets } from '@engine/config';
-import { SkillGuide, SkillSubGuide, loadSkillGuideConfigurations } from './skill-guide-config';
+import type { buttonActionHandler, ButtonActionHook } from '@engine/action/pipe/button.action';
+import type { widgetInteractionActionHandler, WidgetInteractionActionHook } from '@engine/action/pipe/widget-interaction.action';
+import { widgets } from '@engine/config/config-handler';
+import type { Player } from '@engine/world/actor/player/player';
+import type { SkillGuide, SkillSubGuide } from './skill-guide-config';
+import { loadSkillGuideConfigurations } from './skill-guide-config';
 import { logger } from '@runejs/common';
 
 

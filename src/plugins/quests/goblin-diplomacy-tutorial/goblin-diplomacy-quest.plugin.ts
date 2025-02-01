@@ -1,8 +1,9 @@
-import { defaultPlayerTabWidgets, Player } from '@engine/world/actor/player/player';
-import { questDialogueActionFactory, QuestJournalHandler } from '@engine/config/quest-config';
+import type { Player } from '@engine/world/actor/player/player';
+import { defaultPlayerTabWidgets } from '@engine/world/actor/player/player';
+import type { QuestJournalHandler } from '@engine/config/quest-config';
+import { questDialogueActionFactory } from '@engine/config/quest-config';
 import { serverConfig } from '@server/game/game-server';
 import { v4 } from 'uuid';
-import { logger } from '@runejs/common';
 import { Position } from '@engine/world/position';
 import { WorldInstance } from '@engine/world/instances';
 import { findNpc, widgets } from '@engine/config/config-handler';
@@ -10,15 +11,15 @@ import { updateCombatStyleWidget } from '@plugins/combat/combat-styles.plugin';
 import { Subject } from 'rxjs';
 import { dialogue } from '@engine/world/actor/dialogue';
 import { take } from 'rxjs/operators';
-import { equipmentChangeActionHandler } from '@engine/action';
-import { buttonActionHandler } from '@engine/action';
-import { tabIndex } from '@engine/interface';
 import { runescapeGuideDialogueHandler } from './runescape-guide-dialogue';
 import { harlanDialogueHandler } from './melee-tutor-dialogue';
 import { goblinDiplomacyStageHandler } from './stage-handler';
 import { Quest } from '@engine/world/actor/player/quest';
-import { playerInitActionHandler } from '@engine/action';
 import { activeWorld } from '@engine/world';
+import type { buttonActionHandler } from '@engine/action/pipe/button.action';
+import type { equipmentChangeActionHandler } from '@engine/action/pipe/equipment-change.action';
+import type { playerInitActionHandler } from '@engine/action/pipe/player-init.action';
+import { tabIndex } from '@engine/interface/interface-state';
 
 
 export const tutorialTabWidgetOrder = [
@@ -78,16 +79,11 @@ export function unlockAvailableTabs(player: Player, availableTabs?: number): voi
 
 export function npcHint(player: Player, npcKey: string | number): void {
     if(typeof npcKey === 'string') {
-        const npc = findNpc(npcKey) || null;
-        if(!npc) {
-            logger.warn(`Can not provide NPC hint; NPC ${npcKey} is not yet registered on the server.`);
-            return;
-        }
-
+        const npc = findNpc(npcKey);
         npcKey = npc.gameId;
     }
 
-    const npc = activeWorld.findNpcsById(npcKey as number, player.instance.instanceId)[0] || null;
+    const npc = activeWorld.findNpcsById(npcKey, player.instance.instanceId)[0] || null;
 
     if(npc) {
         player.outgoingPackets.showNpcHintIcon(npc);

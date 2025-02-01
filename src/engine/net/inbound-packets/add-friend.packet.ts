@@ -1,6 +1,6 @@
-import { PacketData } from '@engine/net';
-import { longToString } from '@engine/util';
-import { Player } from '@engine/world/actor';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import { longToString } from '@engine/util/strings';
+import type { Player } from '@engine/world/actor/player/player';
 
 
 export default {

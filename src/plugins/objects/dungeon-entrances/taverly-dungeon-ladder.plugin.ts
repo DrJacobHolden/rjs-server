@@ -1,6 +1,5 @@
-import { objectInteractionActionHandler } from '@engine/action';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
 import { objectIds } from '@engine/world/config/object-ids';
-import { World } from '@engine/world';
 import { animationIds } from '@engine/world/config/animation-ids';
 
 export const enterDungeon: objectInteractionActionHandler = (details) => {

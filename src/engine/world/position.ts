@@ -1,8 +1,8 @@
-import { Direction, directionData } from '@engine/world/direction';
+import type { Direction } from '@engine/world/direction';
+import { directionData } from '@engine/world/direction';
 import { filestore } from '@server/game/game-server';
-import { LandscapeObject } from '@runejs/filestore';
+import type { LandscapeObject } from '@runejs/filestore';
 import { logger } from '@runejs/common';
-
 
 const directionDeltaX = [-1, 0, 1, -1, 1, -1, 0, 1];
 const directionDeltaY = [1, 1, 1, 0, 0, -1, -1, -1];

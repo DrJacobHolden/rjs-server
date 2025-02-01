@@ -1,17 +1,18 @@
-import { ButtonAction, ButtonActionHook, TaskExecutor } from '@engine/action';
-import { Player } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
 import { Position } from '@engine/world/position';
 import { animationIds } from '@engine/world/config/animation-ids';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { gfxIds } from '@engine/world/config/gfx-ids';
 import { itemIds } from '@engine/world/config/item-ids';
-import { Item } from '@engine/world/items/item';
+import type { Item } from '@engine/world/items/item';
 import { widgets } from '@engine/config/config-handler';
-import { TravelLocation } from '@engine/world/config';
 import { activeWorld } from '@engine/world';
 import { Skill } from '@engine/world/actor/skills';
 import { openHouse } from '@plugins/skills/construction/house';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
+import type { TaskExecutor } from '@engine/action/hook/task';
+import type { ButtonAction, ButtonActionHook } from '@engine/action/pipe/button.action';
+import type { TravelLocation } from '@engine/world/config/travel-locations';
 
 enum Teleports {
     Home = 591,

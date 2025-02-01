@@ -1,7 +1,10 @@
-import { Player } from '@engine/world/actor';
-import { Item, WorldItem } from '@engine/world';
-import { ActionHook, getActionHooks, questHookFilter, ActionPipe, RunnableHooks } from '@engine/action';
-
+import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { questHookFilter } from '@engine/action/hook/hook-filters';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Item } from '@engine/world/items/item';
+import type { WorldItem } from '@engine/world/items/world-item';
 
 /**
  * Defines an item-on-world-item action hook.

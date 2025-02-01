@@ -1,8 +1,7 @@
-import { Player } from '@engine/world/actor';
-import {
-    ActionHook, getActionHooks, advancedNumberHookFilter, questHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
-
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
+import { getActionHooks, type ActionHook } from '@engine/action/hook/action-hook';
+import { advancedNumberHookFilter, questHookFilter } from '@engine/action/hook/hook-filters';
+import type { Player } from '@engine/world/actor/player/player';
 
 /**
  * Defines a button action hook.

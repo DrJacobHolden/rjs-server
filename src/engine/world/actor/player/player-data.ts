@@ -1,12 +1,12 @@
-import { Item } from '@engine/world/items/item';
+import type { Item } from '@engine/world/items/item';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { logger } from '@runejs/common';
-import { Player } from './player';
-import { SkillValue } from '@engine/world/actor/skills';
+import type { Player } from './player';
+import type { SkillValue } from '@engine/world/actor/skills';
 import { hasValueNotNull } from '@engine/util/data';
-import { PlayerQuest } from '@engine/config/quest-config';
-import { MusicPlayerLoopMode, MusicPlayerMode } from '@engine/world/sound';
+import type { PlayerQuest } from '@engine/config/quest-config';
+import { MusicPlayerMode, MusicPlayerLoopMode } from '@engine/world/sound/music';
 
 export interface Appearance {
     gender: number;

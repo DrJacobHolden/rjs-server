@@ -1,14 +1,15 @@
-import { npcInteractionActionHandler } from '@engine/action';
-import { dialogue, DialogueTree, Emote, execute, goto } from '@engine/world/actor/dialogue';
+import type { DialogueTree } from '@engine/world/actor/dialogue';
+import { dialogue, Emote, execute, goto } from '@engine/world/actor/dialogue';
 import { itemIds } from '@engine/world/config/item-ids';
-import { PlayerQuest, QuestJournalHandler } from '@engine/config/quest-config';
-import { Player } from '@engine/world/actor/player/player';
+import type { PlayerQuest, QuestJournalHandler } from '@engine/config/quest-config';
+import type { Player } from '@engine/world/actor/player/player';
 import { Quest } from '@engine/world/actor/player/quest';
+import type { npcInteractionActionHandler } from '@engine/action/pipe/npc-interaction.action';
 
 
 const journalHandler: QuestJournalHandler = {
 
-    0: `I can start this quest by speaking to the <col=800000>Cook</col> in the 
+    0: `I can start this quest by speaking to the <col=800000>Cook</col> in the
         <col=800000>Kitchen</col> on the ground floor of <col=800000>Lumbridge Castle</col>.`,
 
     50: player => {

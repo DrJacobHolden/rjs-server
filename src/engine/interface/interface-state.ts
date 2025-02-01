@@ -1,5 +1,5 @@
-import { Player } from '@engine/world/actor/player/player';
-import { ItemContainer } from '@engine/world/items/item-container';
+import type { Player } from '@engine/world/actor/player/player';
+import type { ItemContainer } from '@engine/world/items/item-container';
 import { logger } from '@runejs/common';
 import { lastValueFrom, Subject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';

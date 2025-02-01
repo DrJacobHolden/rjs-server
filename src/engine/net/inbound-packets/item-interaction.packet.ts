@@ -1,6 +1,6 @@
-import { getItemOption } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import type { Player } from '@engine/world/actor/player/player';
+import { getItemOption } from '@engine/world/items/item';
 
 const option1 = buffer => {
     const itemId = buffer.get('short', 'u');

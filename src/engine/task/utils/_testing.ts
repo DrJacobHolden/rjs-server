@@ -1,5 +1,6 @@
 import { Task } from '../task';
-import { TaskBreakType, TaskStackGroup, TaskStackType } from '../types';
+import type { TaskBreakType } from '../types';
+import { TaskStackGroup, TaskStackType } from '../types';
 
 export function createMockTask(
     interval: number = 0,

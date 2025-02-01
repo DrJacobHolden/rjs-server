@@ -1,4 +1,5 @@
-import { TaskBreakType, TaskConfig, TaskStackGroup, TaskStackType } from './types';
+import type { TaskBreakType, TaskConfig } from './types';
+import { TaskStackGroup, TaskStackType } from './types';
 
 const DEFAULT_TASK_CONFIG: Required<TaskConfig> = {
     interval: 1,

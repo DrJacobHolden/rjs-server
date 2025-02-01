@@ -1,12 +1,13 @@
-import { Player } from '@engine/world/actor';
-import { WorldItem } from '@engine/world';
-import { ItemDetails, findItem } from '@engine/config';
-import {
-    ActionHook, getActionHooks, numberHookFilter, stringHookFilter, questHookFilter, ActionPipe, RunnableHooks
-} from '@engine/action';
+import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { questHookFilter, numberHookFilter, stringHookFilter } from '@engine/action/hook/hook-filters';
+import { WalkToItemPluginTask } from '@engine/action/pipe/task/walk-to-item-plugin-task';
+import { findItem } from '@engine/config/config-handler';
+import type { ItemDetails } from '@engine/config/item-config';
+import type { Player } from '@engine/world/actor/player/player';
+import type { WorldItem } from '@engine/world/items/world-item';
 import { logger } from '@runejs/common';
-import { WalkToItemPluginTask } from './task/walk-to-item-plugin-task';
-
 
 /**
  * Defines a world item action hook.

@@ -1,11 +1,9 @@
-import { itemOnObjectActionHandler } from '@engine/action';
-import { filestore } from '@server/game/game-server';
 import { itemIds } from '@engine/world/config/item-ids';
 import { animationIds } from '@engine/world/config/animation-ids';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { findItem } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
-
+import type { itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
 
 const FountainIds: number[] = [879];
 const SinkIds: number[] = [14878, 873];

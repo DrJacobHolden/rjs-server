@@ -1,4 +1,4 @@
-import { commandActionHandler } from '@engine/action';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { activeWorld } from '@engine/world';
 import { Position } from '@engine/world/position';
 

@@ -1,4 +1,4 @@
-import { Player } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
 import { Position } from '@engine/world/position';
 
 

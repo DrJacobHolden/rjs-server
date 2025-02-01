@@ -1,8 +1,8 @@
-import { itemInteractionActionHandler } from '@engine/action';
 import { findItem, widgets } from '@engine/config/config-handler';
 import { soundIds } from '@engine/world/config/sound-ids';
-import { ItemDetails } from '@engine/config/item-config';
+import type { ItemDetails } from '@engine/config/item-config';
 import { logger } from '@runejs/common';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 
 interface IGrimyHerb {
     grimy: ItemDetails;

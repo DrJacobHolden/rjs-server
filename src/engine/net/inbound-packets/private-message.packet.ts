@@ -1,7 +1,7 @@
-import { longToString } from '@engine/util';
-import { Player } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import type { Player } from '@engine/world/actor/player/player';
 import { activeWorld } from '@engine/world';
+import { longToString } from '@engine/util/strings';
 
 export default {
     opcode: 207,

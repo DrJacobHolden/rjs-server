@@ -1,9 +1,10 @@
-import { itemInteractionActionHandler } from '@engine/action';
-import { Item } from '@engine/world/items/item';
-import { getItemFromContainer, ItemContainer } from '@engine/world/items/item-container';
+import type { Item } from '@engine/world/items/item';
+import type { ItemContainer } from '@engine/world/items/item-container';
+import { getItemFromContainer } from '@engine/world/items/item-container';
 import { itemIds } from '@engine/world/config/item-ids';
 import { findItem, findShop, widgets } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 
 function removeCoins(inventory: ItemContainer, coinsIndex: number, cost: number): void {
     const coins = inventory.items[coinsIndex];

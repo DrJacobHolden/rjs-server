@@ -1,8 +1,9 @@
-import { Player } from '@engine/world/actor';
-import { ActionHook, getActionHooks, ActionPipe, RunnableHooks } from '@engine/action';
-import { reloadContent, reloadContentCommands } from '@engine/plugins/reload-content';
+import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import { reloadContentCommands, reloadContent } from '@engine/plugins/reload-content';
+import type { Player } from '@engine/world/actor/player/player';
 import { logger } from '@runejs/common';
-
 
 /**
  * Defines a player command action hook.

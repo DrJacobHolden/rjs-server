@@ -1,7 +1,7 @@
+import type { playerInitActionHandler } from '@engine/action/pipe/player-init.action';
 import { findMusicTrack, findSongIdByRegionId, musicRegionMap, musicRegions, widgets } from '@engine/config/config-handler';
 import { colors } from '@engine/util/colors';
-import { playerInitActionHandler } from '@engine/action';
-import { MusicPlayerMode } from '@engine/world/sound';
+import { MusicPlayerMode } from '@engine/world/sound/music';
 
 
 musicRegions.forEach(song => song.regionIds.forEach(region => musicRegionMap.set(region, song.songId)));

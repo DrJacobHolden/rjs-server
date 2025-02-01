@@ -1,5 +1,5 @@
 import { Queue } from '@engine/util/queue';
-import { Task } from './task';
+import type { Task } from './task';
 import { TaskStackType } from './types';
 
 /**

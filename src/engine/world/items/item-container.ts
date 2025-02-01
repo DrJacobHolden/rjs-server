@@ -1,4 +1,4 @@
-import { Item } from './item';
+import type { Item } from './item';
 import { Subject } from 'rxjs';
 import { filestore } from '@server/game/game-server';
 import { hasValueNotNull } from '@engine/util/data';

@@ -1,5 +1,6 @@
-import { commandActionHandler } from '@engine/action';
-import { DataDumpResult, dumpItems, dumpNpcs, dumpObjects, dumpWidgets } from '@engine/config/data-dump';
+import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
+import type { DataDumpResult } from '@engine/config/data-dump';
+import { dumpItems, dumpNpcs, dumpObjects, dumpWidgets } from '@engine/config/data-dump';
 
 
 const action: commandActionHandler = ({ player, args, isConsole }) => {

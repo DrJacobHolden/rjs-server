@@ -1,11 +1,10 @@
-import { Position } from '../position';
-import { Player } from '../actor/player/player';
+import type { Position } from '../position';
+import type { Player } from '../actor/player/player';
 import { CollisionMap } from './collision-map';
-import { Npc } from '../actor/npc';
-import { WorldItem } from '@engine/world/items/world-item';
-import { LandscapeObject } from '@runejs/filestore';
+import type { Npc } from '../actor/npc';
+import type { WorldItem } from '@engine/world/items/world-item';
+import type { LandscapeObject } from '@runejs/filestore';
 import { activeWorld } from '@engine/world';
-
 
 interface CustomLandscapeObject {
     reference?: boolean;

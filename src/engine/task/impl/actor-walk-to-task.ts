@@ -1,8 +1,8 @@
-import { LandscapeObject } from '@runejs/filestore';
+import type { LandscapeObject } from '@runejs/filestore';
 import { Position } from '@engine/world/position';
-import { Actor } from '@engine/world/actor';
 import { TaskStackType, TaskBreakType, TaskStackGroup } from '../types';
 import { ActorTask } from './actor-task';
+import type { Actor } from '@engine/world/actor/actor';
 
 /**
  * Possible types of targets for an actor to walk to.

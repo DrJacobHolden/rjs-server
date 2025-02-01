@@ -8,14 +8,14 @@ import {
     runes,
     talismans,
 } from '@plugins/skills/runecrafting/runecrafting-constants';
-import { itemOnObjectActionHandler, ItemOnObjectAction } from '@engine/action';
-import { objectInteractionActionHandler, ObjectInteractionAction } from '@engine/action';
-import { RunecraftingAltar, RunecraftingRune } from '@plugins/skills/runecrafting/runecrafting-types';
+import type { RunecraftingAltar } from '@plugins/skills/runecrafting/runecrafting-types';
 import { itemIds } from '@engine/world/config/item-ids';
-import { Player } from '@engine/world/actor/player/player';
-import { Item } from '@engine/world/items/item';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Item } from '@engine/world/items/item';
 import { findItem } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
+import type { itemOnObjectActionHandler, ItemOnObjectAction } from '@engine/action/pipe/item-on-object.action';
+import type { objectInteractionActionHandler, ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
 
 
 const enterAltar: itemOnObjectActionHandler = (details: ItemOnObjectAction) => {

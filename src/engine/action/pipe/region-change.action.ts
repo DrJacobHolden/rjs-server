@@ -1,8 +1,10 @@
-import { Player } from '@engine/world/actor';
-import { Coords, Position } from '@engine/world';
-import { RegionType } from '@engine/world/map';
-import { ActionHook, getActionHooks, ActionPipe } from '@engine/action';
-
+import type { ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionHook } from '@engine/action/hook/action-hook';
+import { getActionHooks } from '@engine/action/hook/action-hook';
+import type { Player } from '@engine/world/actor/player/player';
+import type { RegionType } from '@engine/world/map/region';
+import type { Position } from '@engine/world/position';
+import { Coords } from '@engine/world/position';
 
 /**
  * Defines a player region change action hook.

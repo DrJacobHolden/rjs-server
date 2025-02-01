@@ -3,9 +3,9 @@ import 'source-map-support/register';
 import { logger } from '@runejs/common';
 import { launchLoginServer } from '@runejs/login-server';
 import { launchUpdateServer } from '@runejs/update-server';
-import { launchGameServer } from '@server/game';
-import { initErrorHandling } from '@engine/util';
 import { activeWorld } from '@engine/world';
+import { initErrorHandling } from '@engine/util/error-handling';
+import { launchGameServer } from '@server/game/game-server';
 
 
 const shutdownEvents = [

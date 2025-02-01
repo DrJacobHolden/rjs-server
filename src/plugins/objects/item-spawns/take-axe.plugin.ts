@@ -1,5 +1,5 @@
-import { objectInteractionActionHandler } from '@engine/action';
-import { itemIds } from '@engine/world/config';
+import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import { itemIds } from '@engine/world/config/item-ids';
 import { objectIds } from '@engine/world/config/object-ids';
 import { logger } from '@runejs/common';
 

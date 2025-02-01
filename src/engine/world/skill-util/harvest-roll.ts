@@ -1,7 +1,7 @@
 // Note if adding hunter, Strung rabbit foot makes this out of 94 instead of 99
+import { findItem } from '@engine/config/config-handler';
 import { randomBetween } from '@engine/util/num';
-import { Item } from '@engine/world/items/item';
-import { findItem } from '@engine/config';
+import type { Item } from '@engine/world/items/item';
 
 export function rollBirdsNestType(): Item {
     const roll = randomBetween(0, 99);
@@ -52,4 +52,3 @@ export function rollGemType(): Item {
 
     return { itemId: item.gameId, amount: 1 };
 }
-

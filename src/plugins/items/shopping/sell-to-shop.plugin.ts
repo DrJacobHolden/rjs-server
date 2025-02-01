@@ -1,8 +1,7 @@
-import { itemInteractionActionHandler } from '@engine/action';
 import { itemIds } from '@engine/world/config/item-ids';
 import { getItemFromContainer } from '@engine/world/items/item-container';
-import { Shop } from '@engine/config/shop-config';
 import { findShop, widgets } from '@engine/config/config-handler';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 
 
 export const handler: itemInteractionActionHandler = (details) => {

@@ -17,7 +17,7 @@
  */
 
 import { itemIds } from '@engine/world/config/item-ids';
-import { RunecraftingAltar, RunecraftingCombinationRune, RunecraftingRune, RunecraftingTalisman, RunecraftingTiara } from '@plugins/skills/runecrafting/runecrafting-types';
+import type { RunecraftingAltar, RunecraftingCombinationRune, RunecraftingRune, RunecraftingTalisman, RunecraftingTiara } from '@plugins/skills/runecrafting/runecrafting-types';
 import { Position } from '@engine/world/position';
 
 export const tiaras: Map<string, RunecraftingTiara> = new Map<string, RunecraftingTiara>([

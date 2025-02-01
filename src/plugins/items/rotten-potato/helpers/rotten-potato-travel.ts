@@ -1,8 +1,6 @@
-import { Player } from '@engine/world/actor/player/player';
-import {
-    widgetInteractionActionHandler
-} from '@engine/action';
+import type { Player } from '@engine/world/actor/player/player';
 import { activeWorld } from '@engine/world';
+import type { widgetInteractionActionHandler } from '@engine/action/pipe/widget-interaction.action';
 
 const INTRO_PAGE_COUNT = 1;
 const ITEMS_PER_PAGE = 15;

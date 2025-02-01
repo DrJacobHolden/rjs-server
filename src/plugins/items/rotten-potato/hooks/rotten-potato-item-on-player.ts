@@ -1,8 +1,8 @@
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
+import type { itemOnPlayerActionHandler } from '@engine/action/pipe/item-on-player.action';
 import { widgets } from '@engine/config/config-handler';
-import { itemOnPlayerActionHandler } from '@engine/action';
-import { itemInteractionActionHandler } from '@engine/action';
-import { Item } from '@engine/world/items/item';
-import { Player } from '@engine/world/actor';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Item } from '@engine/world/items/item';
 import { logger } from '@runejs/common';
 
 export const potatoOnPlayer: itemOnPlayerActionHandler = (details) => {

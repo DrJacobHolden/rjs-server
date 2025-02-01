@@ -1,4 +1,4 @@
-import { Task } from './task';
+import type { Task } from './task';
 import { TaskScheduler } from './task-scheduler';
 import { TaskStackType } from './types';
 import { createMockTask } from './utils/_testing';

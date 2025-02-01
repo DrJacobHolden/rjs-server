@@ -1,11 +1,11 @@
-import { ActionCancelType, itemInteractionActionHandler } from '@engine/action';
 import { soundIds } from '@engine/world/config/sound-ids';
 import { getItemFromContainer } from '@engine/world/items/item-container';
 import { serverConfig } from '@server/game/game-server';
 import { Rights } from '@engine/world/actor/player/player';
 import { widgets } from '@engine/config/config-handler';
 import { dialogue, execute } from '@engine/world/actor/dialogue';
-
+import type { ActionCancelType } from '@engine/action/action-pipeline';
+import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
 
 export const handler: itemInteractionActionHandler = ({ player, itemId, itemSlot }) => {
     const inventory = player.inventory;

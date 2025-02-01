@@ -1,7 +1,6 @@
-import { Player } from '@engine/world/actor/player/player';
+import type { Player } from '@engine/world/actor/player/player';
 import { filestore } from '@server/game/game-server';
-import { Npc } from '@engine/world/actor/npc';
-import { logger } from '@runejs/common';
+import type { Npc } from '@engine/world/actor/npc';
 
 export const dialogueWidgetIds = {
     PLAYER: [ 64, 65, 66, 67 ],

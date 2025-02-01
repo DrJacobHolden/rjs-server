@@ -1,11 +1,14 @@
+import type { RoomType
+} from '@plugins/skills/construction/con-constants';
 import {
     instance1, instance1Max,
     instance1PohSpawn, instance2, instance2Max,
-    MAP_SIZE, roomTemplates, RoomType
+    MAP_SIZE, roomTemplates
 } from '@plugins/skills/construction/con-constants';
-import { Position } from '@engine/world/position';
-import { ConstructedChunk, ConstructedRegion } from '@engine/world/map/region';
-import { Player } from '@engine/world/actor/player/player';
+import type { Position } from '@engine/world/position';
+import type { ConstructedRegion } from '@engine/world/map/region';
+import { ConstructedChunk } from '@engine/world/map/region';
+import type { Player } from '@engine/world/actor/player/player';
 import { loadHouse } from '@plugins/skills/construction/home-saver';
 import { activeWorld } from '@engine/world';
 

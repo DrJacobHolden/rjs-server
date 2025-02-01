@@ -1,12 +1,12 @@
-import { npcInteractionActionHandler } from '@engine/action';
+import type { npcInteractionActionHandler } from '@engine/action/pipe/npc-interaction.action';
 import { dialogue, Emote } from '@engine/world/actor/dialogue';
 import { findNpc } from '@engine/config/config-handler';
 
 
 const talkTo : npcInteractionActionHandler = (details) => {
     const { player, npc } = details;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const shilop = findNpc('rs:varrock_shilop')!;
+    const shilop = findNpc('rs:varrock_shilop');
+
     dialogue([player, { npc, key: 'wilough' }, { npc: shilop.gameId, key: 'shilop' }], [
         player => [Emote.GENERIC, `Hello again.`],
         wilough => [Emote.GENERIC, `You think you're tough do you?`],

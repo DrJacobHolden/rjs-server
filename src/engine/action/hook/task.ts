@@ -1,11 +1,16 @@
 import { v4 } from 'uuid';
-import { lastValueFrom, Subscription, timer } from 'rxjs';
+import type { Subscription } from 'rxjs';
+import { lastValueFrom, timer } from 'rxjs';
 
 import { logger } from '@runejs/common';
 
-import { ActionHook, ActionStrength } from '@engine/action';
-import { World } from '@engine/world';
-import { Actor, Player, Npc } from '@engine/world/actor';
+import { isNpc, isPlayer } from '@engine/world/actor/util';
+import type { Actor } from '@engine/world/actor/actor';
+import type { Player } from '@engine/world/actor/player/player';
+import type { Npc } from '@engine/world/actor/npc';
+import type { ActionStrength } from '@engine/action/action-pipeline';
+import { World } from '@engine/world/world';
+import type { ActionHook } from '@engine/action/hook/action-hook';
 
 
 export type TaskSessionData = { [key: string]: any };
@@ -149,8 +154,8 @@ export class TaskExecutor<T> {
     public getDetails(): TaskDetails<T> {
         return {
             actor: this.actor,
-            player: this.actor.isPlayer() ? this.actor : undefined,
-            npc: this.actor.isNpc() ? this.actor : undefined,
+            player: isPlayer(this.actor) ? this.actor : undefined,
+            npc: isNpc(this.actor) ? this.actor : undefined,
             actionData: this.actionData,
             session: this.session
         };

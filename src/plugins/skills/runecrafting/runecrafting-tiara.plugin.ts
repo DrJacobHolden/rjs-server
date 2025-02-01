@@ -2,8 +2,8 @@
  * @Author NickNick
  */
 
+import type { equipmentChangeActionHandler } from '@engine/action/pipe/equipment-change.action';
 import { getEntityByAttr, getEntityIds, tiaras } from '@plugins/skills/runecrafting/runecrafting-constants';
-import { equipmentChangeActionHandler } from '@engine/action';
 import { logger } from '@runejs/common';
 
 

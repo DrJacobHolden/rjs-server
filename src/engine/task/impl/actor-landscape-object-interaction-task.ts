@@ -1,7 +1,8 @@
-import { LandscapeObject } from '@runejs/filestore';
-import { activeWorld, Position } from '@engine/world';
-import { Actor } from '@engine/world/actor';
+import type { LandscapeObject } from '@runejs/filestore';
+import { activeWorld } from '@engine/world';
 import { ActorWalkToTask } from './actor-walk-to-task';
+import type { Actor } from '@engine/world/actor/actor';
+import { Position } from '@engine/world/position';
 
 /**
  * A task for an actor to interact with a {@link LandscapeObject}.

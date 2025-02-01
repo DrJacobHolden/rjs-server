@@ -1,7 +1,8 @@
-import { Subscription } from 'rxjs';
-import { Actor } from '@engine/world/actor';
-import { TaskBreakType, TaskConfig } from '../types';
+import type { Subscription } from 'rxjs';
+import type { TaskConfig } from '../types';
+import { TaskBreakType } from '../types';
 import { Task } from '../task';
+import type { Actor } from '@engine/world/actor/actor';
 
 /**
  * A task that is executed by an actor.

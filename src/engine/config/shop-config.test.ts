@@ -1,6 +1,7 @@
-import { setupConfig } from '@server/game';
-import { Shop, ShopConfiguration, shopFactory } from '@engine/config/shop-config';
-import { findItem, findShop, widgets } from '@engine/config/config-handler';
+import type { Shop, ShopConfiguration } from '@engine/config/shop-config';
+import { shopFactory } from '@engine/config/shop-config';
+import { findItem } from '@engine/config/config-handler';
+import { setupConfig } from '@server/game/game-server';
 
 describe('shopping', () => {
 

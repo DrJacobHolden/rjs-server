@@ -1,14 +1,13 @@
 import { Position } from '@engine/world/position';
-import { WorldItem } from '@engine/world/items/world-item';
-import { Item } from '@engine/world/items/item';
-import { Player } from '@engine/world/actor/player/player';
-import { World } from '@engine/world';
+import type { WorldItem } from '@engine/world/items/world-item';
+import type { Item } from '@engine/world/items/item';
+import type { Player } from '@engine/world/actor/player/player';
 import { schedule } from '@engine/world/task';
 import { CollisionMap } from '@engine/world/map/collision-map';
-import { LandscapeObject } from '@runejs/filestore';
+import type { LandscapeObject } from '@runejs/filestore';
 import { logger } from '@runejs/common';
 import { activeWorld } from '@engine/world/index';
-
+import { World } from '@engine/world/world';
 
 /**
  * Additional configuration info for an item being spawned in an instance.

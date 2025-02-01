@@ -1,8 +1,8 @@
-import { ItemDetails } from '@engine/config';
-import { ActorWorldItemInteractionTask } from '@engine/task/impl';
-import { WorldItem } from '@engine/world';
-import { Player } from '@engine/world/actor';
-import { SpawnedItemInteractionHook } from '../spawned-item-interaction.action';
+import type { SpawnedItemInteractionHook } from '@engine/action/pipe/spawned-item-interaction.action';
+import type { ItemDetails } from '@engine/config/item-config';
+import { ActorWorldItemInteractionTask } from '@engine/task/impl/actor-world-item-interaction-task';
+import type { Player } from '@engine/world/actor/player/player';
+import type { WorldItem } from '@engine/world/items/world-item';
 
 /**
 * This is a task to migrate old `walkTo` item interaction actions to the new task system.

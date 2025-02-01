@@ -1,6 +1,6 @@
-import { Position } from '@engine/world';
-import { Actor } from '@engine/world/actor';
 import { ActorTask } from '@engine/task/impl/actor-task';
+import type { Actor } from '@engine/world/actor/actor';
+import type { Position } from '@engine/world/position';
 
 /**
  * A task for an actor to teleport to a new position.

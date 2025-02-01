@@ -1,5 +1,5 @@
-import { Player, Rights } from '@engine/world/actor';
-import { PacketData } from '@engine/net';
+import type { PacketData } from '@engine/net/inbound-packet-handler';
+import { Rights, type Player } from '@engine/world/actor/player/player';
 
 const commandPacket = (player: Player, packet: PacketData) => {
     const input = packet.buffer.getString();

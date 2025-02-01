@@ -1,5 +1,6 @@
+import { itemMap } from '@engine/config/config-handler';
+import type { ItemDetails } from '@engine/config/item-config';
 import { loadConfigurationFiles } from '@runejs/common/fs';
-import { itemMap, ItemDetails } from '@engine/config';
 
 interface SkillGuideConfiguration {
     id: number;

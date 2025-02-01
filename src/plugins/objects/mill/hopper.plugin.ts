@@ -1,7 +1,5 @@
-import { World } from '@engine/world';
+import type { itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
 import { itemIds } from '@engine/world/config/item-ids';
-import { itemOnObjectActionHandler } from '@engine/action';
-
 
 export const action: itemOnObjectActionHandler = (details) => {
     if ((details.player.savedMetadata['mill-grain'] && details.player.savedMetadata['mill-grain'] === 1)) {

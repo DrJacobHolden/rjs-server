@@ -1,10 +1,9 @@
-import { buttonActionHandler } from '@engine/action';
 import { wrapText } from '@engine/util/strings';
 import { widgets } from '@engine/config/config-handler';
-import { Quest } from '@engine/world/actor/player/quest';
-import { QuestKey } from '@engine/config/quest-config';
-import { questMap } from '@engine/plugins';
-
+import type { Quest } from '@engine/world/actor/player/quest';
+import type { QuestKey } from '@engine/config/quest-config';
+import type { buttonActionHandler } from '@engine/action/pipe/button.action';
+import { questMap } from '@engine/plugins/loader';
 
 export const handler: buttonActionHandler = async ({ player, buttonId }) => {
     const quest = Object.values<Quest>(questMap)
