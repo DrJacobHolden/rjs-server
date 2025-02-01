@@ -1,41 +1,41 @@
 import type { NpcInteractionActionHook } from '@engine/action/pipe/npc-interaction.action';
-import { dialogue, Emote, execute, goto } from '@engine/world/actor/dialogue';
-import { giveAchievement, Achievements } from '@engine/world/actor/player/achievements';
+import { Emote, dialogue, execute, goto } from '@engine/world/actor/dialogue';
+import { Achievements, giveAchievement } from '@engine/world/actor/player/achievements';
 import { animationIds } from '@engine/world/config/animation-ids';
-
 
 const handler = async ({ player, npc }) => {
     let sadEnding = false;
 
-    const dialogueParticipants = [ player, { npc, key: 'hans' }];
+    const dialogueParticipants = [player, { npc, key: 'hans' }];
 
     const dialogueTree = [
-        hans => [ Emote.GENERIC, `Welcome to RuneJS!` ],
-        (hans, tag_Hans_Question) => [ Emote.HAPPY, `How do you feel about RuneJS so far?\n` +
-        `Please take a moment to let us know what you think!` ],
-        options => ([
-            `Love it!`, [
-                player => [ Emote.HAPPY, `Loving it so far, thanks for asking!` ],
-                hans => [ Emote.HAPPY, `You're very welcome! Glad to hear it.` ]
+        hans => [Emote.GENERIC, `Welcome to RuneJS!`],
+        (hans, tag_Hans_Question) => [
+            Emote.HAPPY,
+            `How do you feel about RuneJS so far?\n` + `Please take a moment to let us know what you think!`,
+        ],
+        options => [
+            `Love it!`,
+            [
+                player => [Emote.HAPPY, `Loving it so far, thanks for asking!`],
+                hans => [Emote.HAPPY, `You're very welcome! Glad to hear it.`],
             ],
-            `Kind of cool.`, [
-                player => [ Emote.GENERIC, `It's kind of cool, I guess. Bit of a weird gimmick.` ],
-                hans => [ Emote.HAPPY, `Please let us know if you have any suggestions.` ]
+            `Kind of cool.`,
+            [
+                player => [Emote.GENERIC, `It's kind of cool, I guess. Bit of a weird gimmick.`],
+                hans => [Emote.HAPPY, `Please let us know if you have any suggestions.`],
             ],
-            `Not my cup of tea, honestly.`, [
-                player => [ Emote.SKEPTICAL, `Not really my cup of tea, but keep at it.` ],
-                hans => [ Emote.GENERIC, `Thanks for the support!` ]
+            `Not my cup of tea, honestly.`,
+            [player => [Emote.SKEPTICAL, `Not really my cup of tea, but keep at it.`], hans => [Emote.GENERIC, `Thanks for the support!`]],
+            `It's literally the worst.`,
+            [
+                player => [Emote.ANGRY, `Literally the worst thing I've ever seen. You disgust me on a personal level.`],
+                hans => [Emote.SAD, `I-is that so?... Well I'm... I'm sorry to hear that.`],
+                execute(() => (sadEnding = true)),
             ],
-            `It's literally the worst.`, [
-                player => [ Emote.ANGRY, `Literally the worst thing I've ever seen. You disgust me on a personal level.` ],
-                hans => [ Emote.SAD, `I-is that so?... Well I'm... I'm sorry to hear that.` ],
-                execute(() => sadEnding = true)
-            ],
-            `What?`, [
-                player => [ Emote.DROWZY, `What?...` ],
-                goto('tag_Hans_Question')
-            ]
-        ])
+            `What?`,
+            [player => [Emote.DROWZY, `What?...`], goto('tag_Hans_Question')],
+        ],
     ];
 
     const dialogueSuccessful = await dialogue(dialogueParticipants, dialogueTree);
@@ -43,8 +43,8 @@ const handler = async ({ player, npc }) => {
     npc.clearFaceActor();
     player.clearFaceActor();
 
-    if(dialogueSuccessful) {
-        if(sadEnding) {
+    if (dialogueSuccessful) {
+        if (sadEnding) {
             npc.playAnimation(animationIds.cry);
             npc.say(`Jerk!`);
             player.sendMessage(`Hans wanders off rather dejectedly.`);
@@ -56,7 +56,6 @@ const handler = async ({ player, npc }) => {
     }
 };
 
-
 export default {
     pluginId: 'rs:hans',
     hooks: [
@@ -65,7 +64,7 @@ export default {
             npcs: 'rs:hans',
             options: 'talk-to',
             walkTo: true,
-            handler
-        } as NpcInteractionActionHook
-    ]
+            handler,
+        } as NpcInteractionActionHook,
+    ],
 };

@@ -1,21 +1,20 @@
-import type { Item } from '@engine/world/items/item';
-import { soundIds } from '@engine/world/config/sound-ids';
-import { widgets } from '@engine/config/config-handler';
-import { logger } from '@runejs/common';
-import type { spawnedItemInteractionHandler } from '@engine/action/pipe/spawned-item-interaction.action';
 import type { ActionCancelType } from '@engine/action/action-pipeline';
-
+import type { spawnedItemInteractionHandler } from '@engine/action/pipe/spawned-item-interaction.action';
+import { widgets } from '@engine/config/config-handler';
+import { soundIds } from '@engine/world/config/sound-ids';
+import type { Item } from '@engine/world/items/item';
+import { logger } from '@runejs/common';
 
 export const handler: spawnedItemInteractionHandler = ({ player, worldItem, itemDetails }) => {
     const inventory = player.inventory;
     const amount = worldItem.amount;
-    let slot = -1
+    let slot = -1;
 
-    if(itemDetails.stackable) {
+    if (itemDetails.stackable) {
         const existingItemIndex = inventory.findIndex(worldItem.itemId);
-        if(existingItemIndex !== -1) {
+        if (existingItemIndex !== -1) {
             const existingItem = inventory.items[existingItemIndex];
-            if(existingItem && (existingItem.amount + worldItem.amount >= 2147483647)) {
+            if (existingItem && existingItem.amount + worldItem.amount >= 2147483647) {
                 // @TODO create new item stack
                 return;
             } else {
@@ -24,11 +23,11 @@ export const handler: spawnedItemInteractionHandler = ({ player, worldItem, item
         }
     }
 
-    if(slot === -1) {
+    if (slot === -1) {
         slot = inventory.getFirstOpenSlot();
     }
 
-    if(slot === -1) {
+    if (slot === -1) {
         player.sendMessage(`You don't have enough free space to do that.`);
         return;
     }
@@ -42,7 +41,7 @@ export const handler: spawnedItemInteractionHandler = ({ player, worldItem, item
 
     const item: Item = {
         itemId: worldItem.itemId,
-        amount
+        amount,
     };
 
     const addedItem = inventory.add(item);
@@ -65,7 +64,7 @@ export default {
             type: 'spawned_item_interaction',
             options: 'pick-up',
             handler,
-            walkTo: true
-        }
-    ]
+            walkTo: true,
+        },
+    ],
 };

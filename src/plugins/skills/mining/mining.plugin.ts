@@ -1,11 +1,11 @@
-import { Skill } from '@engine/world/actor/skills';
-import { getAllOreIds, getOreFromRock } from '@engine/world/config/harvestable-object';
-import { MiningTask } from './mining-task';
 import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import { Skill } from '@engine/world/actor/skills';
 import { getBestPickaxe } from '@engine/world/config/harvest-tool';
+import { getAllOreIds, getOreFromRock } from '@engine/world/config/harvestable-object';
 import { soundIds } from '@engine/world/config/sound-ids';
+import { MiningTask } from './mining-task';
 
-const action: objectInteractionActionHandler = (details) => {
+const action: objectInteractionActionHandler = details => {
     // Get the mining details for the target rock
     const ore = getOreFromRock(details.object.objectId);
 
@@ -27,7 +27,7 @@ const action: objectInteractionActionHandler = (details) => {
         return;
     }
 
-    if(!tool) {
+    if (!tool) {
         return;
     }
 
@@ -39,14 +39,15 @@ const action: objectInteractionActionHandler = (details) => {
     details.player.enqueueTask(MiningTask, [details.object, ore, tool]);
 };
 
-
 export default {
     pluginId: 'rs:mining',
-    hooks: [ {
-        type: 'object_interaction',
-        options: [ 'mine' ],
-        objectIds: getAllOreIds(),
-        walkTo: true,
-        handler: action
-    } ]
+    hooks: [
+        {
+            type: 'object_interaction',
+            options: ['mine'],
+            objectIds: getAllOreIds(),
+            walkTo: true,
+            handler: action,
+        },
+    ],
 };

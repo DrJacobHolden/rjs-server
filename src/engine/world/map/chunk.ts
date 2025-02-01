@@ -1,10 +1,10 @@
-import type { Position } from '../position';
-import type { Player } from '../actor/player/player';
-import { CollisionMap } from './collision-map';
-import type { Npc } from '../actor/npc';
+import { activeWorld } from '@engine/world';
 import type { WorldItem } from '@engine/world/items/world-item';
 import type { LandscapeObject } from '@runejs/filestore';
-import { activeWorld } from '@engine/world';
+import type { Npc } from '../actor/npc';
+import type { Player } from '../actor/player/player';
+import type { Position } from '../position';
+import { CollisionMap } from './collision-map';
 
 interface CustomLandscapeObject {
     reference?: boolean;
@@ -20,7 +20,6 @@ export interface ChunkUpdateItem {
  * A single map chunk within the game world that keeps track of the entities within it.
  */
 export class Chunk {
-
     private readonly _position: Position;
     private readonly _players: Player[];
     private readonly _npcs: Npc[];
@@ -42,33 +41,32 @@ export class Chunk {
     }
 
     public setFilestoreLandscapeObject(landscapeObject: LandscapeObject): void {
-        this._filestoreLandscapeObjects.set(`${ landscapeObject.x },${ landscapeObject.y },${ landscapeObject.objectId }`,
-            landscapeObject);
+        this._filestoreLandscapeObjects.set(`${landscapeObject.x},${landscapeObject.y},${landscapeObject.objectId}`, landscapeObject);
         this._collisionMap.markGameObject(landscapeObject, true);
     }
 
     public addPlayer(player: Player): void {
-        if(this._players.findIndex(p => p.equals(player)) === -1) {
+        if (this._players.findIndex(p => p.equals(player)) === -1) {
             this._players.push(player);
         }
     }
 
     public removePlayer(player: Player): void {
         const index = this._players.findIndex(p => p.equals(player));
-        if(index !== -1) {
+        if (index !== -1) {
             this._players.splice(index, 1);
         }
     }
 
     public addNpc(npc: Npc): void {
-        if(this._npcs.findIndex(n => n.equals(npc)) === -1) {
+        if (this._npcs.findIndex(n => n.equals(npc)) === -1) {
             this._npcs.push(npc);
         }
     }
 
     public removeNpc(npc: Npc): void {
         const index = this._npcs.findIndex(n => n.equals(npc));
-        if(index !== -1) {
+        if (index !== -1) {
             this._npcs.splice(index, 1);
         }
     }
@@ -78,8 +76,7 @@ export class Chunk {
     }
 
     public equals(chunk: Chunk): boolean {
-        return this.position.x === chunk.position.x && this.position.y === chunk.position.y
-            && this.position.level === chunk.position.level;
+        return this.position.x === chunk.position.x && this.position.y === chunk.position.y && this.position.level === chunk.position.level;
     }
 
     public get position(): Position {

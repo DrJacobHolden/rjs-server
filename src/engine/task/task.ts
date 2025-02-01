@@ -7,7 +7,7 @@ const DEFAULT_TASK_CONFIG: Required<TaskConfig> = {
     stackGroup: TaskStackGroup.ACTION,
     immediate: false,
     breakTypes: [],
-    repeat: true
+    repeat: true,
 };
 
 function readConfigValue(key: keyof TaskConfig, config?: TaskConfig): any {

@@ -1,15 +1,15 @@
-import { widgets } from '@engine/config/config-handler';
-import { Skill } from '@engine/world/actor/skills';
-import { anvilIds, bars, smithables, widgetItems } from '@plugins/skills/smithing/forging-constants';
-import { itemIds } from '@engine/world/config/item-ids';
-import type { Smithable } from '@plugins/skills/smithing/forging-types';
-import type { Player } from '@engine/world/actor/player/player';
-import { findItem } from '@engine/config/config-handler';
-import { Position } from '@engine/world/position';
-import { ForgingTask } from './forging-task';
-import { logger } from '@runejs/common';
 import type { ItemInteractionActionHook } from '@engine/action/pipe/item-interaction.action';
-import type { itemOnObjectActionHandler, ItemOnObjectActionHook } from '@engine/action/pipe/item-on-object.action';
+import type { ItemOnObjectActionHook, itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
+import { widgets } from '@engine/config/config-handler';
+import { findItem } from '@engine/config/config-handler';
+import type { Player } from '@engine/world/actor/player/player';
+import { Skill } from '@engine/world/actor/skills';
+import { itemIds } from '@engine/world/config/item-ids';
+import { Position } from '@engine/world/position';
+import { anvilIds, bars, smithables, widgetItems } from '@plugins/skills/smithing/forging-constants';
+import type { Smithable } from '@plugins/skills/smithing/forging-types';
+import { logger } from '@runejs/common';
+import { ForgingTask } from './forging-task';
 
 /**
  * Get the item ids of all the smithable items, as a flat array.
@@ -21,8 +21,8 @@ import type { itemOnObjectActionHandler, ItemOnObjectActionHook } from '@engine/
  */
 const mapSmithableItemIdsToFlatArray = (input: Map<string, Map<string, Smithable>>) => {
     const result: number[] = [];
-    input.forEach((type) => {
-        type.forEach((smithable) => {
+    input.forEach(type => {
+        type.forEach(smithable => {
             result.push(smithable.item.itemId);
         });
     });
@@ -42,8 +42,8 @@ const mapSmithableItemIdsToFlatArray = (input: Map<string, Map<string, Smithable
  */
 const mapSmithablesToFlatArray = (input: Map<string, Map<string, Smithable>>) => {
     const results: Smithable[] = [];
-    input.forEach((values) => {
-        values.forEach((value) => {
+    input.forEach(values => {
+        values.forEach(value => {
             results.push(value);
         });
     });
@@ -54,10 +54,12 @@ const mapSmithablesToFlatArray = (input: Map<string, Map<string, Smithable>>) =>
  * Lookup a smithable from just an item id.
  * @param itemId
  */
-const findSmithableByItemId = (itemId: number) : Smithable | null => {
-    return mapSmithablesToFlatArray(smithables).find((smithable) => {
-        return smithable.item.itemId === itemId;
-    }) || null;
+const findSmithableByItemId = (itemId: number): Smithable | null => {
+    return (
+        mapSmithablesToFlatArray(smithables).find(smithable => {
+            return smithable.item.itemId === itemId;
+        }) || null
+    );
 };
 
 /**
@@ -113,7 +115,7 @@ const hasMaterials = (player: Player, smithable: Smithable) => {
  * Opens the forging interface, and loads the items.
  * @param details
  */
-const openForgingInterface: itemOnObjectActionHandler = (details) => {
+const openForgingInterface: itemOnObjectActionHandler = details => {
     const { player, item, object } = details;
     const amountInInventory = player.inventory.findAll(item).length;
 
@@ -148,7 +150,7 @@ const openForgingInterface: itemOnObjectActionHandler = (details) => {
     player.outgoingPackets.updateClientConfig(211, player.skills.getLevel(Skill.SMITHING));
 
     details.player.interfaceState.openWidget(widgets.anvil.widgetId, {
-        slot: 'screen'
+        slot: 'screen',
     });
 
     const barWidgetItems = widgetItems.get(item.itemId);
@@ -160,9 +162,14 @@ const openForgingInterface: itemOnObjectActionHandler = (details) => {
 
     barWidgetItems.forEach((items, containerId) => {
         items.forEach((smithable, index) => {
-            player.outgoingPackets.sendUpdateSingleWidgetItem({
-                widgetId: widgets.anvil.widgetId, containerId: containerId
-            }, index, smithable.item);
+            player.outgoingPackets.sendUpdateSingleWidgetItem(
+                {
+                    widgetId: widgets.anvil.widgetId,
+                    containerId: containerId,
+                },
+                index,
+                smithable.item,
+            );
         });
     });
 };
@@ -177,7 +184,7 @@ export default {
             walkTo: true,
 
             cancelOtherActions: true,
-            handler: openForgingInterface
+            handler: openForgingInterface,
         } as ItemOnObjectActionHook,
         {
             type: 'item_interaction',
@@ -196,9 +203,15 @@ export default {
                 let wantedAmount = 0;
 
                 switch (option) {
-                    case 'make': wantedAmount = 1; break;
-                    case 'make-5': wantedAmount = 5; break;
-                    case 'make-10': wantedAmount = 10; break;
+                    case 'make':
+                        wantedAmount = 1;
+                        break;
+                    case 'make-5':
+                        wantedAmount = 5;
+                        break;
+                    case 'make-10':
+                        wantedAmount = 10;
+                        break;
                 }
 
                 if (!canForge(player, smithable)) {
@@ -206,7 +219,7 @@ export default {
                 }
 
                 player.enqueueTask(ForgingTask, [smithable, wantedAmount]);
-            }
-        } as ItemInteractionActionHook
-    ]
+            },
+        } as ItemInteractionActionHook,
+    ],
 };

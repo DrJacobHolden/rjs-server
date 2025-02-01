@@ -1,4 +1,4 @@
-import { Queue } from './queue'
+import { Queue } from './queue';
 
 describe('Queue', () => {
     let queue: Queue<number>;
@@ -104,4 +104,4 @@ describe('Queue', () => {
             expect(items).toEqual([1, 2, 3]);
         });
     });
-})
+});

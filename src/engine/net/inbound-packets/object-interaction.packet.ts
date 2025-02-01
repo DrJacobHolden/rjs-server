@@ -7,7 +7,6 @@ import { Position } from '@engine/world/position';
 import { logger } from '@runejs/common';
 import { filestore } from '@server/game/game-server';
 
-
 interface ObjectInteractionData {
     objectId: number;
     x: number;
@@ -15,7 +14,6 @@ interface ObjectInteractionData {
 }
 
 type objectInteractionPacket = (packet: PacketData) => ObjectInteractionData;
-
 
 const option1: objectInteractionPacket = packet => {
     const { buffer } = packet;
@@ -57,15 +55,13 @@ const option5: objectInteractionPacket = packet => {
     return { objectId, x, y };
 };
 
-
-const objectInteractionPackets: { [key: number]: { packetDef: objectInteractionPacket, index: number } } = {
-    30:  { packetDef: option1, index: 0 },
+const objectInteractionPackets: { [key: number]: { packetDef: objectInteractionPacket; index: number } } = {
+    30: { packetDef: option1, index: 0 },
     164: { packetDef: option2, index: 1 },
     183: { packetDef: option3, index: 2 },
     229: { packetDef: option4, index: 3 },
-    62:  { packetDef: option5, index: 4 },
+    62: { packetDef: option5, index: 4 },
 };
-
 
 const objectInteractionPacket = (player: Player, packet: PacketData) => {
     const { packetId } = packet;
@@ -74,8 +70,8 @@ const objectInteractionPacket = (player: Player, packet: PacketData) => {
     const level = player.position.level;
     const objectPosition = new Position(x, y, level);
     const { object: landscapeObject, cacheOriginal } = activeWorld.findObjectAtLocation(player, objectId, objectPosition);
-    if(!landscapeObject) {
-        if(player.rights === Rights.ADMIN) {
+    if (!landscapeObject) {
+        if (player.rights === Rights.ADMIN) {
             player.sendMessage(`Custom object ${objectId} @[${objectPosition.key}]`);
         }
         return;
@@ -90,15 +86,17 @@ const objectInteractionPacket = (player: Player, packet: PacketData) => {
 
     if (objectConfig.configChangeDest) {
         let morphIndex = -1;
-        if(objectConfig.varbitId === -1) {
-            if(objectConfig.configId !== -1) {
-                morphIndex = player.metadata.configs && player.metadata.configs[objectConfig.configId] ?
-                    player.metadata.configs[objectConfig.configId] : 0;
+        if (objectConfig.varbitId === -1) {
+            if (objectConfig.configId !== -1) {
+                morphIndex =
+                    player.metadata.configs && player.metadata.configs[objectConfig.configId]
+                        ? player.metadata.configs[objectConfig.configId]
+                        : 0;
             }
         } else {
             morphIndex = getVarbitMorphIndex(objectConfig.varbitId, player.metadata.configs);
         }
-        if(morphIndex !== -1) {
+        if (morphIndex !== -1) {
             objectConfig = filestore.configStore.objectStore.getObject(objectConfig.configChangeDest[morphIndex]);
         }
     }
@@ -110,8 +108,8 @@ const objectInteractionPacket = (player: Player, packet: PacketData) => {
 
     const actionIdx = objectInteractionPackets[packetId].index;
     let optionName = `action-${actionIdx + 1}`;
-    if(objectConfig.options && objectConfig.options.length >= actionIdx) {
-        if(!objectConfig.options[actionIdx]) {
+    if (objectConfig.options && objectConfig.options.length >= actionIdx) {
+        if (!objectConfig.options[actionIdx]) {
             // Invalid action
             logger.error(`1: Invalid object ${objectId} option ${actionIdx + 1}, options: ${JSON.stringify(objectConfig.options)}`);
             return;
@@ -124,12 +122,19 @@ const objectInteractionPacket = (player: Player, packet: PacketData) => {
         return;
     }
 
-    player.actionPipeline.call('object_interaction', player, landscapeObject, objectConfig, objectPosition, optionName.toLowerCase(), cacheOriginal);
+    player.actionPipeline.call(
+        'object_interaction',
+        player,
+        landscapeObject,
+        objectConfig,
+        objectPosition,
+        optionName.toLowerCase(),
+        cacheOriginal,
+    );
 };
-
 
 export default Object.keys(objectInteractionPackets).map(opcode => ({
     opcode: parseInt(opcode, 10),
     size: 6,
-    handler: objectInteractionPacket
+    handler: objectInteractionPacket,
 }));

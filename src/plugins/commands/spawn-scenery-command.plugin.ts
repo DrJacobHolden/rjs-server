@@ -1,22 +1,22 @@
+import { writeFileSync } from 'fs';
 import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { objectIds } from '@engine/world/config/object-ids';
-import { dump } from 'js-yaml';
-import { writeFileSync } from 'fs';
 import { logger } from '@runejs/common';
 import type { LandscapeObject } from '@runejs/filestore';
+import { dump } from 'js-yaml';
 
 const spawnSceneryAction: commandActionHandler = ({ player, args }) => {
     const locationObjectSearch: string = (args.locationObjectSearch as string).trim();
     let locationObjectId: number;
 
-    if(locationObjectSearch.match(/^[0-9]+$/)) {
+    if (locationObjectSearch.match(/^[0-9]+$/)) {
         locationObjectId = parseInt(locationObjectSearch, 10);
     } else {
         // @TODO nested object ids
         locationObjectId = objectIds[locationObjectSearch];
     }
 
-    if(isNaN(locationObjectId)) {
+    if (isNaN(locationObjectId)) {
         throw new Error(`Location object name not found.`);
     }
 
@@ -31,12 +31,12 @@ const spawnSceneryAction: commandActionHandler = ({ player, args }) => {
         y: position.y,
         level: position.level,
         type: objectType,
-        orientation: objectOrientation
+        orientation: objectOrientation,
     };
 
     player.metadata.lastSpawnedScenery = locationObject;
 
-    if(!player.metadata.spawnedScenery) {
+    if (!player.metadata.spawnedScenery) {
         player.metadata.spawnedScenery = [];
     }
 
@@ -45,27 +45,27 @@ const spawnSceneryAction: commandActionHandler = ({ player, args }) => {
     player.instance.spawnGameObject(locationObject);
 };
 
-const undoSceneryAction: commandActionHandler = (details) => {
+const undoSceneryAction: commandActionHandler = details => {
     const { player } = details;
 
     const o = player.metadata.lastSpawnedScenery;
 
-    if(!o) {
+    if (!o) {
         return;
     }
 
     player.instance.despawnGameObject(o);
     delete player.metadata.lastSpawnedScenery;
 
-    if(player.metadata.spawnedScenery) {
+    if (player.metadata.spawnedScenery) {
         player.metadata.spawnedScenery.pop();
     }
 };
 
-const dumpSceneryAction: commandActionHandler = (details) => {
+const dumpSceneryAction: commandActionHandler = details => {
     const { player } = details;
 
-    const path = `data/dump/scene-${ new Date().getTime() }.yml`;
+    const path = `data/dump/scene-${new Date().getTime()}.yml`;
     writeFileSync(path, dump(player.metadata.spawnedScenery));
     logger.info(path);
     player.metadata.spawnedScenery = [];
@@ -76,32 +76,34 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'scene', 'sc' ],
+            commands: ['scene', 'sc'],
             args: [
                 {
                     name: 'locationObjectSearch',
-                    type: 'string'
+                    type: 'string',
                 },
                 {
                     name: 'objectOrientation',
                     type: 'number',
-                    defaultValue: 0
+                    defaultValue: 0,
                 },
                 {
                     name: 'objectType',
                     type: 'number',
-                    defaultValue: 10
-                }
+                    defaultValue: 10,
+                },
             ],
-            handler: spawnSceneryAction
-        }, {
+            handler: spawnSceneryAction,
+        },
+        {
             type: 'player_command',
-            commands: [ 'undoscene', 'undosc' ],
-            handler: undoSceneryAction
-        }, {
+            commands: ['undoscene', 'undosc'],
+            handler: undoSceneryAction,
+        },
+        {
             type: 'player_command',
-            commands: [ 'dumpscene', 'dumpsc' ],
-            handler: dumpSceneryAction
-        }
-    ]
+            commands: ['dumpscene', 'dumpsc'],
+            handler: dumpSceneryAction,
+        },
+    ],
 };

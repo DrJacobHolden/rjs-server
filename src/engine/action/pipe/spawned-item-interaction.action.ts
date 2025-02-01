@@ -1,7 +1,7 @@
-import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
 import type { ActionHook } from '@engine/action/hook/action-hook';
 import { getActionHooks } from '@engine/action/hook/action-hook';
-import { questHookFilter, numberHookFilter, stringHookFilter } from '@engine/action/hook/hook-filters';
+import { numberHookFilter, questHookFilter, stringHookFilter } from '@engine/action/hook/hook-filters';
 import { WalkToItemPluginTask } from '@engine/action/pipe/task/walk-to-item-plugin-task';
 import { findItem } from '@engine/config/config-handler';
 import type { ItemDetails } from '@engine/config/item-config';
@@ -21,12 +21,10 @@ export interface SpawnedItemInteractionHook extends ActionHook<SpawnedItemIntera
     walkTo: boolean;
 }
 
-
 /**
  * The world item action hook handler function to be called when the hook's conditions are met.
  */
 export type spawnedItemInteractionHandler = (spawnedItemInteractionAction: SpawnedItemInteractionAction) => void;
-
 
 /**
  * Details about a world item action being performed.
@@ -42,27 +40,30 @@ export interface SpawnedItemInteractionAction {
     // TODO (jkm) add "option" to the action
 }
 
-
 /**
  * The pipe that the game engine hands world item actions off to.
  * @param player
  * @param worldItem
  * @param option
  */
-const spawnedItemInteractionPipe = (player: Player, worldItem: WorldItem, option: string): RunnableHooks<SpawnedItemInteractionAction> | null => {
+const spawnedItemInteractionPipe = (
+    player: Player,
+    worldItem: WorldItem,
+    option: string,
+): RunnableHooks<SpawnedItemInteractionAction> | null => {
     // Find all world item action plugins that reference this world item
     let matchingHooks = getActionHooks<SpawnedItemInteractionHook>('spawned_item_interaction').filter(plugin => {
-        if(!questHookFilter(player, plugin)) {
+        if (!questHookFilter(player, plugin)) {
             return false;
         }
 
-        if(plugin.itemIds !== undefined) {
-            if(!numberHookFilter(plugin.itemIds, worldItem.itemId)) {
+        if (plugin.itemIds !== undefined) {
+            if (!numberHookFilter(plugin.itemIds, worldItem.itemId)) {
                 return false;
             }
         }
 
-        if(!stringHookFilter(plugin.options, option)) {
+        if (!stringHookFilter(plugin.options, option)) {
             return false;
         }
 
@@ -71,18 +72,18 @@ const spawnedItemInteractionPipe = (player: Player, worldItem: WorldItem, option
 
     const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
 
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
+    if (matchingHooks.length === 0) {
         player.outgoingPackets.chatboxMessage(`Unhandled world item interaction: ${option} ${worldItem.itemId}`);
         return null;
     }
 
     const itemDetails = findItem(worldItem.itemId);
 
-    if(!itemDetails) {
+    if (!itemDetails) {
         logger.error(`Item ${worldItem.itemId} not registered on the server [spawned-item-interaction action pipe]`);
         return null;
     }
@@ -100,13 +101,12 @@ const spawnedItemInteractionPipe = (player: Player, worldItem: WorldItem, option
         action: {
             player,
             worldItem,
-            itemDetails
-        }
-    }
+            itemDetails,
+        },
+    };
 };
-
 
 /**
  * World item action pipe definition.
  */
-export default [ 'spawned_item_interaction', spawnedItemInteractionPipe ] as ActionPipe;
+export default ['spawned_item_interaction', spawnedItemInteractionPipe] as ActionPipe;

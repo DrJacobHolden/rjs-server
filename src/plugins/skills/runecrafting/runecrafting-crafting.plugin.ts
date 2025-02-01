@@ -1,21 +1,22 @@
+import type { ItemOnObjectAction, itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
+import type { ObjectInteractionAction, objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import { findItem, widgets } from '@engine/config/config-handler';
+import { randomBetween } from '@engine/util/num';
 /**
  * @Author NickNick
  */
 import { Skill } from '@engine/world/actor/skills';
+import { itemIds } from '@engine/world/config/item-ids';
 import {
-    altars, combinationRunes,
+    altars,
+    combinationRunes,
     getEntityByAttr,
-    getEntityIds, runeMultiplier,
+    getEntityIds,
+    runeMultiplier,
     runes,
 } from '@plugins/skills/runecrafting/runecrafting-constants';
 import type { RunecraftingCombinationRune } from '@plugins/skills/runecrafting/runecrafting-types';
-import { randomBetween } from '@engine/util/num';
-import { itemIds } from '@engine/world/config/item-ids';
-import { findItem, widgets } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
-import type { itemOnObjectActionHandler, ItemOnObjectAction } from '@engine/action/pipe/item-on-object.action';
-import type { objectInteractionActionHandler, ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
-
 
 const craftRune: objectInteractionActionHandler = (details: ObjectInteractionAction) => {
     const { player, object } = details;
@@ -39,21 +40,21 @@ const craftRune: objectInteractionActionHandler = (details: ObjectInteractionAct
         return;
     }
     let essenceAvailable = 0;
-    rune.essence.forEach((essenceId) => {
+    rune.essence.forEach(essenceId => {
         essenceAvailable += player.inventory.findAll(essenceId).length;
     });
 
     if (essenceAvailable > 0) {
         // Remove essence from inventory.
-        rune.essence.forEach((essenceId) => {
-            player.inventory.findAll(essenceId).forEach((index) => {
+        rune.essence.forEach(essenceId => {
+            player.inventory.findAll(essenceId).forEach(index => {
                 player.inventory.remove(index);
             });
         });
         // Add crafted runes to inventory.
-        player.inventory.add({ itemId: rune.id, amount: (runeMultiplier(rune.id, level) * essenceAvailable) });
+        player.inventory.add({ itemId: rune.id, amount: runeMultiplier(rune.id, level) * essenceAvailable });
         // Add experience
-        player.skills.addExp(Skill.RUNECRAFTING, (rune.xp * essenceAvailable));
+        player.skills.addExp(Skill.RUNECRAFTING, rune.xp * essenceAvailable);
         // Update widget items.
         player.outgoingPackets.sendUpdateAllWidgetItems(widgets.inventory, player.inventory);
         return;
@@ -64,7 +65,7 @@ const craftRune: objectInteractionActionHandler = (details: ObjectInteractionAct
 
 function getCombinationRuneByAltar(itemId: number, objectId: number): RunecraftingCombinationRune | undefined {
     for (const combinationRune of combinationRunes.values()) {
-        const altarIndex = combinationRune.altar.findIndex((altar) => altar.craftingId === objectId);
+        const altarIndex = combinationRune.altar.findIndex(altar => altar.craftingId === objectId);
         if (altarIndex > -1 && combinationRune.talisman[altarIndex ^ 1].id === itemId) {
             return combinationRune;
         }
@@ -111,7 +112,7 @@ const craftCombinationRune: itemOnObjectActionHandler = (details: ItemOnObjectAc
         } else {
             player.inventory.set(requiredRunesIndex, {
                 itemId: rune.runes[altarIndex ^ 1].id,
-                amount: requiredRunesAvailable - amountToCraft
+                amount: requiredRunesAvailable - amountToCraft,
             });
         }
         // Remove essence from inventory.
@@ -121,7 +122,7 @@ const craftCombinationRune: itemOnObjectActionHandler = (details: ItemOnObjectAc
         // Add crafted runes to inventory.
         player.inventory.add({ itemId: rune.id, amount: amountToCraft });
         // Add experience
-        player.skills.addExp(Skill.RUNECRAFTING, (rune.xp[altarIndex] * essenceAvailable));
+        player.skills.addExp(Skill.RUNECRAFTING, rune.xp[altarIndex] * essenceAvailable);
         if (shouldBreakTalisman) {
             player.inventory.removeFirst(item.itemId);
         }
@@ -134,7 +135,6 @@ const craftCombinationRune: itemOnObjectActionHandler = (details: ItemOnObjectAc
     player.sendMessage(`You do not have any pure essence to bind.`);
 };
 
-
 export default {
     pluginId: 'rs:runecrafting',
     hooks: [
@@ -142,13 +142,13 @@ export default {
             type: 'object_interaction',
             objectIds: getEntityIds(altars, 'craftingId'),
             walkTo: true,
-            handler: craftRune
+            handler: craftRune,
         },
         {
             type: 'item_on_object',
             objectIds: getEntityIds(altars, 'craftingId'),
             walkTo: true,
-            handler: craftCombinationRune
-        }
-    ]
+            handler: craftCombinationRune,
+        },
+    ],
 };

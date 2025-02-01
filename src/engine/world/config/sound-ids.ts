@@ -70,7 +70,7 @@ export const soundIds = {
             femaleDefence: 506,
             playerDefence: 516,
             noArmorHitPlayer: 519,
-            noArmorHit: 511
-        }
-    }
+            noArmorHit: 511,
+        },
+    },
 };

@@ -1,30 +1,30 @@
-import type { Actor } from '@engine/world/actor/actor';
-import { Position } from '../position';
-import type { Chunk } from '@engine/world/map/chunk';
-import { logger } from '@runejs/common';
-import type { WorldInstance } from '@engine/world/instances';
-import type { Tile } from '@engine/world/map/chunk-manager';
 import { activeWorld } from '@engine/world';
+import type { Actor } from '@engine/world/actor/actor';
 import { isPlayer } from '@engine/world/actor/util';
-
+import type { WorldInstance } from '@engine/world/instances';
+import type { Chunk } from '@engine/world/map/chunk';
+import type { Tile } from '@engine/world/map/chunk-manager';
+import { logger } from '@runejs/common';
+import { Position } from '../position';
 
 class Point {
-
     private _parent: Point | null = null;
     private _cost: number = 0;
 
-    public constructor(private readonly _x: number, private readonly _y: number) {
-    }
+    public constructor(
+        private readonly _x: number,
+        private readonly _y: number,
+    ) {}
 
     public equals(point: Point | null): boolean {
         if (point === null) {
             return false;
         }
 
-        if(this._cost === point._cost) {
-            if(this._parent === null && point._parent !== null) {
+        if (this._cost === point._cost) {
+            if (this._parent === null && point._parent !== null) {
                 return false;
-            } else if(this._parent !== null && !this._parent.equals(point._parent)) {
+            } else if (this._parent !== null && !this._parent.equals(point._parent)) {
                 return false;
             }
 
@@ -65,25 +65,23 @@ export interface PathingOptions {
 }
 
 export class Pathfinding {
-
     public stopped = false;
     private currentPoint: Point;
     private points: Point[][];
     private closedPoints = new Set<Point>();
     private openPoints = new Set<Point>();
 
-    public constructor(private actor: Actor) {
-    }
+    public constructor(private actor: Actor) {}
 
     public walkTo(position: Position, options: PathingOptions): void {
-        if(!options.pathingSearchRadius) {
+        if (!options.pathingSearchRadius) {
             options.pathingSearchRadius = 16;
         }
 
         try {
             const path = this.pathTo(position.x, position.y, options.pathingSearchRadius);
 
-            if(!path) {
+            if (!path) {
                 return;
             }
 
@@ -92,14 +90,14 @@ export class Pathfinding {
             walkingQueue.clear();
             walkingQueue.valid = true;
 
-            if(options.ignoreDestination) {
+            if (options.ignoreDestination) {
                 path.splice(path.length - 1, 1);
             }
 
-            for(const point of path) {
+            for (const point of path) {
                 walkingQueue.add(point.x, point.y);
             }
-        } catch(error) {
+        } catch (error) {
             logger.error(error);
         }
     }
@@ -112,15 +110,13 @@ export class Pathfinding {
         const highestY = position.y + searchRadius;
 
         const tiles: Tile[] = [];
-        for(let x = lowestX; x < highestX; x++) {
-            for(let y = lowestY; y < highestY; y++) {
+        for (let x = lowestX; x < highestX; x++) {
+            for (let y = lowestY; y < highestY; y++) {
                 tiles.push(activeWorld.chunkManager.getTile(new Position(x, y, this.actor.position.level)));
             }
         }
 
-        return Object.fromEntries(
-            tiles.map(tile => [ `${tile.x},${tile.y}`, tile ])
-        );
+        return Object.fromEntries(tiles.map(tile => [`${tile.x},${tile.y}`, tile]));
     }
 
     public pathTo(destinationX: number, destinationY: number, searchRadius: number = 16): Point[] | null {
@@ -130,7 +126,7 @@ export class Pathfinding {
         const highestX = position.x + searchRadius;
         const highestY = position.y + searchRadius;
 
-        if(destinationX < lowestX || destinationX > highestX || destinationY < lowestY || destinationY > highestY) {
+        if (destinationX < lowestX || destinationX > highestX || destinationY < lowestY || destinationY > highestY) {
             throw new Error(`Out of range.`);
         }
 
@@ -141,14 +137,14 @@ export class Pathfinding {
 
         const pointLen = searchRadius * 2;
 
-        if(pointLen <= 0) {
+        if (pointLen <= 0) {
             throw new Error(`Why is your search radius zero?`);
         }
 
         this.points = [...Array(pointLen)].map(e => Array(pointLen));
 
-        for(let x = 0; x < pointLen; x++) {
-            for(let y = 0; y < pointLen; y++) {
+        for (let x = 0; x < pointLen; x++) {
+            for (let y = 0; y < pointLen; y++) {
                 this.points[x][y] = new Point(lowestX + x, lowestY + y);
             }
         }
@@ -158,14 +154,14 @@ export class Pathfinding {
         this.closedPoints = new Set<Point>();
         this.openPoints.add(this.points[startingIndexX][startingIndexY]);
 
-        while(this.openPoints.size > 0) {
-            if(this.stopped) {
+        while (this.openPoints.size > 0) {
+            if (this.stopped) {
                 return null;
             }
 
             const bestPoint = this.calculateBestPoint();
 
-            if(!bestPoint || bestPoint.equals(this.points[destinationIndexX][destinationIndexY])) {
+            if (!bestPoint || bestPoint.equals(this.points[destinationIndexX][destinationIndexY])) {
                 break;
             }
 
@@ -180,63 +176,61 @@ export class Pathfinding {
             const indexY = y - lowestY;
 
             // North-West
-            if(indexX > 0 && this.points[indexX - 1] && indexY < this.points[indexX - 1].length - 1) {
-                if(this.canPathDiagonally(x, y, new Position(x - 1, y + 1, level), -1, 1,
-                    0x1280138, 0x1280108, 0x1280120)) {
+            if (indexX > 0 && this.points[indexX - 1] && indexY < this.points[indexX - 1].length - 1) {
+                if (this.canPathDiagonally(x, y, new Position(x - 1, y + 1, level), -1, 1, 0x1280138, 0x1280108, 0x1280120)) {
                     this.calculateCost(this.points[indexX - 1][indexY + 1]);
                 }
             }
 
             // North-East
-            if(indexX < this.points.length - 1 && this.points[indexX + 1] && indexY < this.points[indexX + 1].length - 1) {
-                if(this.canPathDiagonally(x, y, new Position(x + 1, y + 1, level), 1, 1,
-                    0x12801e0, 0x1280180, 0x1280120)) {
+            if (indexX < this.points.length - 1 && this.points[indexX + 1] && indexY < this.points[indexX + 1].length - 1) {
+                if (this.canPathDiagonally(x, y, new Position(x + 1, y + 1, level), 1, 1, 0x12801e0, 0x1280180, 0x1280120)) {
                     this.calculateCost(this.points[indexX + 1][indexY + 1]);
                 }
             }
 
             // South-West
-            if(indexX > 0 && indexY > 0 && this.points[indexX - 1]) {
-                if(this.canPathDiagonally(x, y,
-                    new Position(x - 1, y - 1, level), -1, -1,
-                    0x128010e, 0x1280108, 0x1280102)) {
+            if (indexX > 0 && indexY > 0 && this.points[indexX - 1]) {
+                if (this.canPathDiagonally(x, y, new Position(x - 1, y - 1, level), -1, -1, 0x128010e, 0x1280108, 0x1280102)) {
                     this.calculateCost(this.points[indexX - 1][indexY - 1]);
                 }
             }
 
             // South-East
-            if(indexX < this.points.length - 1 && indexY > 0 && this.points[indexX + 1]) {
-                if(this.canPathDiagonally(x, y, new Position(x + 1, y - 1, level), 1, -1,
-                    0x1280183, 0x1280180, 0x1280102)) {
+            if (indexX < this.points.length - 1 && indexY > 0 && this.points[indexX + 1]) {
+                if (this.canPathDiagonally(x, y, new Position(x + 1, y - 1, level), 1, -1, 0x1280183, 0x1280180, 0x1280102)) {
                     this.calculateCost(this.points[indexX + 1][indexY - 1]);
                 }
             }
 
             // West
-            if(indexX > 0 && this.canPathNSEW(new Position(x - 1, y, level), 0x1280108)) {
+            if (indexX > 0 && this.canPathNSEW(new Position(x - 1, y, level), 0x1280108)) {
                 this.calculateCost(this.points[indexX - 1][indexY]);
             }
 
             // East
-            if(indexX < this.points.length - 1 && this.canPathNSEW(new Position(x + 1, y, level), 0x1280180)) {
+            if (indexX < this.points.length - 1 && this.canPathNSEW(new Position(x + 1, y, level), 0x1280180)) {
                 this.calculateCost(this.points[indexX + 1][indexY]);
             }
 
             // South
-            if(indexY > 0 && this.canPathNSEW(new Position(x, y - 1, level), 0x1280102)) {
+            if (indexY > 0 && this.canPathNSEW(new Position(x, y - 1, level), 0x1280102)) {
                 this.calculateCost(this.points[indexX][indexY - 1]);
             }
 
             // North
-            if(this.points[indexX] && indexY < this.points[indexX].length - 1 &&
-                    this.canPathNSEW(new Position(x, y + 1, level), 0x1280120)) {
+            if (
+                this.points[indexX] &&
+                indexY < this.points[indexX].length - 1 &&
+                this.canPathNSEW(new Position(x, y + 1, level), 0x1280120)
+            ) {
                 this.calculateCost(this.points[indexX][indexY + 1]);
             }
         }
 
         const destinationPoint = this.points[destinationIndexX][destinationIndexY];
 
-        if(!destinationPoint || !destinationPoint.parent) {
+        if (!destinationPoint || !destinationPoint.parent) {
             // throw new Error(`Unable to find destination point.`);
             return null;
         }
@@ -247,7 +241,7 @@ export class Pathfinding {
         let iterations = 0;
 
         do {
-            if(this.stopped) {
+            if (this.stopped) {
                 return null;
             }
 
@@ -255,14 +249,14 @@ export class Pathfinding {
             point = point.parent;
             iterations++;
 
-            if(iterations > 1000) {
+            if (iterations > 1000) {
                 throw new Error(`Path iteration overflow, path can not be found.`);
             }
 
-            if(point === null) {
+            if (point === null) {
                 break;
             }
-        } while(!point.equals(this.points[startingIndexX][startingIndexY]));
+        } while (!point.equals(this.points[startingIndexX][startingIndexY]));
 
         return path.reverse();
     }
@@ -271,7 +265,7 @@ export class Pathfinding {
         const destinationChunk: Chunk = activeWorld.chunkManager.getChunkForWorldPosition(destination);
         const tile: Tile = activeWorld.chunkManager.getTile(destination);
 
-        if(tile?.blocked) {
+        if (tile?.blocked) {
             return false;
         }
 
@@ -281,61 +275,117 @@ export class Pathfinding {
         const destinationLocalY: number = destination.y - destinationChunk.collisionMap.insetY;
 
         // West
-        if(destination.x < initialX && destination.y == initialY) {
-            if(!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280108)) {
+        if (destination.x < initialX && destination.y == initialY) {
+            if (!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280108)) {
                 return false;
             }
         }
 
         // East
-        if(destination.x > initialX && destination.y == initialY) {
-            if(!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280180)) {
+        if (destination.x > initialX && destination.y == initialY) {
+            if (!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280180)) {
                 return false;
             }
         }
 
         // South
-        if(destination.y < initialY && destination.x == initialX) {
-            if(!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280102)) {
+        if (destination.y < initialY && destination.x == initialX) {
+            if (!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280102)) {
                 return false;
             }
         }
 
         // North
-        if(destination.y > initialY && destination.x == initialX) {
-            if(!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280120)) {
+        if (destination.y > initialY && destination.x == initialX) {
+            if (!this.movementPermitted(this.instance, destinationChunk, destinationLocalX, destinationLocalY, 0x1280120)) {
                 return false;
             }
         }
 
         // South-West
-        if(destination.x < initialX && destination.y < initialY) {
-            if(!this.diagonalMovementPermitted(this.instance, origin, destinationChunk, destinationLocalX, destinationLocalY, initialX, initialY, -1, -1,
-                0x128010e, 0x1280108, 0x1280102)) {
+        if (destination.x < initialX && destination.y < initialY) {
+            if (
+                !this.diagonalMovementPermitted(
+                    this.instance,
+                    origin,
+                    destinationChunk,
+                    destinationLocalX,
+                    destinationLocalY,
+                    initialX,
+                    initialY,
+                    -1,
+                    -1,
+                    0x128010e,
+                    0x1280108,
+                    0x1280102,
+                )
+            ) {
                 return false;
             }
         }
 
         // South-East
-        if(destination.x > initialX && destination.y < initialY) {
-            if(!this.diagonalMovementPermitted(this.instance, origin, destinationChunk, destinationLocalX, destinationLocalY, initialX, initialY, 1, -1,
-                0x1280183, 0x1280180, 0x1280102)) {
+        if (destination.x > initialX && destination.y < initialY) {
+            if (
+                !this.diagonalMovementPermitted(
+                    this.instance,
+                    origin,
+                    destinationChunk,
+                    destinationLocalX,
+                    destinationLocalY,
+                    initialX,
+                    initialY,
+                    1,
+                    -1,
+                    0x1280183,
+                    0x1280180,
+                    0x1280102,
+                )
+            ) {
                 return false;
             }
         }
 
         // North-West
-        if(destination.x < initialX && destination.y > initialY) {
-            if(!this.diagonalMovementPermitted(this.instance, origin, destinationChunk, destinationLocalX, destinationLocalY, initialX, initialY, -1, 1,
-                0x1280138, 0x1280108, 0x1280120)) {
+        if (destination.x < initialX && destination.y > initialY) {
+            if (
+                !this.diagonalMovementPermitted(
+                    this.instance,
+                    origin,
+                    destinationChunk,
+                    destinationLocalX,
+                    destinationLocalY,
+                    initialX,
+                    initialY,
+                    -1,
+                    1,
+                    0x1280138,
+                    0x1280108,
+                    0x1280120,
+                )
+            ) {
                 return false;
             }
         }
 
         // North-East
-        if(destination.x > initialX && destination.y > initialY) {
-            if(!this.diagonalMovementPermitted(this.instance, origin, destinationChunk, destinationLocalX, destinationLocalY, initialX, initialY, 1, 1,
-                0x12801e0, 0x1280180, 0x1280120)) {
+        if (destination.x > initialX && destination.y > initialY) {
+            if (
+                !this.diagonalMovementPermitted(
+                    this.instance,
+                    origin,
+                    destinationChunk,
+                    destinationLocalX,
+                    destinationLocalY,
+                    initialX,
+                    initialY,
+                    1,
+                    1,
+                    0x12801e0,
+                    0x1280180,
+                    0x1280120,
+                )
+            ) {
                 return false;
             }
         }
@@ -343,8 +393,15 @@ export class Pathfinding {
         return true;
     }
 
-    public movementPermitted(instance: WorldInstance, globalChunk: Chunk, destinationLocalX: number, destinationLocalY: number, i: number): boolean {
-        const instancedAdjacency = instance.getInstancedChunk(globalChunk.position.x, globalChunk.position.y, globalChunk.position.level).collisionMap.adjacency;
+    public movementPermitted(
+        instance: WorldInstance,
+        globalChunk: Chunk,
+        destinationLocalX: number,
+        destinationLocalY: number,
+        i: number,
+    ): boolean {
+        const instancedAdjacency = instance.getInstancedChunk(globalChunk.position.x, globalChunk.position.y, globalChunk.position.level)
+            .collisionMap.adjacency;
         const globalAdjacency = globalChunk.collisionMap.adjacency;
 
         try {
@@ -352,36 +409,46 @@ export class Pathfinding {
 
             const instancedTileFlags = instancedAdjacencyForTile === null ? null : instancedAdjacencyForTile & i;
 
-            const globalAdjacencyForTile =
-                globalAdjacency[destinationLocalX][destinationLocalY];
+            const globalAdjacencyForTile = globalAdjacency[destinationLocalX][destinationLocalY];
 
-            const globalTileFlags =
-                globalAdjacencyForTile === null
-                    ? null
-                    : globalAdjacencyForTile & i;
+            const globalTileFlags = globalAdjacencyForTile === null ? null : globalAdjacencyForTile & i;
 
             return instancedTileFlags === null ? globalTileFlags === 0 : instancedTileFlags === 0;
-        } catch(error) {
+        } catch (error) {
             logger.error(`Unable to calculate movement permission for local coordinates ${destinationLocalX},${destinationLocalY}.`);
             return false;
         }
     }
 
-    public diagonalMovementPermitted(instance: WorldInstance, origin: Position, destinationGlobalChunk: Chunk, destinationLocalX: number, destinationLocalY: number,
-        initialX: number, initialY: number, offsetX: number, offsetY: number, destMask: number, cornerMask1: number, cornerMask2: number): boolean {
+    public diagonalMovementPermitted(
+        instance: WorldInstance,
+        origin: Position,
+        destinationGlobalChunk: Chunk,
+        destinationLocalX: number,
+        destinationLocalY: number,
+        initialX: number,
+        initialY: number,
+        offsetX: number,
+        offsetY: number,
+        destMask: number,
+        cornerMask1: number,
+        cornerMask2: number,
+    ): boolean {
         const corner1 = this.findLocalCornerChunk(initialX + offsetX, initialY, origin);
         const corner2 = this.findLocalCornerChunk(initialX, initialY + offsetY, origin);
 
-        return this.movementPermitted(instance, destinationGlobalChunk, destinationLocalX, destinationLocalY, destMask) &&
+        return (
+            this.movementPermitted(instance, destinationGlobalChunk, destinationLocalX, destinationLocalY, destMask) &&
             this.movementPermitted(instance, corner1.chunk, corner1.localX, corner1.localY, cornerMask1) &&
-            this.movementPermitted(instance, corner2.chunk, corner2.localX, corner2.localY, cornerMask2);
+            this.movementPermitted(instance, corner2.chunk, corner2.localX, corner2.localY, cornerMask2)
+        );
     }
 
-    public findLocalCornerChunk(cornerX: number, cornerY: number, origin: Position): { localX: number, localY: number, chunk: Chunk } {
+    public findLocalCornerChunk(cornerX: number, cornerY: number, origin: Position): { localX: number; localY: number; chunk: Chunk } {
         const cornerPosition: Position = new Position(cornerX, cornerY, origin.level + 1);
         let cornerChunk: Chunk = activeWorld.chunkManager.getChunkForWorldPosition(cornerPosition);
         const tileAbove: Tile = activeWorld.chunkManager.getTile(cornerPosition);
-        if(!tileAbove?.bridge) {
+        if (!tileAbove?.bridge) {
             cornerPosition.level = cornerPosition.level - 1;
             cornerChunk = activeWorld.chunkManager.getChunkForWorldPosition(cornerPosition);
         }
@@ -392,18 +459,18 @@ export class Pathfinding {
     }
 
     private calculateCost(point: Point): void {
-        if(!this.currentPoint || !point) {
+        if (!this.currentPoint || !point) {
             return;
         }
 
         const nextStepCost = this.currentPoint.cost + this.calculateCostBetween(this.currentPoint, point);
 
-        if(nextStepCost < point.cost) {
+        if (nextStepCost < point.cost) {
             this.openPoints.delete(point);
             this.closedPoints.delete(point);
         }
 
-        if(!this.openPoints.has(point) && !this.closedPoints.has(point)) {
+        if (!this.openPoints.has(point) && !this.closedPoints.has(point)) {
             point.parent = this.currentPoint;
             point.cost = nextStepCost;
             this.openPoints.add(point);
@@ -420,9 +487,9 @@ export class Pathfinding {
         let bestPoint: Point | null = null;
 
         this.openPoints.forEach(point => {
-            if(!bestPoint) {
+            if (!bestPoint) {
                 bestPoint = point;
-            } else if(point.cost < bestPoint.cost) {
+            } else if (point.cost < bestPoint.cost) {
                 bestPoint = point;
             }
         });
@@ -437,17 +504,36 @@ export class Pathfinding {
         return this.movementPermitted(this.instance, chunk, destinationLocalX, destinationLocalY, i);
     }
 
-    private canPathDiagonally(originX: number, originY: number, position: Position, offsetX: number, offsetY: number,
-        destMask: number, cornerMask1: number, cornerMask2: number): boolean {
+    private canPathDiagonally(
+        originX: number,
+        originY: number,
+        position: Position,
+        offsetX: number,
+        offsetY: number,
+        destMask: number,
+        cornerMask1: number,
+        cornerMask2: number,
+    ): boolean {
         const chunk = activeWorld.chunkManager.getChunkForWorldPosition(position);
         const destinationLocalX: number = position.x - chunk.collisionMap.insetX;
         const destinationLocalY: number = position.y - chunk.collisionMap.insetY;
-        return this.diagonalMovementPermitted(this.instance, position, chunk, destinationLocalX, destinationLocalY,
-            originX, originY, offsetX, offsetY, destMask, cornerMask1, cornerMask2);
+        return this.diagonalMovementPermitted(
+            this.instance,
+            position,
+            chunk,
+            destinationLocalX,
+            destinationLocalY,
+            originX,
+            originY,
+            offsetX,
+            offsetY,
+            destMask,
+            cornerMask1,
+            cornerMask2,
+        );
     }
 
     private get instance(): WorldInstance {
         return isPlayer(this.actor) ? this.actor.instance : activeWorld.globalInstance;
     }
-
 }

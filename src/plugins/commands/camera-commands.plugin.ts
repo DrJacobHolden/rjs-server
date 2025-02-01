@@ -1,25 +1,40 @@
 import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
 import { Position } from '@engine/world/position';
 
-
 const moveCameraAction: commandActionHandler = ({ player, args }) => {
     const { x, y, height, speed, acceleration } = args;
-    player.outgoingPackets.snapCameraTo(new Position(x as number, y as number, player.position.level),
-        height as number, speed as number, acceleration as number);
+    player.outgoingPackets.snapCameraTo(
+        new Position(x as number, y as number, player.position.level),
+        height as number,
+        speed as number,
+        acceleration as number,
+    );
 };
 
 const turnCameraAction: commandActionHandler = ({ player, args }) => {
     const { x, y, height, speed, acceleration } = args;
-    player.outgoingPackets.turnCameraTowards(new Position(x as number, y as number, player.position.level),
-        height as number, speed as number, acceleration as number);
+    player.outgoingPackets.turnCameraTowards(
+        new Position(x as number, y as number, player.position.level),
+        height as number,
+        speed as number,
+        acceleration as number,
+    );
 };
 
 const lookCameraAction: commandActionHandler = ({ player, args }) => {
     const { cameraX, cameraY, cameraHeight, lookX, lookY, lookHeight, speed, acceleration } = args;
-    player.outgoingPackets.snapCameraTo(new Position(cameraX as number, cameraY as number, player.position.level),
-        cameraHeight as number, speed as number, acceleration as number);
-    player.outgoingPackets.turnCameraTowards(new Position(lookX as number, lookY as number, player.position.level),
-        lookHeight as number, speed as number, acceleration as number);
+    player.outgoingPackets.snapCameraTo(
+        new Position(cameraX as number, cameraY as number, player.position.level),
+        cameraHeight as number,
+        speed as number,
+        acceleration as number,
+    );
+    player.outgoingPackets.turnCameraTowards(
+        new Position(lookX as number, lookY as number, player.position.level),
+        lookHeight as number,
+        speed as number,
+        acceleration as number,
+    );
 };
 
 const lookTestAction: commandActionHandler = ({ player }) => {
@@ -41,104 +56,107 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'looktest', 'lt' ],
-            handler: lookTestAction
-        }, {
+            commands: ['looktest', 'lt'],
+            handler: lookTestAction,
+        },
+        {
             type: 'player_command',
-            commands: [ 'cameralook' ],
+            commands: ['cameralook'],
             args: [
                 {
                     name: 'cameraX',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'cameraY',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'cameraHeight',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'lookX',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'lookY',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'lookHeight',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'speed',
                     type: 'number',
-                    defaultValue: 0
+                    defaultValue: 0,
                 },
                 {
                     name: 'acceleration',
                     type: 'number',
-                    defaultValue: 100
-                }
+                    defaultValue: 100,
+                },
             ],
-            handler: lookCameraAction
-        }, {
+            handler: lookCameraAction,
+        },
+        {
             type: 'player_command',
-            commands: [ 'mcam', 'movecamera', 'move_camera', 'setcam', 'setcamera', 'set_camera' ],
+            commands: ['mcam', 'movecamera', 'move_camera', 'setcam', 'setcamera', 'set_camera'],
             args: [
                 {
                     name: 'x',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'y',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'height',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'speed',
                     type: 'number',
-                    defaultValue: 0
+                    defaultValue: 0,
                 },
                 {
                     name: 'acceleration',
                     type: 'number',
-                    defaultValue: 100
-                }
+                    defaultValue: 100,
+                },
             ],
-            handler: moveCameraAction
-        }, {
+            handler: moveCameraAction,
+        },
+        {
             type: 'player_command',
-            commands: [ 'tcam', 'turncamera', 'turn_camera' ],
+            commands: ['tcam', 'turncamera', 'turn_camera'],
             args: [
                 {
                     name: 'x',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'y',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'height',
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     name: 'speed',
                     type: 'number',
-                    defaultValue: 0
+                    defaultValue: 0,
                 },
                 {
                     name: 'acceleration',
                     type: 'number',
-                    defaultValue: 100
-                }
+                    defaultValue: 100,
+                },
             ],
-            handler: turnCameraAction
-        }
-    ]
+            handler: turnCameraAction,
+        },
+    ],
 };

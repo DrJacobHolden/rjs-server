@@ -1,8 +1,8 @@
-import { findItem, widgets } from '@engine/config/config-handler';
 import type { objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import { findItem, widgets } from '@engine/config/config-handler';
 import { itemIds } from '@engine/world/config/item-ids';
 
-export const action: objectInteractionActionHandler = (details) => {
+export const action: objectInteractionActionHandler = details => {
     const veggies = [itemIds.onion, itemIds.grain, itemIds.cabbage];
     details.player.busy = true;
     details.player.playAnimation(827);
@@ -29,10 +29,10 @@ export default {
     hooks: [
         {
             type: 'object_interaction',
-            objectIds: [ 366, 357, 355 ],
-            options: ['loot', 'search', 'examine' ],
+            objectIds: [366, 357, 355],
+            options: ['loot', 'search', 'examine'],
             walkTo: true,
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

@@ -1,8 +1,8 @@
 import type { Direction } from '@engine/world/direction';
 import { directionData } from '@engine/world/direction';
-import { filestore } from '@server/game/game-server';
-import type { LandscapeObject } from '@runejs/filestore';
 import { logger } from '@runejs/common';
+import type { LandscapeObject } from '@runejs/filestore';
+import { filestore } from '@server/game/game-server';
 
 const directionDeltaX = [-1, 0, 1, -1, 1, -1, 0, 1];
 const directionDeltaY = [1, 1, 1, 0, 0, -1, -1, -1];
@@ -24,7 +24,6 @@ export class Coords {
  * Represents a single position, or coordinate, within the game world.
  */
 export class Position {
-
     public metadata: { [key: string]: any } = {};
     private _x: number;
     private _y: number;
@@ -34,7 +33,7 @@ export class Position {
     public constructor(coords: Coords);
     public constructor(x: number, y: number, level?: number);
     public constructor(arg0: number | Coords | Position, y?: number, level?: number) {
-        if(typeof arg0 === 'number') {
+        if (typeof arg0 === 'number') {
             // using ! here, because we know that if arg0 is a number, then y and level are numbers
             this.move(arg0, y!, level);
         } else {
@@ -50,7 +49,7 @@ export class Position {
     public withinInteractionDistance(position: Position, minimumDistance?: number): boolean;
     public withinInteractionDistance(target: LandscapeObject | Position, minimumDistance?: number): boolean;
     public withinInteractionDistance(target: LandscapeObject | Position, minimumDistance: number = 1): boolean {
-        if(target instanceof Position) {
+        if (target instanceof Position) {
             return this.distanceBetween(target) <= minimumDistance;
         } else {
             const definition = filestore.configStore.objectStore.getObject(target.objectId);
@@ -64,25 +63,25 @@ export class Position {
             let width = definition?.rendering?.sizeX || 1;
             let height = definition?.rendering?.sizeY || 1;
 
-            if(width === undefined || width === null || width < 1) {
+            if (width === undefined || width === null || width < 1) {
                 width = 1;
             }
-            if(height === undefined || height === null || height < 1) {
+            if (height === undefined || height === null || height < 1) {
                 height = 1;
             }
 
-            if(width === 1 && height === 1) {
+            if (width === 1 && height === 1) {
                 return this.distanceBetween(new Position(occupantX, occupantY, target.level)) <= minimumDistance;
             } else {
-                if(target.orientation === 1 || target.orientation === 3) {
+                if (target.orientation === 1 || target.orientation === 3) {
                     const off = width;
                     width = height;
                     height = off;
                 }
 
-                for(let x = occupantX; x < occupantX + width; x++) {
-                    for(let y = occupantY; y < occupantY + height; y++) {
-                        if(this.distanceBetween(new Position(x, y, target.level)) <= minimumDistance) {
+                for (let x = occupantX; x < occupantX + width; x++) {
+                    for (let y = occupantY; y < occupantY + height; y++) {
+                        if (this.distanceBetween(new Position(x, y, target.level)) <= minimumDistance) {
                             return true;
                         }
                     }
@@ -98,7 +97,7 @@ export class Position {
      * @param position The game world position to check the distance of.
      */
     public withinViewDistance(position: Position): boolean {
-        if(position.level !== this.level) {
+        if (position.level !== this.level) {
             return false;
         }
 
@@ -115,7 +114,7 @@ export class Position {
      * @param checkPlane Whether or not to check if the position is within the same plane. Defaults to true.
      */
     public within(min: Position, max: Position, checkPlane: boolean = true): boolean {
-        if(checkPlane && (min.level !== max.level || max.level !== this.level)) {
+        if (checkPlane && (min.level !== max.level || max.level !== this.level)) {
             return false;
         }
 
@@ -126,7 +125,7 @@ export class Position {
         this._x = x;
         this._y = y;
 
-        if(level === undefined) {
+        if (level === undefined) {
             this._level = 0;
         } else {
             this._level = level;
@@ -135,8 +134,8 @@ export class Position {
         return this;
     }
 
-    public equalsIgnoreLevel(position: Position | { x: number, y: number }): boolean {
-        if(!(position instanceof Position)) {
+    public equalsIgnoreLevel(position: Position | { x: number; y: number }): boolean {
+        if (!(position instanceof Position)) {
             position = new Position(position.x, position.y);
         }
 
@@ -152,15 +151,15 @@ export class Position {
     }
 
     public step(steps: number, direction: Direction): Position {
-        return new Position(this.x + (steps * directionData[direction].deltaX), this.y + (steps * directionData[direction].deltaY), this.level);
+        return new Position(this.x + steps * directionData[direction].deltaX, this.y + steps * directionData[direction].deltaY, this.level);
     }
 
     public copy(): Position {
         return new Position(this._x, this._y, this._level);
     }
 
-    public equals(position: Position | { x: number, y: number, level: number }): boolean {
-        if(!(position instanceof Position)) {
+    public equals(position: Position | { x: number; y: number; level: number }): boolean {
+        if (!(position instanceof Position)) {
             position = new Position(position.x, position.y, position.level);
         }
 
@@ -209,7 +208,7 @@ export class Position {
         return {
             x: this._x,
             y: this._y,
-            level: this._level
+            level: this._level,
         };
     }
 
@@ -264,5 +263,4 @@ export class Position {
     public get key(): string {
         return `${this.x},${this.y},${this.level}`;
     }
-
 }

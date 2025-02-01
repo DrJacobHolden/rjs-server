@@ -1,25 +1,24 @@
 import type { Socket } from 'net';
-import type { LandscapeObject } from '@runejs/filestore';
-import { ByteBuffer, logger } from '@runejs/common';
-import { activeWorld } from '@engine/world';
 import { xteaRegions } from '@engine/config/config-handler';
 import { Packet, PacketType } from '@engine/net/packet';
 import { stringToLong } from '@engine/util/strings';
+import { activeWorld } from '@engine/world';
 import type { Npc } from '@engine/world/actor/npc';
 import type { Player, SidebarTab } from '@engine/world/actor/player/player';
 import type { Item } from '@engine/world/items/item';
 import { ItemContainer } from '@engine/world/items/item-container';
 import type { WorldItem } from '@engine/world/items/world-item';
 import type { Chunk, ChunkUpdateItem } from '@engine/world/map/chunk';
-import type { ConstructedRegion, ConstructedChunk } from '@engine/world/map/region';
+import type { ConstructedChunk, ConstructedRegion } from '@engine/world/map/region';
 import { Position } from '@engine/world/position';
+import { ByteBuffer, logger } from '@runejs/common';
+import type { LandscapeObject } from '@runejs/filestore';
 import { serverConfig } from '@server/game/game-server';
 
 /**
  * A helper class for sending various network packets back to the game client.
  */
 export class OutboundPacketHandler {
-
     private static privateMessageCounter: number = Math.floor(Math.random() * 100000000);
 
     private readonly player: Player;
@@ -70,7 +69,17 @@ export class OutboundPacketHandler {
     //packet - 129 - freezes client?
     //packet - 202 - directly to login screen
 
-    public sendProjectile(position: Position, offsetX: number, offsetY: number, id: number, startHeight: number, endHeight: number, speed: number, lockon: number, delay: number) {
+    public sendProjectile(
+        position: Position,
+        offsetX: number,
+        offsetY: number,
+        id: number,
+        startHeight: number,
+        endHeight: number,
+        speed: number,
+        lockon: number,
+        delay: number,
+    ) {
         this.updateReferencePosition(position);
 
         const packet = new Packet(1);
@@ -125,7 +134,14 @@ export class OutboundPacketHandler {
         this.queue(packet);
     }
 
-    public playSoundAtPosition(soundId: number, soundX: number, soundY: number, volume: number, radius: number = 5, delay: number = 0): void {
+    public playSoundAtPosition(
+        soundId: number,
+        soundX: number,
+        soundY: number,
+        volume: number,
+        radius: number = 5,
+        delay: number = 0,
+    ): void {
         const packet = new Packet(9);
         const offset = 0;
         packet.put(offset, 'BYTE');
@@ -144,21 +160,21 @@ export class OutboundPacketHandler {
         packet.put(offsetY);
 
         chunkUpdates.forEach(update => {
-            if(update.type === 'ADD') {
-                if(update.object && !update.object.reference) {
+            if (update.type === 'ADD') {
+                if (update.object && !update.object.reference) {
                     const offset = this.getChunkPositionOffset(update.object.x, update.object.y, chunk);
                     packet.put(241, 'BYTE');
                     packet.put((update.object.type << 2) + (update.object.orientation & 3));
                     packet.put(update.object.objectId, 'SHORT');
                     packet.put(offset);
-                } else if(update.worldItem) {
+                } else if (update.worldItem) {
                     const offset = this.getChunkPositionOffset(update.worldItem.position.x, update.worldItem.position.y, chunk);
                     packet.put(175, 'BYTE');
                     packet.put(update.worldItem.itemId, 'SHORT', 'LITTLE_ENDIAN');
                     packet.put(update.worldItem.amount, 'SHORT');
                     packet.put(offset, 'BYTE');
                 }
-            } else if(update.type === 'REMOVE') {
+            } else if (update.type === 'REMOVE') {
                 if (!update.object) {
                     logger.warn('Tried to remove object that does not exist.');
                     return;
@@ -227,8 +243,8 @@ export class OutboundPacketHandler {
     }
 
     public updateReferencePosition(position: Position): void {
-        const offsetX = position.x - (this.player.lastMapRegionUpdatePosition.chunkX * 8);
-        const offsetY = position.y - (this.player.lastMapRegionUpdatePosition.chunkY * 8);
+        const offsetX = position.x - this.player.lastMapRegionUpdatePosition.chunkX * 8;
+        const offsetY = position.y - this.player.lastMapRegionUpdatePosition.chunkY * 8;
 
         const packet = new Packet(254);
         packet.put(offsetY);
@@ -250,14 +266,14 @@ export class OutboundPacketHandler {
     public setWidgetNpcHead(widgetId: number, childId: number, modelId: number): void {
         const packet = new Packet(160);
         packet.put(modelId, 'SHORT', 'LITTLE_ENDIAN');
-        packet.put(widgetId << 16 | childId, 'INT', 'LITTLE_ENDIAN');
+        packet.put((widgetId << 16) | childId, 'INT', 'LITTLE_ENDIAN');
 
         this.queue(packet);
     }
 
     public setWidgetPlayerHead(widgetId: number, childId: number): void {
         const packet = new Packet(210);
-        packet.put(widgetId << 16 | childId, 'INT', 'LITTLE_ENDIAN');
+        packet.put((widgetId << 16) | childId, 'INT', 'LITTLE_ENDIAN');
 
         this.queue(packet);
     }
@@ -265,7 +281,7 @@ export class OutboundPacketHandler {
     public playWidgetAnimation(widgetId: number, childId: number, animationId: number): void {
         const packet = new Packet(24);
         packet.put(animationId, 'SHORT');
-        packet.put(widgetId << 16 | childId, 'INT');
+        packet.put((widgetId << 16) | childId, 'INT');
 
         this.queue(packet);
     }
@@ -285,12 +301,12 @@ export class OutboundPacketHandler {
     public updateClientConfig(configId: number, value: number): void {
         let packet: Packet;
         const metadata = this.player.metadata;
-        if(!metadata.configs) {
-            metadata.configs = []
+        if (!metadata.configs) {
+            metadata.configs = [];
         }
         metadata.configs[configId] = value;
 
-        if(value > 128) {
+        if (value > 128) {
             packet = new Packet(2);
             packet.put(value, 'INT');
             packet.put(configId, 'SHORT');
@@ -308,7 +324,7 @@ export class OutboundPacketHandler {
         packet.put(rotationX, 'SHORT');
         packet.put(zoom, 'SHORT', 'LITTLE_ENDIAN');
         packet.put(rotationY, 'SHORT');
-        packet.put(widgetId << 16 | childId, 'INT', 'LITTLE_ENDIAN');
+        packet.put((widgetId << 16) | childId, 'INT', 'LITTLE_ENDIAN');
 
         this.queue(packet);
     }
@@ -316,7 +332,7 @@ export class OutboundPacketHandler {
     public updateWidgetModel1(widgetId: number, childId: number, modelId: number): void {
         const packet = new Packet(250);
         packet.put(modelId, 'SHORT', 'LITTLE_ENDIAN');
-        packet.put(widgetId << 16 | childId, 'INT', 'LITTLE_ENDIAN');
+        packet.put((widgetId << 16) | childId, 'INT', 'LITTLE_ENDIAN');
 
         this.queue(packet);
     }
@@ -334,7 +350,7 @@ export class OutboundPacketHandler {
 
     public updateWidgetString(widgetId: number, childId: number, value: string): void {
         const packet = new Packet(110, PacketType.DYNAMIC_LARGE);
-        packet.put(widgetId << 16 | childId, 'INT', 'LITTLE_ENDIAN');
+        packet.put((widgetId << 16) | childId, 'INT', 'LITTLE_ENDIAN');
         packet.putString(value);
 
         this.queue(packet);
@@ -343,7 +359,7 @@ export class OutboundPacketHandler {
     public updateWidgetColor(widgetId: number, childId: number, color: number): void {
         const packet = new Packet(231);
         packet.put(color, 'SHORT');
-        packet.put(widgetId << 16 | childId, 'INT', 'LITTLE_ENDIAN');
+        packet.put((widgetId << 16) | childId, 'INT', 'LITTLE_ENDIAN');
 
         this.queue(packet);
     }
@@ -365,17 +381,17 @@ export class OutboundPacketHandler {
     }
 
     // @TODO this can support multiple items/slots !!!
-    public sendUpdateSingleWidgetItem(widget: { widgetId: number, containerId: number }, slot: number, item: Item | null): void {
+    public sendUpdateSingleWidgetItem(widget: { widgetId: number; containerId: number }, slot: number, item: Item | null): void {
         const packet = new Packet(214, PacketType.DYNAMIC_LARGE);
-        packet.put(widget.widgetId << 16 | widget.containerId, 'INT');
+        packet.put((widget.widgetId << 16) | widget.containerId, 'INT');
         packet.put(slot, 'SMART_SHORT');
 
-        if(!item) {
+        if (!item) {
             packet.put(0, 'SHORT');
         } else {
             packet.put(item.itemId + 1, 'SHORT'); // +1 because 0 means an empty slot
 
-            if(item.amount >= 255) {
+            if (item.amount >= 255) {
                 packet.put(255, 'BYTE');
                 packet.put(item.amount, 'INT');
             } else {
@@ -386,8 +402,8 @@ export class OutboundPacketHandler {
         this.queue(packet);
     }
 
-    public update(packet: Packet, widget: { widgetId: number, containerId: number }, container: ItemContainer): void {
-        const packed = widget.widgetId << 16 | widget.containerId;
+    public update(packet: Packet, widget: { widgetId: number; containerId: number }, container: ItemContainer): void {
+        const packed = (widget.widgetId << 16) | widget.containerId;
         packet.put(packed, 'INT');
 
         const size = container.size;
@@ -413,12 +429,12 @@ export class OutboundPacketHandler {
         this.queue(packet);
     }
 
-    public sendUpdateAllWidgetItems(widget: { widgetId: number, containerId: number }, container: ItemContainer): void {
+    public sendUpdateAllWidgetItems(widget: { widgetId: number; containerId: number }, container: ItemContainer): void {
         const packet = new Packet(12, PacketType.DYNAMIC_LARGE);
         this.update(packet, widget, container);
     }
 
-    public sendUpdateAllWidgetItemsById(widget: { widgetId: number, containerId: number }, itemIds: number[]): void {
+    public sendUpdateAllWidgetItemsById(widget: { widgetId: number; containerId: number }, itemIds: number[]): void {
         const container = new ItemContainer(itemIds.length);
         const items = itemIds.map(id => (!id ? null : { itemId: id, amount: 1 }));
         container.setAll(items, false);
@@ -430,7 +446,7 @@ export class OutboundPacketHandler {
         const packet = new Packet(120);
         packet.put(zoom, 'SHORT');
         packet.put(itemId, 'SHORT', 'LITTLE_ENDIAN');
-        packet.put(widgetId << 16 | childId, 'INT', 'LITTLE_ENDIAN');
+        packet.put((widgetId << 16) | childId, 'INT', 'LITTLE_ENDIAN');
 
         this.queue(packet);
     }
@@ -438,14 +454,14 @@ export class OutboundPacketHandler {
     public toggleWidgetVisibility(widgetId: number, childId: number, hidden: boolean): void {
         const packet = new Packet(115);
         packet.put(hidden ? 1 : 0, 'BYTE');
-        packet.put(widgetId << 16 | childId, 'INT', 'LITTLE_ENDIAN');
+        packet.put((widgetId << 16) | childId, 'INT', 'LITTLE_ENDIAN');
 
         this.queue(packet);
     }
 
     public moveWidgetChild(widgetId: number, childId: number, offsetX: number, offsetY: number): void {
         const packet = new Packet(3);
-        packet.put(widgetId << 16 | childId, 'INT');
+        packet.put((widgetId << 16) | childId, 'INT');
         packet.put(offsetY, 'SHORT', 'LITTLE_ENDIAN');
         packet.put(offsetX, 'SHORT', 'LITTLE_ENDIAN');
 
@@ -603,7 +619,9 @@ export class OutboundPacketHandler {
         const mapWorldX = mapData.renderPosition.x;
         const mapWorldY = mapData.renderPosition.y;
 
-        const topCornerMapChunk = activeWorld.chunkManager.getChunkForWorldPosition(new Position(mapWorldX, mapWorldY, this.player.position.level));
+        const topCornerMapChunk = activeWorld.chunkManager.getChunkForWorldPosition(
+            new Position(mapWorldX, mapWorldY, this.player.position.level),
+        );
         const playerChunk = activeWorld.chunkManager.getChunkForWorldPosition(this.player.position);
 
         const offsetX = playerChunk.position.x - (topCornerMapChunk.position.x - 2);
@@ -612,26 +630,26 @@ export class OutboundPacketHandler {
         mapData.drawOffsetX = offsetX - 6; // 6 === center
         mapData.drawOffsetY = offsetY - 6; // 6 === center
 
-        for(let level = 0; level < 4; level++) {
-            for(let x = 0; x < 13; x++) {
-                for(let y = 0; y < 13; y++) {
+        for (let level = 0; level < 4; level++) {
+            for (let x = 0; x < 13; x++) {
+                for (let y = 0; y < 13; y++) {
                     let mapTileOffsetX = x + mapData.drawOffsetX;
                     let mapTileOffsetY = y + mapData.drawOffsetY;
-                    if(mapTileOffsetX < 0) {
+                    if (mapTileOffsetX < 0) {
                         mapTileOffsetX = 0;
                     }
-                    if(mapTileOffsetX > 12) {
+                    if (mapTileOffsetX > 12) {
                         mapTileOffsetX = 12;
                     }
-                    if(mapTileOffsetY < 0) {
+                    if (mapTileOffsetY < 0) {
                         mapTileOffsetY = 0;
                     }
-                    if(mapTileOffsetY > 12) {
+                    if (mapTileOffsetY > 12) {
                         mapTileOffsetY = 12;
                     }
 
                     const constructedChunk: ConstructedChunk | null = mapData.chunks[level][mapTileOffsetX][mapTileOffsetY];
-                    packet.putBits(1, constructedChunk === null ? 0 : 1)
+                    packet.putBits(1, constructedChunk === null ? 0 : 1);
                     if (constructedChunk !== null) {
                         const { templatePosition, orientation } = constructedChunk;
                         packet.putBits(2, templatePosition?.level & 0x3);
@@ -650,9 +668,9 @@ export class OutboundPacketHandler {
 
         // Put the xtea keys for the two construction room template maps
         // Map coords: 29,79 && 30,79
-        for(let mapX = 29; mapX <= 30; mapX++) {
+        for (let mapX = 29; mapX <= 30; mapX++) {
             const xteaRegion = xteaRegions[`l${mapX}_79`];
-            for(let seeds = 0; seeds < 4; seeds++) {
+            for (let seeds = 0; seeds < 4; seeds++) {
                 packet.put(encryptionEnabled ? (xteaRegion?.key[seeds] ?? 0) : 0, 'int');
             }
         }
@@ -675,10 +693,10 @@ export class OutboundPacketHandler {
 
         const encryptionEnabled = serverConfig.encryptionEnabled === undefined ? true : serverConfig.encryptionEnabled;
 
-        for(let mapX = startX; mapX <= endX; mapX++) {
-            for(let mapY = startY; mapY <= endY; mapY++) {
+        for (let mapX = startX; mapX <= endX; mapX++) {
+            for (let mapY = startY; mapY <= endY; mapY++) {
                 const xteaRegion = xteaRegions[`l${mapX}_${mapY}`];
-                for(let seeds = 0; seeds < 4; seeds++) {
+                for (let seeds = 0; seeds < 4; seeds++) {
                     packet.put(encryptionEnabled ? (xteaRegion?.key[seeds] ?? 0) : 0, 'int');
                 }
             }
@@ -697,12 +715,12 @@ export class OutboundPacketHandler {
     }
 
     public flushQueue(): void {
-        if(!this.socket || this.socket.destroyed) {
+        if (!this.socket || this.socket.destroyed) {
             return;
         }
 
         const buffer = Buffer.concat([...this.packetQueue, ...this.updatingQueue]);
-        if(buffer.length !== 0) {
+        if (buffer.length !== 0) {
             this.socket.write(buffer);
         }
 
@@ -711,7 +729,7 @@ export class OutboundPacketHandler {
     }
 
     public queue(packet: Packet, updateTask: boolean = false): void {
-        if(!this.socket || this.socket.destroyed) {
+        if (!this.socket || this.socket.destroyed) {
             return;
         }
 
@@ -730,16 +748,16 @@ export class OutboundPacketHandler {
     }
 
     private getChunkPositionOffset(x: number, y: number, chunk: Chunk): number {
-        const offsetX = x - ((chunk.position.x + 6) * 8);
-        const offsetY = y - ((chunk.position.y + 6) * 8);
-        return (offsetX * 16 + offsetY);
+        const offsetX = x - (chunk.position.x + 6) * 8;
+        const offsetY = y - (chunk.position.y + 6) * 8;
+        return offsetX * 16 + offsetY;
     }
 
-    private getChunkOffset(chunk: Chunk): { offsetX: number, offsetY: number } {
+    private getChunkOffset(chunk: Chunk): { offsetX: number; offsetY: number } {
         let offsetX = (chunk.position.x + 6) * 8;
         let offsetY = (chunk.position.y + 6) * 8;
-        offsetX -= (this.player.lastMapRegionUpdatePosition.chunkX * 8);
-        offsetY -= (this.player.lastMapRegionUpdatePosition.chunkY * 8);
+        offsetX -= this.player.lastMapRegionUpdatePosition.chunkX * 8;
+        offsetY -= this.player.lastMapRegionUpdatePosition.chunkY * 8;
 
         return { offsetX, offsetY };
     }
@@ -751,7 +769,7 @@ export class OutboundPacketHandler {
         return Buffer.from(buffer);
     }
 
-    private segment(container: ItemContainer, start: number): { bitset: number, buffer: Buffer } {
+    private segment(container: ItemContainer, start: number): { bitset: number; buffer: Buffer } {
         const bound = 7 * 8;
         const payload = new Packet(-1, PacketType.FIXED, bound);
 
@@ -778,5 +796,4 @@ export class OutboundPacketHandler {
 
         return { bitset, buffer: this.strip(payload) };
     }
-
 }

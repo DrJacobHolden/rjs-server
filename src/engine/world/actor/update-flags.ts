@@ -31,7 +31,7 @@ export interface Animation {
 export enum DamageType {
     NO_DAMAGE = 0,
     DAMAGE = 1,
-    POISON = 2
+    POISON = 2,
 }
 
 /**
@@ -48,7 +48,6 @@ export interface Damage {
  * Various actor updating flags.
  */
 export class UpdateFlags {
-
     private _mapRegionUpdateRequired: boolean;
     private _appearanceUpdateRequired: boolean;
     private _chatMessages: ChatMessage[];
@@ -72,7 +71,7 @@ export class UpdateFlags {
         this._animation = null;
         this._damage = null;
 
-        if(this._chatMessages.length !== 0) {
+        if (this._chatMessages.length !== 0) {
             this._chatMessages.shift();
         }
     }
@@ -81,12 +80,13 @@ export class UpdateFlags {
         this.damage = {
             damageDealt: amount,
             damageType: type,
-            remainingHitpoints, maxHitpoints
+            remainingHitpoints,
+            maxHitpoints,
         };
     }
 
     public addChatMessage(chatMessage: ChatMessage): void {
-        if(this._chatMessages.length > 4) {
+        if (this._chatMessages.length > 4) {
             return;
         }
 

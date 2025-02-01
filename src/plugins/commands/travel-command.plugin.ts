@@ -1,8 +1,8 @@
 import type { commandActionHandler } from '@engine/action/pipe/player-command.action';
-import type { TravelLocation } from '@engine/world/config/travel-locations';
 import { activeWorld } from '@engine/world';
+import type { TravelLocation } from '@engine/world/config/travel-locations';
 
-const action: commandActionHandler = (details) => {
+const action: commandActionHandler = details => {
     const { player, args } = details;
 
     const search: string = args.search as string;
@@ -21,14 +21,14 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'travel' ],
+            commands: ['travel'],
             args: [
                 {
                     name: 'search',
-                    type: 'string'
-                }
+                    type: 'string',
+                },
             ],
-            handler: action
-        }
-    ]
+            handler: action,
+        },
+    ],
 };

@@ -1,6 +1,6 @@
+import type { ObjectInteractionActionHook } from '@engine/action/pipe/object-interaction.action';
 import { getTreeIds } from '@engine/world/config/harvestable-object';
 import { runWoodcuttingTask } from './woodcutting-task';
-import type { ObjectInteractionActionHook } from '@engine/action/pipe/object-interaction.action';
 
 /**
  * Woodcutting plugin
@@ -15,11 +15,11 @@ export default {
          */
         {
             type: 'object_interaction',
-            options: [ 'chop down', 'chop' ],
+            options: ['chop down', 'chop'],
             objectIds: getTreeIds(),
             handler: ({ player, object }) => {
                 runWoodcuttingTask(player, object);
-            }
-        } as ObjectInteractionActionHook
-    ]
+            },
+        } as ObjectInteractionActionHook,
+    ],
 };

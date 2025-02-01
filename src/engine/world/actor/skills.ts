@@ -1,10 +1,10 @@
-import { startsWithVowel } from '@engine/util/strings';
-import { serverConfig } from '@server/game/game-server';
-import type { Actor } from './actor';
 import { QueueableTask } from '@engine/action/pipe/task/queueable-task';
-import { isPlayer } from './util';
+import { startsWithVowel } from '@engine/util/strings';
 import type { Player } from '@engine/world/actor/player/player';
 import { gfxIds } from '@engine/world/config/gfx-ids';
+import { serverConfig } from '@server/game/game-server';
+import type { Actor } from './actor';
+import { isPlayer } from './util';
 
 export enum Skill {
     ATTACK,
@@ -28,12 +28,32 @@ export enum Skill {
     SLAYER,
     FARMING,
     RUNECRAFTING,
-    CONSTRUCTION = 22
+    CONSTRUCTION = 22,
 }
 
-export type SkillName = 'attack' | 'defence' | 'strength' | 'hitpoints' | 'ranged' | 'prayer' | 'magic' | 'cooking' |
-    'woodcutting' | 'fletching' | 'fishing' | 'firemaking' | 'crafting' | 'smithing' | 'mining' | 'herblore' |
-    'agility' | 'thieving' | 'slayer' | 'farming' | 'runecrafting' | 'construction';
+export type SkillName =
+    | 'attack'
+    | 'defence'
+    | 'strength'
+    | 'hitpoints'
+    | 'ranged'
+    | 'prayer'
+    | 'magic'
+    | 'cooking'
+    | 'woodcutting'
+    | 'fletching'
+    | 'fishing'
+    | 'firemaking'
+    | 'crafting'
+    | 'smithing'
+    | 'mining'
+    | 'herblore'
+    | 'agility'
+    | 'thieving'
+    | 'slayer'
+    | 'farming'
+    | 'runecrafting'
+    | 'construction';
 
 export interface SkillDetail {
     readonly name: string;
@@ -63,7 +83,7 @@ export const skillDetails: SkillDetail[] = [
     { name: 'Farming', advancementWidgetId: 162 },
     { name: 'Runecrafting', advancementWidgetId: 172 },
     null as unknown as SkillDetail, // (Jameskmonger) this is a placeholder
-    { name: 'Construction' }
+    { name: 'Construction' },
 ];
 
 export interface SkillValue {
@@ -73,9 +93,10 @@ export interface SkillValue {
 }
 
 export class SkillShortcut {
-
-    public constructor(private skills: Skills, private skillName: SkillName) {
-    }
+    public constructor(
+        private skills: Skills,
+        private skillName: SkillName,
+    ) {}
 
     public addExp(exp: number): void {
         this.skills.addExp(this.skillName, exp);
@@ -100,7 +121,6 @@ export class SkillShortcut {
     public get levelForExp(): number {
         return this.skills.getLevelForExp(this.exp);
     }
-
 }
 
 type SkillShortcutMap = {
@@ -133,16 +153,13 @@ class SkillShortcuts implements SkillShortcutMap {
 }
 
 export class Skills extends SkillShortcuts {
-
     private static EXPERIENCE_LOOKUP_TABLE: number[] = [
-        0,83,174,276,388,512,650,801,969,1154,1358,1584,1833,2107,2411,2746,3115,3523,
-        3973,4470,5018,5624,6291,7028,7842,8740,9730,10824,12031,13363,14833,16456,18247,
-        20224,22406,24815,27473,30408,33648,37224,41171,45529,50339,55649,61512,67983,75127,
-        83014,91721,101333,111945,123660,136594,150872,166636,184040,203254,224466,247886,
-        273742,302288,333804,368599,407015,449428,496254,547953,605032,668051,737627,814445,
-        899257,992895,1096278,1210421,1336443,1475581,1629200,1798808,1986068,2192818,2421087,
-        2673114,2951373,3258594,3597792,3972294,4385776,4842295,5346332,5902831,6517253,7195629,
-        7944614,8771558,9684577,10692629,11805606,13034431
+        0, 83, 174, 276, 388, 512, 650, 801, 969, 1154, 1358, 1584, 1833, 2107, 2411, 2746, 3115, 3523, 3973, 4470, 5018, 5624, 6291, 7028,
+        7842, 8740, 9730, 10824, 12031, 13363, 14833, 16456, 18247, 20224, 22406, 24815, 27473, 30408, 33648, 37224, 41171, 45529, 50339,
+        55649, 61512, 67983, 75127, 83014, 91721, 101333, 111945, 123660, 136594, 150872, 166636, 184040, 203254, 224466, 247886, 273742,
+        302288, 333804, 368599, 407015, 449428, 496254, 547953, 605032, 668051, 737627, 814445, 899257, 992895, 1096278, 1210421, 1336443,
+        1475581, 1629200, 1798808, 1986068, 2192818, 2421087, 2673114, 2951373, 3258594, 3597792, 3972294, 4385776, 4842295, 5346332,
+        5902831, 6517253, 7195629, 7944614, 8771558, 9684577, 10692629, 11805606, 13034431,
     ];
 
     private static MAXIMUM_EXPERIENCE: number = 200000000;
@@ -152,16 +169,17 @@ export class Skills extends SkillShortcuts {
 
     private _values: SkillValue[];
 
-    public constructor(private actor: Actor, values?: SkillValue[]) {
+    public constructor(
+        private actor: Actor,
+        values?: SkillValue[],
+    ) {
         super();
 
         Object.keys(Skill)
             .map(skillName => skillName.toLowerCase())
-            .forEach(skillName =>
-                this[skillName] = new SkillShortcut(this, skillName as SkillName)
-            );
+            .forEach(skillName => (this[skillName] = new SkillShortcut(this, skillName as SkillName)));
 
-        if(values) {
+        if (values) {
             this._values = values;
         } else {
             this._values = this.defaultValues();
@@ -177,8 +195,7 @@ export class Skills extends SkillShortcuts {
     }
 
     public getTotalLevel(): number {
-        return this._values.map(skillValue => skillValue.level)
-            .reduce((accumulator, currentValue) => accumulator + currentValue);
+        return this._values.map(skillValue => skillValue.level).reduce((accumulator, currentValue) => accumulator + currentValue);
     }
 
     public getCombatLevel(): number {
@@ -189,10 +206,9 @@ export class Skills extends SkillShortcuts {
         return combatLevel + Math.max(melee, Math.max(ranger, mage));
     }
 
-
     public getLevel(skill: number | SkillName, ignoreLevelModifications: boolean = false): number {
         const s = this.get(skill);
-        return (s.modifiedLevel !== undefined && !ignoreLevelModifications ? s.modifiedLevel : s.level);
+        return s.modifiedLevel !== undefined && !ignoreLevelModifications ? s.modifiedLevel : s.level;
     }
 
     public hasLevel(skill: number | SkillName, level: number, ignoreLevelModifications: boolean = false): boolean {
@@ -200,7 +216,7 @@ export class Skills extends SkillShortcuts {
     }
 
     public getLevelForExp(exp: number, index: number | undefined = undefined): number {
-        const start = Skills.confine((index || Skills.MAXIMUM_INDEX), Skills.MINIMUM_LEVEL, Skills.MAXIMUM_INDEX);
+        const start = Skills.confine(index || Skills.MAXIMUM_INDEX, Skills.MINIMUM_LEVEL, Skills.MAXIMUM_INDEX);
         for (let level = start; level >= 1; level--) {
             const requirement = Skills.EXPERIENCE_LOOKUP_TABLE[level];
             if (exp >= requirement) {
@@ -218,7 +234,7 @@ export class Skills extends SkillShortcuts {
     public addExp(skill: number | SkillName, exp: number): void {
         const currentExp = this.get(skill).exp;
         const currentLevel = this.getLevelForExp(currentExp);
-        let finalExp = currentExp + (exp * serverConfig.expRate);
+        let finalExp = currentExp + exp * serverConfig.expRate;
         if (finalExp > Skills.MAXIMUM_EXPERIENCE) {
             finalExp = Skills.MAXIMUM_EXPERIENCE;
         }
@@ -227,16 +243,16 @@ export class Skills extends SkillShortcuts {
 
         this.setExp(skill, finalExp);
 
-        if(isPlayer(this.actor)) {
+        if (isPlayer(this.actor)) {
             this.actor.outgoingPackets.updateSkill(this.getSkillId(skill), finalLevel, finalExp);
         }
 
-        if(currentLevel !== finalLevel) {
+        if (currentLevel !== finalLevel) {
             this.setLevel(skill, finalLevel);
 
-            if(isPlayer(this.actor)) {
+            if (isPlayer(this.actor)) {
                 const achievementDetails = skillDetails[this.getSkillId(skill)];
-                if(!achievementDetails) {
+                if (!achievementDetails) {
                     return;
                 }
 
@@ -250,20 +266,30 @@ export class Skills extends SkillShortcuts {
                  * dialogue being shown after other events get processed on the
                  * tick that the xp drop occurred.
                  */
-                this.actor.enqueueBaseTask(new QueueableTask([], this.actor, () => {
-                    (this.actor as Player).sendMessage(`Congratulations, you just advanced a ` + `${ achievementDetails.name.toLowerCase() } level.`);
-                    this.showLevelUpDialogue(skill, finalLevel);
-                    return {
-                        callbackResult: false,
-                        shouldContinueLooping: false,
-                    }
-                } , null, null))
+                this.actor.enqueueBaseTask(
+                    new QueueableTask(
+                        [],
+                        this.actor,
+                        () => {
+                            (this.actor as Player).sendMessage(
+                                `Congratulations, you just advanced a ` + `${achievementDetails.name.toLowerCase()} level.`,
+                            );
+                            this.showLevelUpDialogue(skill, finalLevel);
+                            return {
+                                callbackResult: false,
+                                shouldContinueLooping: false,
+                            };
+                        },
+                        null,
+                        null,
+                    ),
+                );
             }
         }
     }
 
     public showLevelUpDialogue(skill: number | SkillName, level: number): void {
-        if(!isPlayer(this.actor)) {
+        if (!isPlayer(this.actor)) {
             return;
         }
 
@@ -271,7 +297,7 @@ export class Skills extends SkillShortcuts {
         const achievementDetails = skillDetails[this.getSkillId(skill)];
         const widgetId = achievementDetails.advancementWidgetId;
 
-        if(!widgetId) {
+        if (!widgetId) {
             return;
         }
 
@@ -279,17 +305,17 @@ export class Skills extends SkillShortcuts {
 
         player.modifyWidget(widgetId, {
             childId: 0,
-            text: `<col=000080>Congratulations, you just advanced ${ startsWithVowel(skillName) ? 'an' : 'a' } ` +
-                `${ skillName } level.</col>`
+            text:
+                `<col=000080>Congratulations, you just advanced ${startsWithVowel(skillName) ? 'an' : 'a'} ` + `${skillName} level.</col>`,
         });
         player.modifyWidget(widgetId, {
             childId: 1,
-            text: `Your ${ skillName } level is now ${ level }.`
+            text: `Your ${skillName} level is now ${level}.`,
         });
 
         player.interfaceState.openWidget(widgetId, {
             slot: 'chatbox',
-            multi: true
+            multi: true,
         });
 
         player.playGraphics({ id: gfxIds.levelUpFireworks, delay: 0, height: 125 });
@@ -297,7 +323,7 @@ export class Skills extends SkillShortcuts {
     }
 
     public getSkillId(skill: number | SkillName): number {
-        if(typeof skill === 'number') {
+        if (typeof skill === 'number') {
             return skill;
         } else {
             const skillName = skill.toString().toUpperCase();
@@ -306,7 +332,7 @@ export class Skills extends SkillShortcuts {
     }
 
     public get(skill: number | SkillName): SkillValue {
-        if(typeof skill === 'number') {
+        if (typeof skill === 'number') {
             return this._values[skill];
         } else {
             const skillName = skill.toString().toUpperCase();

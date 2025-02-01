@@ -40,21 +40,23 @@ export class PlayerQuest {
     }
 }
 
-export function questDialogueActionFactory(questId: string,
-                                           npcDialogueHandler: QuestDialogueHandler,
-                                           stageHandler: (player: Player) => Promise<void>): npcInteractionActionHandler {
-    return async({ player, npc }) => {
+export function questDialogueActionFactory(
+    questId: string,
+    npcDialogueHandler: QuestDialogueHandler,
+    stageHandler: (player: Player) => Promise<void>,
+): npcInteractionActionHandler {
+    return async ({ player, npc }) => {
         const quest = player.getQuest(questId);
-        if(!quest) {
+        if (!quest) {
             return;
         }
 
         const progress = quest.progress;
         const dialogueHandler = npcDialogueHandler[progress];
-        if(dialogueHandler) {
+        if (dialogueHandler) {
             try {
                 await dialogueHandler(player, npc);
-            } catch(e) {
+            } catch (e) {
                 logger.error(e);
             }
 

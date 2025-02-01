@@ -1,20 +1,18 @@
-import { v4 } from 'uuid';
 import type { Subscription } from 'rxjs';
 import { lastValueFrom, timer } from 'rxjs';
+import { v4 } from 'uuid';
 
 import { logger } from '@runejs/common';
 
-import { isNpc, isPlayer } from '@engine/world/actor/util';
-import type { Actor } from '@engine/world/actor/actor';
-import type { Player } from '@engine/world/actor/player/player';
-import type { Npc } from '@engine/world/actor/npc';
 import type { ActionStrength } from '@engine/action/action-pipeline';
-import { World } from '@engine/world/world';
 import type { ActionHook } from '@engine/action/hook/action-hook';
-
+import type { Actor } from '@engine/world/actor/actor';
+import type { Npc } from '@engine/world/actor/npc';
+import type { Player } from '@engine/world/actor/player/player';
+import { isNpc, isPlayer } from '@engine/world/actor/util';
+import { World } from '@engine/world/world';
 
 export type TaskSessionData = { [key: string]: any };
-
 
 export interface TaskDetails<T> {
     actor: Actor;
@@ -24,7 +22,6 @@ export interface TaskDetails<T> {
     session: TaskSessionData;
 }
 
-
 export interface HookTask<T = any> {
     canActivate?: <Q = T>(task: TaskExecutor<Q>, iteration?: number) => boolean | Promise<boolean>;
     activate: <Q = T>(task: TaskExecutor<Q>, iteration?: number) => void | undefined | boolean | Promise<void | undefined | boolean>;
@@ -32,13 +29,11 @@ export interface HookTask<T = any> {
     delay?: number; // # of ticks before execution
     delayMs?: number; // # of milliseconds before execution
     interval?: number; // # of ticks between loop intervals (defaults to single run task)
-    intervalMs?: number;  // # of milliseconds between loop intervals (defaults to single run task)
+    intervalMs?: number; // # of milliseconds between loop intervals (defaults to single run task)
 }
-
 
 // T = current action info (ButtonAction, MoveItemAction, etc)
 export class TaskExecutor<T> {
-
     public readonly taskId = v4();
     public readonly strength: ActionStrength;
     public running: boolean = false;
@@ -47,30 +42,30 @@ export class TaskExecutor<T> {
     private iteration: number = 0;
     private intervalSubscription: Subscription;
 
-    public constructor(public readonly actor: Actor,
-                       public readonly task: HookTask<T>,
-                       public readonly hook: ActionHook,
-                       public readonly actionData: T) {
+    public constructor(
+        public readonly actor: Actor,
+        public readonly task: HookTask<T>,
+        public readonly hook: ActionHook,
+        public readonly actionData: T,
+    ) {
         this.strength = this.hook.strength || 'normal';
     }
 
     public async run(): Promise<void> {
         this.running = true;
 
-        if(!!this.task.delay || !!this.task.delayMs) {
-            await lastValueFrom(timer(this.task.delayMs !== undefined ? this.task.delayMs :
-                    (this.task.delay! * World.TICK_LENGTH)));
+        if (!!this.task.delay || !!this.task.delayMs) {
+            await lastValueFrom(timer(this.task.delayMs !== undefined ? this.task.delayMs : this.task.delay! * World.TICK_LENGTH));
         }
 
-        if(!!this.task.interval || !!this.task.intervalMs) {
+        if (!!this.task.interval || !!this.task.intervalMs) {
             // Looping execution task
-            const intervalMs = this.task.intervalMs !== undefined ? this.task.intervalMs :
-                    (this.task.interval! * World.TICK_LENGTH);
+            const intervalMs = this.task.intervalMs !== undefined ? this.task.intervalMs : this.task.interval! * World.TICK_LENGTH;
 
             await new Promise<void>(resolve => {
                 this.intervalSubscription = timer(0, intervalMs).subscribe(
-                    async() => {
-                        if(!await this.execute()) {
+                    async () => {
+                        if (!(await this.execute())) {
                             this.intervalSubscription?.unsubscribe();
                             resolve();
                         }
@@ -79,35 +74,36 @@ export class TaskExecutor<T> {
                         logger.error(error);
                         resolve();
                     },
-                    () => resolve());
+                    () => resolve(),
+                );
             });
         } else {
             // Single execution task
             await this.execute();
         }
 
-        if(this.running) {
+        if (this.running) {
             await this.stop();
         }
     }
 
     public async execute(): Promise<boolean> {
-        if(!this.actor) {
+        if (!this.actor) {
             // Actor destroyed, cancel the task
             return false;
         }
 
-        if(!await this.canActivate()) {
+        if (!(await this.canActivate())) {
             // Unable to activate the task, cancel
             return false;
         }
 
-        if(this.actor.actionPipeline.paused) {
+        if (this.actor.actionPipeline.paused) {
             // Action paused, continue loop if applicable
             return true;
         }
 
-        if(!this.running) {
+        if (!this.running) {
             // Task no longer running, cancel execution
             return false;
         }
@@ -115,7 +111,7 @@ export class TaskExecutor<T> {
         try {
             const response = await this.task.activate(this, this.iteration++);
             return typeof response === 'boolean' ? response : true;
-        } catch(error) {
+        } catch (error) {
             logger.error(`Error executing action task`);
             logger.error(error);
             return false;
@@ -123,17 +119,17 @@ export class TaskExecutor<T> {
     }
 
     public async canActivate(): Promise<boolean> {
-        if(!this.valid) {
+        if (!this.valid) {
             return false;
         }
 
-        if(!this.task.canActivate) {
+        if (!this.task.canActivate) {
             return true;
         }
 
         try {
             return this.task.canActivate(this, this.iteration);
-        } catch(error) {
+        } catch (error) {
             logger.error(`Error calling action canActivate`, this.task);
             logger.error(error);
             return false;
@@ -144,7 +140,7 @@ export class TaskExecutor<T> {
         this.running = false;
         this.intervalSubscription?.unsubscribe();
 
-        if(this.task?.onComplete) {
+        if (this.task?.onComplete) {
             await this.task.onComplete(this, this.iteration);
         }
     }
@@ -155,12 +151,11 @@ export class TaskExecutor<T> {
             player: isPlayer(this.actor) ? this.actor : undefined,
             npc: isNpc(this.actor) ? this.actor : undefined,
             actionData: this.actionData,
-            session: this.session
+            session: this.session,
         };
     }
 
     public get valid(): boolean {
         return !!this.task?.activate && !!this.actionData;
     }
-
 }

@@ -1,4 +1,4 @@
-import type { commandActionHandler, PlayerCommandActionHook } from '@engine/action/pipe/player-command.action';
+import type { PlayerCommandActionHook, commandActionHandler } from '@engine/action/pipe/player-command.action';
 
 const action: commandActionHandler = (details): void => {
     const { player, args } = details;
@@ -12,14 +12,14 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'anim', 'animation', 'playanim' ],
+            commands: ['anim', 'animation', 'playanim'],
             args: [
                 {
                     name: 'animationId',
-                    type: 'number'
-                }
+                    type: 'number',
+                },
             ],
-            handler: action
-        } as PlayerCommandActionHook
-    ]
+            handler: action,
+        } as PlayerCommandActionHook,
+    ],
 };

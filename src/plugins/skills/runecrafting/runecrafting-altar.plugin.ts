@@ -1,22 +1,15 @@
+import type { ItemOnObjectAction, itemOnObjectActionHandler } from '@engine/action/pipe/item-on-object.action';
+import type { ObjectInteractionAction, objectInteractionActionHandler } from '@engine/action/pipe/object-interaction.action';
+import { findItem } from '@engine/config/config-handler';
+import type { Player } from '@engine/world/actor/player/player';
+import { itemIds } from '@engine/world/config/item-ids';
+import type { Item } from '@engine/world/items/item';
 /**
  * @Author NickNick
  */
-import {
-    altars,
-    getEntityByAttr,
-    getEntityIds,
-    runes,
-    talismans,
-} from '@plugins/skills/runecrafting/runecrafting-constants';
+import { altars, getEntityByAttr, getEntityIds, runes, talismans } from '@plugins/skills/runecrafting/runecrafting-constants';
 import type { RunecraftingAltar } from '@plugins/skills/runecrafting/runecrafting-types';
-import { itemIds } from '@engine/world/config/item-ids';
-import type { Player } from '@engine/world/actor/player/player';
-import type { Item } from '@engine/world/items/item';
-import { findItem } from '@engine/config/config-handler';
 import { logger } from '@runejs/common';
-import type { itemOnObjectActionHandler, ItemOnObjectAction } from '@engine/action/pipe/item-on-object.action';
-import type { objectInteractionActionHandler, ObjectInteractionAction } from '@engine/action/pipe/object-interaction.action';
-
 
 const enterAltar: itemOnObjectActionHandler = (details: ItemOnObjectAction) => {
     const { player, object, item } = details;
@@ -34,10 +27,12 @@ const enterAltar: itemOnObjectActionHandler = (details: ItemOnObjectAction) => {
     }
 
     if (item.itemId === itemIds.talismans.elemental) {
-        if (rune.talisman.id === itemIds.talismans.air
-            || rune.talisman.id === itemIds.talismans.water
-            || rune.talisman.id === itemIds.talismans.earth
-            || rune.talisman.id === itemIds.talismans.fire) {
+        if (
+            rune.talisman.id === itemIds.talismans.air ||
+            rune.talisman.id === itemIds.talismans.water ||
+            rune.talisman.id === itemIds.talismans.earth ||
+            rune.talisman.id === itemIds.talismans.fire
+        ) {
             finishEnterAltar(player, item, altar);
             return;
         }
@@ -52,7 +47,6 @@ const enterAltar: itemOnObjectActionHandler = (details: ItemOnObjectAction) => {
     // Correct talisman.
     if (item.itemId === rune.talisman.id) {
         finishEnterAltar(player, item, altar);
-
     }
 };
 
@@ -69,7 +63,6 @@ function finishEnterAltar(player: Player, item: Item, altar: RunecraftingAltar):
     player.teleport(altar.entrance);
 }
 
-
 const exitAltar: objectInteractionActionHandler = (details: ObjectInteractionAction) => {
     const { player, object } = details;
     const altar = getEntityByAttr(altars, 'portalId', object.objectId);
@@ -82,7 +75,6 @@ const exitAltar: objectInteractionActionHandler = (details: ObjectInteractionAct
     player.teleport(altar.exit);
 };
 
-
 export default {
     pluginId: 'rs:runecrafting_altars',
     hooks: [
@@ -91,12 +83,13 @@ export default {
             itemIds: getEntityIds(talismans, 'id'),
             objectIds: getEntityIds(altars, 'entranceId'),
             walkTo: true,
-            handler: enterAltar
-        }, {
+            handler: enterAltar,
+        },
+        {
             type: 'object_interaction',
             objectIds: getEntityIds(altars, 'portalId'),
             walkTo: true,
-            handler: exitAltar
-        }
-    ]
+            handler: exitAltar,
+        },
+    ],
 };

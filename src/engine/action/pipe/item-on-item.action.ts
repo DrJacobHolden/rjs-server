@@ -1,4 +1,4 @@
-import type { RunnableHooks, ActionPipe } from '@engine/action/action-pipeline';
+import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
 import type { ActionHook } from '@engine/action/hook/action-hook';
 import { getActionHooks } from '@engine/action/hook/action-hook';
 import { questHookFilter } from '@engine/action/hook/hook-filters';
@@ -10,15 +10,13 @@ import type { Item } from '@engine/world/items/item';
  */
 export interface ItemOnItemActionHook extends ActionHook<ItemOnItemAction, itemOnItemActionHandler> {
     // The item pairs being used. Each item can be used on the other, so item order does not matter.
-    items: { item1: number, item2?: number }[];
+    items: { item1: number; item2?: number }[];
 }
-
 
 /**
  * The item-on-item action hook handler function to be called when the hook's conditions are met.
  */
 export type itemOnItemActionHandler = (itemOnItemAction: ItemOnItemAction) => void;
-
 
 /**
  * Details about an item-on-item action being performed.
@@ -40,7 +38,6 @@ export interface ItemOnItemAction {
     usedWithWidgetId: number;
 }
 
-
 /**
  * The pipe that the game engine hands item-on-item actions off to.
  * @param player
@@ -51,25 +48,32 @@ export interface ItemOnItemAction {
  * @param usedWithSlot
  * @param usedWithWidgetId
  */
-const itemOnItemActionPipe = (player: Player, usedItem: Item, usedSlot: number, usedWidgetId: number,
-    usedWithItem: Item, usedWithSlot: number, usedWithWidgetId: number): RunnableHooks<ItemOnItemAction> | null => {
-    if(player.busy) {
+const itemOnItemActionPipe = (
+    player: Player,
+    usedItem: Item,
+    usedSlot: number,
+    usedWidgetId: number,
+    usedWithItem: Item,
+    usedWithSlot: number,
+    usedWithWidgetId: number,
+): RunnableHooks<ItemOnItemAction> | null => {
+    if (player.busy) {
         return null;
     }
 
     // Find all item on item action plugins that match this action
     let matchingHooks = getActionHooks<ItemOnItemActionHook>('item_on_item', plugin => {
-        if(questHookFilter(player, plugin)) {
+        if (questHookFilter(player, plugin)) {
             const used = usedItem.itemId;
             const usedWith = usedWithItem.itemId;
 
-            return (plugin.items.some(({ item1, item2 }) => {
+            return plugin.items.some(({ item1, item2 }) => {
                 if (item2) {
                     return (item1 === used && item2 === usedWith) || (item1 === usedWith && item2 === used);
                 }
 
                 return item1 === used || item1 === usedWith;
-            }));
+            });
         }
 
         return false;
@@ -77,27 +81,30 @@ const itemOnItemActionPipe = (player: Player, usedItem: Item, usedSlot: number, 
 
     const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
 
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
-        player.outgoingPackets.chatboxMessage(
-            `Unhandled item on item interaction: ${usedItem.itemId} on ${usedWithItem.itemId}`);
+    if (matchingHooks.length === 0) {
+        player.outgoingPackets.chatboxMessage(`Unhandled item on item interaction: ${usedItem.itemId} on ${usedWithItem.itemId}`);
         return null;
     }
 
     return {
         hooks: matchingHooks,
         action: {
-            player, usedItem, usedWithItem, usedSlot, usedWithSlot,
-            usedWidgetId: usedWidgetId, usedWithWidgetId: usedWithWidgetId
-        }
-    }
+            player,
+            usedItem,
+            usedWithItem,
+            usedSlot,
+            usedWithSlot,
+            usedWidgetId: usedWidgetId,
+            usedWithWidgetId: usedWithWidgetId,
+        },
+    };
 };
-
 
 /**
  * Item-on-item action pipe definition.
  */
-export default [ 'item_on_item', itemOnItemActionPipe ] as ActionPipe;
+export default ['item_on_item', itemOnItemActionPipe] as ActionPipe;

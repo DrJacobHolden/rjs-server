@@ -10,14 +10,9 @@ import type { IHarvestable } from '@engine/world/config/harvestable-object';
  *
  * @returns True if the tree was successfully cut, false otherwise
  */
-export const canCut = (
-    tree: IHarvestable,
-    toolLevel: number,
-    woodcuttingLevel: number
-): boolean => {
+export const canCut = (tree: IHarvestable, toolLevel: number, woodcuttingLevel: number): boolean => {
     const successChance = randomBetween(0, 255);
 
-    const percentNeeded =
-        tree.baseChance + toolLevel + woodcuttingLevel;
+    const percentNeeded = tree.baseChance + toolLevel + woodcuttingLevel;
     return successChance <= percentNeeded;
 };

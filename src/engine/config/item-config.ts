@@ -3,49 +3,75 @@ import type { SkillName } from '@engine/world/actor/skills';
 import { logger } from '@runejs/common';
 import { loadConfigurationFiles } from '@runejs/common/fs';
 
-export type WeaponStyle = 'axe' | 'hammer' | 'bow' | 'claws' | 'crossbow' | 'gun' | 'slash_sword'
-    | '2h_sword' | 'pickaxe' | 'halberd' | 'polestaff' | 'scythe' | 'spear' | 'mace'
-    | 'dagger' | 'magical_staff' | 'darts' | 'unarmed' | 'whip';
+export type WeaponStyle =
+    | 'axe'
+    | 'hammer'
+    | 'bow'
+    | 'claws'
+    | 'crossbow'
+    | 'gun'
+    | 'slash_sword'
+    | '2h_sword'
+    | 'pickaxe'
+    | 'halberd'
+    | 'polestaff'
+    | 'scythe'
+    | 'spear'
+    | 'mace'
+    | 'dagger'
+    | 'magical_staff'
+    | 'darts'
+    | 'unarmed'
+    | 'whip';
 
 export const weaponWidgetIds: Record<WeaponStyle, number> = {
-    'axe': 75,
-    'hammer': 76,
-    'bow': 77,
-    'claws': 78,
-    'crossbow': 79,
-    'gun': 80,
-    'slash_sword': 81,
+    axe: 75,
+    hammer: 76,
+    bow: 77,
+    claws: 78,
+    crossbow: 79,
+    gun: 80,
+    slash_sword: 81,
     '2h_sword': 82,
-    'pickaxe': 83,
-    'halberd': 84,
-    'polestaff': 85,
-    'scythe': 86,
-    'spear': 87,
-    'mace': 88,
-    'dagger': 89,
-    'magical_staff': 90,
-    'darts': 91,
-    'unarmed': 92,
-    'whip': 93
+    pickaxe: 83,
+    halberd: 84,
+    polestaff: 85,
+    scythe: 86,
+    spear: 87,
+    mace: 88,
+    dagger: 89,
+    magical_staff: 90,
+    darts: 91,
+    unarmed: 92,
+    whip: 93,
 };
 
-
-
-export type EquipmentSlot = 'head' | 'back' | 'neck' | 'main_hand' | 'off_hand' | 'torso' |
-    'legs' | 'hands' | 'feet' | 'ring' | 'quiver' | '2h';
+export type EquipmentSlot =
+    | 'head'
+    | 'back'
+    | 'neck'
+    | 'main_hand'
+    | 'off_hand'
+    | 'torso'
+    | 'legs'
+    | 'hands'
+    | 'feet'
+    | 'ring'
+    | 'quiver'
+    | '2h';
 
 export const equipmentIndices = {
-    'head': 0,
-    'back': 1,
-    'neck': 2,
-    'main_hand': 3,
-    'torso': 4,
-    'off_hand': 5,
-    'legs': 7,
-    'hands': 9,
-    'feet': 10,
-    'ring': 12,
-    'quiver': 13
+    head: 0,
+    back: 1,
+    neck: 2,
+    main_hand: 3,
+    torso: 4,
+    off_hand: 5,
+    legs: 7,
+    hands: 9,
+    feet: 10,
+    ring: 12,
+    quiver: 13,
 };
 
 export const equipmentIndex = (equipmentSlot: EquipmentSlot): number => equipmentIndices[equipmentSlot];
@@ -113,7 +139,6 @@ export interface ItemMetadata {
     wikiId?: string;
 }
 
-
 export interface EquipmentData {
     equipmentSlot: EquipmentSlot;
     equipmentType?: EquipmentType;
@@ -133,9 +158,11 @@ export interface ItemConfiguration {
     game_id?: number;
     examine?: string;
     tradable?: boolean;
-    variations?: [{
-        suffix: string;
-    } & ItemConfiguration];
+    variations?: [
+        {
+            suffix: string;
+        } & ItemConfiguration,
+    ];
     weight?: number;
     equippable?: boolean;
     consumable?: boolean;
@@ -184,7 +211,7 @@ export class ItemDetails {
     public constructor(item?: ItemDetails) {
         if (item) {
             const keys = Object.keys(item);
-            keys.forEach(key => this[key] = item[key]);
+            keys.forEach(key => (this[key] = item[key]));
         }
     }
 
@@ -213,26 +240,30 @@ export function translateItemConfig(key: string | undefined, config: ItemConfigu
         destroy: config.destroy || undefined,
         groups: config.groups || [],
         consumable: config.consumable,
-        equipmentData: config.equipment_data ? {
-            equipmentType: config.equipment_data?.equipment_type || undefined,
-            equipmentSlot: config.equipment_data?.equipment_slot || undefined,
-            requirements: config.equipment_data?.requirements || undefined,
-            offensiveBonuses: config.equipment_data?.offensive_bonuses || undefined,
-            defensiveBonuses: config.equipment_data?.defensive_bonuses || undefined,
-            skillBonuses: config.equipment_data?.skill_bonuses || undefined,
-            weaponInfo: config.equipment_data?.weapon_info || undefined,
-        } : undefined,
-        metadata: config.metadata ? { ...config.metadata } : {}
+        equipmentData: config.equipment_data
+            ? {
+                  equipmentType: config.equipment_data?.equipment_type || undefined,
+                  equipmentSlot: config.equipment_data?.equipment_slot || undefined,
+                  requirements: config.equipment_data?.requirements || undefined,
+                  offensiveBonuses: config.equipment_data?.offensive_bonuses || undefined,
+                  defensiveBonuses: config.equipment_data?.defensive_bonuses || undefined,
+                  skillBonuses: config.equipment_data?.skill_bonuses || undefined,
+                  weaponInfo: config.equipment_data?.weapon_info || undefined,
+              }
+            : undefined,
+        metadata: config.metadata ? { ...config.metadata } : {},
     };
 }
 
 export async function loadItemConfigurations(path: string): Promise<{
     items: { [key: string]: ItemDetails };
-    itemIds: { [key: number]: string }; itemPresets: ItemPresetConfiguration; itemGroups: Record<string, Record<string, boolean>>;
+    itemIds: { [key: number]: string };
+    itemPresets: ItemPresetConfiguration;
+    itemGroups: Record<string, Record<string, boolean>>;
 }> {
     const itemIds: { [key: number]: string } = {};
     const items: { [key: string]: ItemDetails } = {};
-    const itemGroups: Record<string, Record<string, boolean>> = {} // Record where key is group id, and value is an array of all itemstags in group
+    const itemGroups: Record<string, Record<string, boolean>> = {}; // Record where key is group id, and value is an array of all itemstags in group
     let itemPresets: ItemPresetConfiguration = {};
 
     const files = await loadConfigurationFiles<ItemConfiguration>(path);
@@ -251,7 +282,7 @@ export async function loadItemConfigurations(path: string): Promise<{
     Object.entries(itemConfigurations).forEach(([key, itemConfig]) => {
         if (itemConfig.game_id !== undefined && !isNaN(itemConfig.game_id)) {
             itemIds[itemConfig.game_id] = key;
-            let item = { ...translateItemConfig(key, itemConfig) }
+            let item = { ...translateItemConfig(key, itemConfig) };
             if (item?.extends) {
                 let extensions = item.extends;
                 if (typeof extensions === 'string') {
@@ -267,12 +298,12 @@ export async function loadItemConfigurations(path: string): Promise<{
                 });
             }
             items[key] = item;
-            item.groups.forEach((group) => {
+            item.groups.forEach(group => {
                 if (!itemGroups[group]) {
                     itemGroups[group] = {};
                 }
                 itemGroups[group][key] = true;
-            })
+            });
         }
 
         if (itemConfig.variations) {
@@ -304,18 +335,18 @@ export async function loadItemConfigurations(path: string): Promise<{
                         });
                     }
                     items[subKey] = item;
-                    items[subKey].groups.forEach((group) => {
+                    items[subKey].groups.forEach(group => {
                         if (!itemGroups[group]) {
                             itemGroups[group] = {};
                         }
                         itemGroups[group][subKey] = true;
-                    })
+                    });
                 } else {
                     logger.warn(`Duplicate item key ${subKey} found - the item was not loaded.`);
                 }
             }
         }
-    })
+    });
 
     return { items, itemIds, itemPresets, itemGroups };
 }

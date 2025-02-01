@@ -1,12 +1,9 @@
 import type { playerInitActionHandler } from '@engine/action/pipe/player-init.action';
 import { unlockEmotes } from '@plugins/buttons/player-emotes.plugin';
 
-export const handler: playerInitActionHandler =
-    ({  player  }) => unlockEmotes(player);
+export const handler: playerInitActionHandler = ({ player }) => unlockEmotes(player);
 
 export default {
     pluginId: 'rs:unlock_player_emotes',
-    hooks: [
-        { type: 'player_init', handler }
-    ]
+    hooks: [{ type: 'player_init', handler }],
 };

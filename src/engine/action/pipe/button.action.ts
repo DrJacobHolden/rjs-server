@@ -1,5 +1,5 @@
 import type { ActionPipe, RunnableHooks } from '@engine/action/action-pipeline';
-import { getActionHooks, type ActionHook } from '@engine/action/hook/action-hook';
+import { type ActionHook, getActionHooks } from '@engine/action/hook/action-hook';
 import { advancedNumberHookFilter, questHookFilter } from '@engine/action/hook/hook-filters';
 import type { Player } from '@engine/world/actor/player/player';
 
@@ -17,12 +17,10 @@ export interface ButtonActionHook extends ActionHook<ButtonAction, buttonActionH
     cancelActions?: boolean;
 }
 
-
 /**
  * The button action hook handler function to be called when the hook's conditions are met.
  */
 export type buttonActionHandler = (buttonAction: ButtonAction) => void | Promise<void>;
-
 
 /**
  * Details about a button action being performed.
@@ -36,7 +34,6 @@ export interface ButtonAction {
     buttonId: number;
 }
 
-
 /**
  * The pipe that the game engine hands button actions off to.
  * @param player
@@ -44,23 +41,21 @@ export interface ButtonAction {
  * @param buttonId
  */
 const buttonActionPipe = (player: Player, widgetId: number, buttonId: number): RunnableHooks<ButtonAction> | null => {
-    let matchingHooks = getActionHooks<ButtonActionHook>('button')
-        .filter(plugin =>
-            questHookFilter(player, plugin) && (
-                (plugin.widgetId && plugin.widgetId === widgetId) ||
-                (plugin.widgetIds && advancedNumberHookFilter(plugin.widgetIds, widgetId)
-                ))
-        && (plugin.buttonIds === undefined ||
-            advancedNumberHookFilter(plugin.buttonIds, buttonId))
-        );
+    let matchingHooks = getActionHooks<ButtonActionHook>('button').filter(
+        plugin =>
+            questHookFilter(player, plugin) &&
+            ((plugin.widgetId && plugin.widgetId === widgetId) ||
+                (plugin.widgetIds && advancedNumberHookFilter(plugin.widgetIds, widgetId))) &&
+            (plugin.buttonIds === undefined || advancedNumberHookFilter(plugin.buttonIds, buttonId)),
+    );
 
     const questActions = matchingHooks.filter(plugin => plugin.questRequirement !== undefined);
 
-    if(questActions.length !== 0) {
+    if (questActions.length !== 0) {
         matchingHooks = questActions;
     }
 
-    if(matchingHooks.length === 0) {
+    if (matchingHooks.length === 0) {
         player.outgoingPackets.chatboxMessage(`Unhandled button interaction: ${widgetId}:${buttonId}`);
         return null;
     }
@@ -68,13 +63,14 @@ const buttonActionPipe = (player: Player, widgetId: number, buttonId: number): R
     return {
         hooks: matchingHooks,
         action: {
-            player, widgetId, buttonId
-        }
+            player,
+            widgetId,
+            buttonId,
+        },
     };
 };
-
 
 /**
  * Button action pipe definition.
  */
-export default [ 'button', buttonActionPipe ] as ActionPipe;
+export default ['button', buttonActionPipe] as ActionPipe;

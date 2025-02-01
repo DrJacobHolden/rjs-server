@@ -55,7 +55,7 @@
         "weight": 2.267,
         "equippable": false
     },
-    "rs:coal":{
+    "rs:coal": {
         "game_id": 453,
         "examine": "Hmm a non-renewable energy source!",
         "tradable": true,
@@ -83,7 +83,7 @@
         "weight": 2.721,
         "equippable": false
     },
-    "rs:soft_clay":{
+    "rs:soft_clay": {
         "game_id": 1761,
         "examine": "Clay soft enough to mould.",
         "tradable": true,

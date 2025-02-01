@@ -13,5 +13,5 @@ const chatPacket = (player: Player, packet: PacketData) => {
 export default {
     opcode: 75,
     size: -3,
-    handler: chatPacket
+    handler: chatPacket,
 };

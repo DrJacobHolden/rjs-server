@@ -5,6 +5,5 @@ import type { Player } from '@engine/world/actor/player/player';
 export default {
     opcode: 251,
     size: 8,
-    handler: (player: Player, packet: PacketData) =>
-        player.addIgnoredPlayer(longToString(BigInt(packet.buffer.get('LONG'))))
+    handler: (player: Player, packet: PacketData) => player.addIgnoredPlayer(longToString(BigInt(packet.buffer.get('LONG')))),
 };

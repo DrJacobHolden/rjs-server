@@ -1,13 +1,13 @@
-import { Position } from '@engine/world/position';
+import type { npcInitActionHandler } from '@engine/action/pipe/npc-init.action';
 import { findNpc } from '@engine/config/config-handler';
-import type { Npc } from '@engine/world/actor/npc';
 import { randomBetween } from '@engine/util/num';
 import { activeWorld } from '@engine/world';
-import type { npcInitActionHandler } from '@engine/action/pipe/npc-init.action';
+import type { Npc } from '@engine/world/actor/npc';
+import { Position } from '@engine/world/position';
 import { World } from '@engine/world/world';
 
-const npcs = ['rs:guard:0', 'rs:guard:1']
-const npcObjects = npcs.map((sNpc) => findNpc(sNpc));
+const npcs = ['rs:guard:0', 'rs:guard:1'];
+const npcObjects = npcs.map(sNpc => findNpc(sNpc));
 
 interface DialogueNpcTree {
     a?: string;
@@ -34,12 +34,12 @@ const dialogueTrees: DialogueNpcTree[][] = [
         },
         {
             a_anim: 837,
-            a: 'Oh my god.'
+            a: 'Oh my god.',
         },
         {
             b: 'Yeah welcome to the club pal.',
-            b_anim: 2113
-        }
+            b_anim: 2113,
+        },
     ],
     [
         {
@@ -122,23 +122,23 @@ const dialogueTrees: DialogueNpcTree[][] = [
             b_anim: 856,
             b: `Shut up!`,
         },
-    ]
-]
+    ],
+];
 
 function startIdleDialogueTree(npc: Npc, closeNpc: Npc, dialogueTree: DialogueNpcTree[]) {
-    if(npc.busy || closeNpc.busy){
+    if (npc.busy || closeNpc.busy) {
         return;
     }
     npc.busy = true;
     closeNpc.busy = true;
     npc.face(closeNpc);
     closeNpc.face(npc);
-    setTimeout(() => doDialogue(npc,closeNpc,0, dialogueTree), 3 * World.TICK_LENGTH)
+    setTimeout(() => doDialogue(npc, closeNpc, 0, dialogueTree), 3 * World.TICK_LENGTH);
 }
 function doDialogue(a: Npc, b: Npc, dialogueIndex: number, dialogueTree: DialogueNpcTree[]) {
     a.stopAnimation();
     b.stopAnimation();
-    if(dialogueIndex > dialogueTree.length-1 || !a.exists || !b.exists) {
+    if (dialogueIndex > dialogueTree.length - 1 || !a.exists || !b.exists) {
         a.busy = false;
         b.busy = false;
         a.clearFaceActor();
@@ -146,47 +146,45 @@ function doDialogue(a: Npc, b: Npc, dialogueIndex: number, dialogueTree: Dialogu
         return;
     }
     const currentDialogue = dialogueTree[dialogueIndex];
-    if(currentDialogue.a) {
+    if (currentDialogue.a) {
         a.say(currentDialogue.a);
     }
-    if(currentDialogue.b) {
+    if (currentDialogue.b) {
         b.say(currentDialogue.b);
     }
-    if(currentDialogue.a_anim) {
+    if (currentDialogue.a_anim) {
         a.playAnimation(currentDialogue.a_anim);
     }
-    if(currentDialogue.b_anim) {
+    if (currentDialogue.b_anim) {
         b.playAnimation(currentDialogue.b_anim);
     }
-    setTimeout(() => doDialogue(a,b,dialogueIndex+1, dialogueTree), 5 * World.TICK_LENGTH)
+    setTimeout(() => doDialogue(a, b, dialogueIndex + 1, dialogueTree), 5 * World.TICK_LENGTH);
 }
 
-const npcIdleAction =  (npc: Npc) => {
-    if(Math.random() >= 0.14) {
+const npcIdleAction = (npc: Npc) => {
+    if (Math.random() >= 0.14) {
         const currentLocation = new Position(npc.position);
         const closeNpcs = activeWorld.findNearbyNpcs(currentLocation, 4);
         for (const closeNpc of closeNpcs) {
-            if(closeNpc === npc) {
+            if (closeNpc === npc) {
                 continue;
             }
-            if(npcObjects.find((oNpc) => oNpc.gameId === closeNpc.id)) {
-                if(closeNpc.busy) {
+            if (npcObjects.find(oNpc => oNpc.gameId === closeNpc.id)) {
+                if (closeNpc.busy) {
                     continue;
                 }
-                startIdleDialogueTree(npc, closeNpc, dialogueTrees[randomBetween(0, dialogueTrees.length-1)]);
+                startIdleDialogueTree(npc, closeNpc, dialogueTrees[randomBetween(0, dialogueTrees.length - 1)]);
                 return;
             }
         }
     }
-}
+};
 
 const guardInitAction: npcInitActionHandler = ({ npc }) => {
     // this used to use `setInterval` but will need rewriting to be synced with ticks
     // see https://github.com/runejs/server/issues/417
-
     // setInterval(() => npcIdleAction(npc), (Math.floor(Math.random() * 20) + 10) * World.TICK_LENGTH);
 };
-
 
 export default {
     pluginId: 'promises:custom_guards',
@@ -194,7 +192,7 @@ export default {
         {
             type: 'npc_init',
             npcs: npcs,
-            handler: guardInitAction
-        }
-    ]
+            handler: guardInitAction,
+        },
+    ],
 };

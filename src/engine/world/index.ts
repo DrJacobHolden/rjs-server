@@ -5,7 +5,6 @@ import { World } from '@engine/world/world';
  */
 export let activeWorld: World;
 
-
 /**
  * Creates a new instance of the game world and assigns it to the singleton world variable.
  */

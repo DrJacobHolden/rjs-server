@@ -2,15 +2,15 @@ import type { commandActionHandler } from '@engine/action/pipe/player-command.ac
 
 const setLevelAction: commandActionHandler = ({ player, args }) => {
     const skillId = args?.skillId || null;
-    const level: number | null = args?.level as number || null;
+    const level: number | null = (args?.level as number) || null;
 
-    if(!skillId || !level) {
+    if (!skillId || !level) {
         player.sendMessage(`Invalid syntax: Use ::setlevel skill_id skill_level`);
         return;
     }
 
     const skill = player.skills[skillId];
-    if(!skill) {
+    if (!skill) {
         player.sendMessage(`Skill ${skillId} not found.`);
         return;
     }
@@ -26,18 +26,18 @@ export default {
     hooks: [
         {
             type: 'player_command',
-            commands: [ 'setlevel', 'setlvl' ],
+            commands: ['setlevel', 'setlvl'],
             args: [
                 {
                     name: 'skillId',
-                    type: 'string'
+                    type: 'string',
                 },
                 {
                     name: 'level',
-                    type: 'number'
-                }
+                    type: 'number',
+                },
             ],
-            handler: setLevelAction
-        }
-    ]
+            handler: setLevelAction,
+        },
+    ],
 };

@@ -1,8 +1,8 @@
-import { findItem, widgets } from '@engine/config/config-handler';
-import { soundIds } from '@engine/world/config/sound-ids';
-import type { ItemDetails } from '@engine/config/item-config';
-import { logger } from '@runejs/common';
 import type { itemInteractionActionHandler } from '@engine/action/pipe/item-interaction.action';
+import { findItem, widgets } from '@engine/config/config-handler';
+import type { ItemDetails } from '@engine/config/item-config';
+import { soundIds } from '@engine/world/config/sound-ids';
+import { logger } from '@runejs/common';
 
 interface IGrimyHerb {
     grimy: ItemDetails;
@@ -21,96 +21,95 @@ const herbs: IGrimyHerb[] = [
         grimy: findItem('rs:grimy_guam')!,
         clean: findItem('rs:herb_guam')!,
         level: 3,
-        experience: 2.5
+        experience: 2.5,
     },
     {
         grimy: findItem('rs:grimy_marrentill')!,
         clean: findItem('rs:herb_marrentill')!,
         level: 5,
-        experience: 3.8
+        experience: 3.8,
     },
     {
         grimy: findItem('rs:grimy_tarromin')!,
         clean: findItem('rs:herb_tarromin')!,
         level: 11,
-        experience: 5
+        experience: 5,
     },
     {
         grimy: findItem('rs:grimy_harralander')!,
         clean: findItem('rs:herb_harralander')!,
         level: 20,
-        experience: 6.3
+        experience: 6.3,
     },
     {
         grimy: findItem('rs:grimy_ranarr')!,
         clean: findItem('rs:herb_ranarr')!,
         level: 25,
-        experience: 7.5
+        experience: 7.5,
     },
     {
         grimy: findItem('rs:grimy_toadflax')!,
         clean: findItem('rs:herb_toadflax')!,
         level: 30,
-        experience: 8
+        experience: 8,
     },
     {
         grimy: findItem('rs:grimy_irit')!,
         clean: findItem('rs:herb_irit')!,
         level: 40,
-        experience: 8.8
+        experience: 8.8,
     },
     {
         grimy: findItem('rs:grimy_avantoe')!,
         clean: findItem('rs:herb_avantoe')!,
         level: 48,
-        experience: 10
+        experience: 10,
     },
     {
         grimy: findItem('rs:grimy_kwuarm')!,
         clean: findItem('rs:herb_kwuarm')!,
         level: 54,
-        experience: 11.3
+        experience: 11.3,
     },
     {
         grimy: findItem('rs:grimy_snapdragon')!,
         clean: findItem('rs:herb_snapdragon')!,
         level: 59,
-        experience: 11.8
+        experience: 11.8,
     },
     {
         grimy: findItem('rs:grimy_cadantine')!,
         clean: findItem('rs:herb_cadantine')!,
         level: 65,
-        experience: 12.5
+        experience: 12.5,
     },
     {
         grimy: findItem('rs:grimy_lantadyme')!,
         clean: findItem('rs:herb_lantadyme')!,
         level: 67,
-        experience: 13.1
+        experience: 13.1,
     },
     {
         grimy: findItem('rs:grimy_dwarf_weed')!,
         clean: findItem('rs:herb_dwarf_weed')!,
         level: 70,
-        experience: 13.8
+        experience: 13.8,
     },
     {
         grimy: findItem('rs:grimy_torstol')!,
         clean: findItem('rs:herb_torstol')!,
         level: 75,
-        experience: 15
+        experience: 15,
     },
-]
-
+];
 
 export const action: itemInteractionActionHandler = details => {
     const { player, itemId, itemSlot } = details;
-    const herb = herbs.find((herb) => herb.grimy.gameId === itemId);
-    if(!herb) {
+    const herb = herbs.find(herb => herb.grimy.gameId === itemId);
+    if (!herb) {
         return;
     }
-    if(!player.skills.hasLevel('herblore', herb.level)) {
+    if (!player.skills.hasLevel('herblore', herb.level)) {
         player.sendMessage(`You need a Herblore level of ${herb.level} to identify this herb.`, true);
         return;
     }
@@ -138,7 +137,7 @@ export default {
     type: 'item_action',
     widgets: widgets.inventory,
     options: 'identify',
-    itemIds: herbs.map((herb) => herb.grimy.gameId),
+    itemIds: herbs.map(herb => herb.grimy.gameId),
     action,
-    cancelOtherActions: true
+    cancelOtherActions: true,
 };
