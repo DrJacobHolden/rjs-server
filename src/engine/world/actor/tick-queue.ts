@@ -157,9 +157,15 @@ export class TickQueue {
         // Handle STRONG tasks entering queue
         if (type === QueueType.STRONG) {
             // Clear weak tasks first
-            this.clearWeakTasks('Strong task present');
+            this.tasks = this.tasks.filter(task => {
+                if (task.type === QueueType.WEAK) {
+                    task.reject('Strong task present');
+                    return false;
+                }
+                return true;
+            });
 
-            // Force close modal interfaces immediately
+            // Force close modal interfaces
             if (isPlayer(this.actor)) {
                 this.actor.interfaceState.closeAllSlots();
             }

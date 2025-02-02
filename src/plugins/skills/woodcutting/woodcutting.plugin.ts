@@ -89,11 +89,20 @@ const startWoodcutting = async (details: ObjectInteractionAction): Promise<void>
 
     const axe = getBestAxe(player);
     if (!axe) return;
+    // Request a STRONG type tick to clear any existing woodcutting tasks
+    await player.tickQueue.requestTicks({
+        ticks: 0,
+        type: QueueType.STRONG,
+    });
 
     // Initial setup
     const startTick = player.tickQueue.currentTick;
     player.sendMessage('You swing your axe at the tree.');
 
+    const axeData = AXES.get(axe);
+    if (axeData) {
+        player.playAnimation(axeData.animationId);
+    }
     const chopTree = async (): Promise<void> => {
         // Check if we can still chop
         if (player.inventory.isFull()) {
@@ -113,10 +122,10 @@ const startWoodcutting = async (details: ObjectInteractionAction): Promise<void>
         handleSoundCycle(player, startTick);
 
         try {
-            // Wait for woodcutting timer (3 ticks normally, can be manipulated)
+            // Wait for woodcutting timer with proper queue type
             await player.tickQueue.requestTicks({
                 ticks: 3,
-                type: QueueType.WEAK,
+                type: QueueType.WEAK, // Explicitly specify WEAK type for skilling
                 useGlobalTimer: true,
             });
 
